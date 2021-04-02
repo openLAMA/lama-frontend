@@ -1,0 +1,359 @@
+/** 
+ * openLAMA is an open source platform which has been developed by the
+ * Swiss Kanton Basel Landschaft, with the goal of automating and managing
+ * large scale Covid testing programs or any other pandemic/viral infections.
+
+ * Copyright(C) 2021 Kanton Basel Landschaft, Switzerland
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Affero General Public License as published
+ * by the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Affero General Public License for more details.
+ * See LICENSE.md in the project root for license information.
+ * You should have received a copy of the GNU Affero General Public License
+ * along with this program.  If not, see https://www.gnu.org/licenses/.
+*/
+
+@import 'styles/colors.scss';
+
+/* http://meyerweb.com/eric/tools/css/reset/ 
+   v2.0 | 20110126
+   License: none (public domain)
+*/
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body,
+div,
+span,
+applet,
+object,
+iframe,
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+p,
+blockquote,
+pre,
+a,
+abbr,
+acronym,
+address,
+big,
+cite,
+code,
+del,
+dfn,
+em,
+img,
+ins,
+kbd,
+q,
+s,
+samp,
+small,
+strike,
+strong,
+sub,
+sup,
+tt,
+var,
+b,
+u,
+i,
+center,
+dl,
+dt,
+dd,
+ol,
+ul,
+li,
+fieldset,
+form,
+label,
+legend,
+table,
+caption,
+tbody,
+tfoot,
+thead,
+tr,
+th,
+td,
+article,
+aside,
+canvas,
+details,
+embed,
+figure,
+figcaption,
+footer,
+header,
+hgroup,
+menu,
+nav,
+output,
+ruby,
+section,
+summary,
+time,
+mark,
+audio,
+video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article,
+aside,
+details,
+figcaption,
+figure,
+footer,
+header,
+hgroup,
+menu,
+nav,
+section {
+  display: block;
+}
+body {
+  line-height: 1;
+}
+ol,
+ul {
+  list-style: none;
+}
+blockquote,
+q {
+  quotes: none;
+}
+blockquote:before,
+blockquote:after,
+q:before,
+q:after {
+  content: '';
+  content: none;
+}
+table {
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+body {
+  margin: 0;
+  font-family: 'Roboto', sans-serif;
+  height: 100%;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  background-color: $site-background-color;
+}
+
+body #root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.overflow-hidden {
+  overflow: hidden;
+}
+
+.overflow-auto {
+  overflow: auto;
+}
+
+.relative {
+  position: relative;
+}
+
+.table-header-shadow {
+  box-shadow: 0 0 6px 0px rgba(0, 0, 0, 0.75);
+}
+
+.height100vh {
+  height: 100vh;
+}
+
+.MuiTableCell-head {
+  background-color: $white;
+}
+
+.fullWidth {
+  width: 100%;
+}
+
+.fullHeight {
+  height: 100%;
+}
+
+.align-self-flex-end {
+  align-self: center;
+}
+
+.bg-color-transparent {
+  background-color: transparent;
+}
+
+.bg-color-white {
+  background-color: $white;
+}
+
+.bold {
+  font-weight: 700;
+}
+
+.to-upper-case {
+  text-transform: uppercase;
+}
+
+.color-white {
+  color: $white;
+}
+
+.color-primary {
+  color: $primary-color;
+}
+
+.color-success {
+  color: $color-primary-green;
+}
+
+.color-error {
+  color: $primary-color;
+}
+
+.color-gray {
+  color: $gray;
+}
+
+.max-width-924 {
+  max-width: 924px;
+}
+
+.break-all-words {
+  word-break: break-all;
+}
+
+.display-none {
+  display: none;
+}
+
+.main-container-max-height {
+  height: calc(100vh - 64px);
+}
+
+.text-no-wrap {
+  white-space: nowrap;
+}
+
+.custom-label-text-overflow {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  right: 22px; //do not overlap icon
+  bottom: 0px; //maximize container height so label wont be cut horizontaly
+  &.with-icon {
+    right: 64px;
+  }
+}
+
+.custom-label-text-shrinked {
+  right: unset; //show complete label if shrinked
+}
+
+.width-200 {
+  width: 200px;
+}
+
+.font-size-tiny {
+  font-size: 0.64rem;
+}
+
+.test-tableContainer {
+  flex: 1;
+  min-height: 0;
+}
+
+.test-table {
+  height: 100%;
+  flex-direction: column;
+}
+
+.test-fillExpand {
+  flex: 1;
+  min-height: 0;
+  overflow: scroll;
+}
+
+@mixin generate($prefix, $property) {
+  // List of sizes to generate for each
+  $sizes: (
+    0,
+    0.25,
+    0.5,
+    0.75,
+    1,
+    1.25,
+    1.5,
+    2,
+    2.5,
+    3,
+    3.5,
+    4,
+    4.5,
+    5,
+    5.5,
+    6,
+    6.5,
+    7,
+    7.5,
+    8,
+    9,
+    10,
+    11,
+    12
+  );
+  // Spacing to multiply the sizes by
+  $spacing: 1rem;
+
+  // Loop through all of the sizes(we use @for rather than @each, as we want access to the index)
+  @for $i from 1 through length($sizes) {
+    // Get the size for the current index
+    $size: nth($sizes, $i);
+
+    // Create the rule
+    .#{$prefix}-#{$i - 1} {
+      #{$property}: $spacing * $size;
+    }
+  }
+}
+
+@include generate(ml, margin-left);
+@include generate(mr, margin-right);
+@include generate(mt, margin-top);
+@include generate(mb, margin-bottom);
+
+@include generate(pl, padding-left);
+@include generate(pr, padding-right);
+@include generate(pt, padding-top);
+@include generate(pb, padding-bottom);
+@include generate(font-size, font-size);

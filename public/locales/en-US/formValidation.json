@@ -1,0 +1,9 @@
+{
+  "Field is required!": "Field is required!",
+  "Enter a valid email!": "Enter a valid email!",
+  "Value must be greater than 0!": "Value must be greater than 0!",
+  "Max number of characters allowed is {x}!": "Max number of characters allowed is {{numberOfChars}}!",
+  "Value must be positive!": "Value must be positive!",
+  "At least one item must be selected!": "At least one item must be selected!",
+  "This email address is already being used!": "This email address is already being used!"
+}

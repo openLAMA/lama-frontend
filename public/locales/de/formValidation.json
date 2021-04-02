@@ -1,0 +1,9 @@
+{
+  "Field is required!": "Eingabe erforderlich.",
+  "Enter a valid email!": "Bitte gÃ¼ltige Email eingeben.",
+  "Value must be greater than 0!": "Eingabe darf nicht 0 sein.",
+  "Max number of characters allowed is {x}!": "Maximale Anzahl von {{numberOfChars}}! Zeichen Ã¼berschritten.",
+  "Value must be positive!": "Der Wert muss positiv sein.",
+  "At least one item must be selected!": "Mindestens ein Wert muss ausgewählt sein.",
+  "This email address is already being used!": "Diese Email Adresse wird bereits verwendet"
+}
