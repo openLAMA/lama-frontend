@@ -17,7 +17,7 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { RouteProps, useParams } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
@@ -29,6 +29,8 @@ import { Grid } from '@material-ui/core';
 import PageContainerWithHeader from 'components/PageContainerWithHeader';
 import EditProgramMemberForm from 'components/Forms/EditProgramMemberForm';
 import LoadingSwapComponent from 'components/loaders/LoadingSwapComponent';
+import DeactiveProgramMember from 'components/Forms/EditProgramMemberForm/DeactiveProgramMember';
+import SendToEpaad from 'components/Forms/EditProgramMemberForm/SendToEpaad';
 
 // Actions
 import { getCities } from 'redux/globalState/citiesData/citiesDataSlice';
@@ -40,6 +42,7 @@ import { OnboardingAndTrainingAdministrationRoutes } from 'config/routes';
 
 // Utils
 import { RootState } from 'redux/combineReducers';
+import FollowUpEmail from 'components/Forms/EditProgramMemberForm/FollowUpEmail';
 
 // Types
 type OnboardingAndTrainingAdministrationEditProgramMemberType = RouteProps;
@@ -52,12 +55,21 @@ const OnboardingAndTrainingAdministrationEditProgramMember: React.FC<OnboardingA
   const reactParams: reactParamsType = useParams();
   const { t } = useTranslation();
 
+  const [openFollowUpModal, setOpenFollowUpModal] = useState<boolean>(false);
+  const [disableFollowUpModal, setDisableFollowUpModal] = useState<boolean>(
+    false,
+  );
+
   const citiesStatus = useSelector(
     (state: RootState) => state.cities.citiesStatus,
   );
 
   const organizationTypesStatus = useSelector(
     (state: RootState) => state.organizationTypes.organizationTypesStatus,
+  );
+
+  const followUpEmailStatus = useSelector(
+    (state: RootState) => state.followUpEmail.followUpEmailStatus,
   );
 
   const programMemberStatus = useSelector(
@@ -78,37 +90,87 @@ const OnboardingAndTrainingAdministrationEditProgramMember: React.FC<OnboardingA
     dispatch(getProgramMember(reactParams.id));
   }, []);
 
+  useEffect(() => {
+    if (followUpEmailStatus.success) {
+      dispatch(getProgramMember(reactParams.id));
+      setOpenFollowUpModal(false);
+    }
+  }, [followUpEmailStatus]);
+
+  useEffect(() => {
+    if (programMemberStatus.requesting) {
+      setOpenFollowUpModal(false);
+      setDisableFollowUpModal(false);
+    }
+  }, [programMemberStatus]);
+
   const isLoading =
     citiesStatus.requesting ||
     organizationTypesStatus.requesting ||
     programMemberStatus.requesting;
 
-  // TODO remove these
-  const arrayOfMessages = [];
+  let text = '';
   if (citiesStatus.requesting) {
-    arrayOfMessages.push(t('progressMessages:Fetching cities'));
+    text = t('progressMessages:Fetching cities');
   }
 
   if (organizationTypesStatus.requesting) {
-    arrayOfMessages.push(t('progressMessages:Fetching organization types'));
+    text = t('progressMessages:Fetching organization types');
   }
 
   if (programMemberStatus.requesting) {
-    arrayOfMessages.push(t('progressMessages:Fetching organization data'));
+    text = t('progressMessages:Fetching organization data');
   }
 
   return (
     <>
       <PageContainerWithHeader
-        title={
-          OnboardingAndTrainingAdministrationRoutes.editProgramMemberRoute.title
-        }>
-        <LoadingSwapComponent
-          isLoading={isLoading}
-          withGrid
-          arrayOfMessages={arrayOfMessages}>
-          <Grid item>
-            <EditProgramMemberForm />
+        title={t(
+          `common:${OnboardingAndTrainingAdministrationRoutes.editProgramMemberRoute.title}`,
+        )}>
+        <LoadingSwapComponent isLoading={isLoading} center text={text}>
+          <Grid container spacing={2}>
+            <Grid item xs={12}>
+              <Grid container justify="flex-end" alignItems="center">
+                {/* <Grid item>
+                  <FollowUpChange />
+                </Grid> */}
+                <Grid item>
+                  <Grid container spacing={2}>
+                    <Grid item>
+                      <FollowUpEmail
+                        outsideTriggerOpen={openFollowUpModal}
+                        onCloseOutsideFollowUpModal={() => {
+                          setOpenFollowUpModal(false);
+                        }}
+                        disabled={disableFollowUpModal}
+                      />
+                    </Grid>
+                    <Grid item>
+                      <SendToEpaad />
+                    </Grid>
+                    <Grid item>
+                      <DeactiveProgramMember />
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+            </Grid>
+            <Grid item xs={12}>
+              <Grid item>
+                {/* add props ? isReadOnly */}
+                <EditProgramMemberForm
+                  onOpenFollowUpModal={() => {
+                    if (!followUpEmailStatus.success) {
+                      setOpenFollowUpModal(true);
+                    }
+                  }}
+                  disableFollowUpModal={() => {
+                    setDisableFollowUpModal(true);
+                  }}
+                />
+              </Grid>
+            </Grid>
           </Grid>
         </LoadingSwapComponent>
       </PageContainerWithHeader>

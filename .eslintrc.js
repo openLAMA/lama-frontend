@@ -36,25 +36,10 @@ module.exports = {
   },
   rules: {
     'prettier/prettier': ['error', prettierOptions],
-    // 'no-underscore-dangle': 'off',
-    // 'import/no-cycle': 'off',
-    // 'no-param-reassign': 'warn',
-    // "indent": "off",
-    // "@typescript-eslint/indent":"warn",
   },
   settings: {
     react: {
       version: 'detect',
     },
   },
-  // rules: {
-  //   'linebreak-style': 'off',
-  //   'prettier/prettier': [
-  //     'error',
-  //     {
-  //       endOfLine: 'auto',
-  //     },
-  //   ],
-  //   '@typescript-eslint/no-var-requires': 'off',
-  // },
 };

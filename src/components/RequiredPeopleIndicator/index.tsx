@@ -23,7 +23,10 @@ import React from 'react';
 import { Typography } from '@material-ui/core';
 
 interface IRequiredPeopleIndicatorProps {
-  number: number;
+  invitationAlreadySent: boolean;
+  current: number;
+  max: number;
+  total: number;
 }
 
 import styles from './RequiredPeopleIndicator.module.scss';
@@ -31,13 +34,32 @@ import styles from './RequiredPeopleIndicator.module.scss';
 const RequiredPeopleIndicator: React.FC<IRequiredPeopleIndicatorProps> = (
   props: IRequiredPeopleIndicatorProps,
 ) => {
-  const { number } = props;
+  const { invitationAlreadySent, current, max, total } = props;
+
+  if (!invitationAlreadySent) {
+    return (
+      <div className={`${styles.root}`}>
+        <div className={`${styles.box}  ${styles.gray}`}>
+          <Typography variant="body2" className={styles['line-height']}>
+            {total}
+          </Typography>
+        </div>
+      </div>
+    );
+  }
 
   return (
-    <div className={`${styles.root} ${styles.circle}`}>
-      <Typography variant="body2" className={styles['line-height']}>
-        {number}
-      </Typography>
+    <div className={`${styles.root}`}>
+      <div className={`${styles.box} ${styles.blue}`}>
+        <Typography variant="body2" className={styles['line-height']}>
+          {`${current} / ${max}`}
+        </Typography>
+      </div>
+      <div className={`${styles.box}  ${styles.gray}`}>
+        <Typography variant="body2" className={styles['line-height']}>
+          {total}
+        </Typography>
+      </div>
     </div>
   );
 };

@@ -24,6 +24,37 @@ export enum APIMethods {
   DELETE = 'DELETE',
 }
 
+export type HttpClientRequestParametersType = {
+  url: string;
+  method: APIMethods;
+  data?: any;
+  params?: any;
+  formData?: any;
+  onUploadProgress?: (progressEvent: any) => void;
+  baseURL?: string;
+};
+
+export type ErrorObjectType =
+  | {
+      showGenericMessage: true;
+      dynamicData?: never;
+      message?: never;
+    }
+  | {
+      showGenericMessage?: never;
+      dynamicData: { [key: string]: string };
+      message: string;
+    }
+  | {
+      showGenericMessage?: never;
+      dynamicData?: never;
+      message: string;
+    };
+
+export type INoContent = {
+  noContent: boolean;
+};
+
 export enum HttpStatusCode {
   /**
    * The server has received the request headers and the client should proceed to send the request body

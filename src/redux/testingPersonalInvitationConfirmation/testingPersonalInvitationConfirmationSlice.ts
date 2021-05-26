@@ -19,9 +19,11 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
+// Types
 import { IApiStatus } from 'redux/globalTypes';
-
+import { ErrorObjectType } from 'apiService/types';
 import {
   TestingPersonalInvitationConfirmationRequestType,
   TestingPersonalInvitationConfirmationResponseType,
@@ -103,8 +105,9 @@ export const checkTestingPersonalInvitationConfirmation = (
         dispatch(setResponseIsEmpty());
       }
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(testingPersonalInvitationConfirmationFailed());
+      extractErrorMessage(error, 'Failed to get program member data!');
     },
   );
 };

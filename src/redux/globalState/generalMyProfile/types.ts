@@ -32,6 +32,7 @@ export type MyProfileUserType = {
   phoneNumber: string;
   id: string;
   landLineNumber?: string;
+  uuidKey: string;
 };
 
 export type GetGeneralMyProfileType = {

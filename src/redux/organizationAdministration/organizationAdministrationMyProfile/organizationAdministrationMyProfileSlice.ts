@@ -19,19 +19,20 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
 import callSnackbar from 'utils/customHooks/useSnackbar';
 
+// Types
 import { ContactPersonType } from 'redux/globalTypes';
-
 import { IApiStatus } from 'redux/globalTypes';
-
 import {
   GetOrganizationType,
   GetOrganizationResponseType,
   GetOrganizationRequestType,
   UpdateOrganizationRequestType,
 } from 'redux/organizationAdministration/organizationAdministrationMyProfile/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import {
   getOrganizationAPI,
@@ -191,13 +192,9 @@ export const getMyProfileOrganization = (
         }),
       );
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getOrganizationError());
-      callSnackbar({
-        message: 'Failed to fetch organization details!',
-
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to fetch organization details!');
     },
   );
 };
@@ -215,13 +212,9 @@ export const updateMyOrganization = (
         messageType: 'success',
       });
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(updateOrganizationError());
-      callSnackbar({
-        message: 'Failed to update organization details!',
-
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to update organization details!');
     },
   );
 };

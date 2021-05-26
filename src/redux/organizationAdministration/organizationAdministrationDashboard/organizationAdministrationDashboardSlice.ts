@@ -19,16 +19,16 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
-import callSnackbar from 'utils/customHooks/useSnackbar';
-
+// Types
 import { IApiStatus } from 'redux/globalTypes';
-
 import {
   OrganizationDashboardInfo,
   GetOrganizationDashboardResponseType,
   GetOrganizationDashboardInfoRequestType,
 } from 'redux/organizationAdministration/organizationAdministrationDashboard/types';
+import { ErrorObjectType } from 'apiService/types';
 
 // Outer Actions
 import { setSupportPerson } from 'redux/globalState/supportPerson/supportPersonSlice';
@@ -99,12 +99,9 @@ export const getOrganizationDashboardInfo = (
       dispatch(getOrganizationDashboardSuccess(response));
       dispatch(setSupportPerson(response.supportPerson));
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getOrganizationDashboardError());
-      callSnackbar({
-        message: 'Failed to get dashboard info!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to get dashboard info!');
     },
   );
 };

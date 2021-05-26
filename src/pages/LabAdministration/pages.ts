@@ -18,13 +18,17 @@
 */
 
 import LabAdministrationDashboard from 'pages/LabAdministration/LabAdministrationDashboard';
+import LabAdministrationAnalytics from 'pages/LabAdministration/LabAdministrationAnalytics';
 import LabAdministrationMyProfile from 'pages/LabAdministration/LabAdministrationMyProfile';
 import LabAdministrationTestingPersonal from 'pages/LabAdministration/LabAdministrationTestingPersonal';
 import LabAdministrationProgramMembers from 'pages/LabAdministration/LabAdministrationProgramMembers';
+import LabEditDay from 'pages/LabAdministration/LabAdministrationEditDay';
 
 export default {
   LabAdministrationDashboard,
   LabAdministrationMyProfile,
   LabAdministrationTestingPersonal,
   LabAdministrationProgramMembers,
+  LabAdministrationAnalytics,
+  LabEditDay,
 };

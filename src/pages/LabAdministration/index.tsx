@@ -18,8 +18,6 @@
 */
 
 import React from 'react';
-import { useDispatch } from 'react-redux';
-import { useLocation, useHistory } from 'react-router-dom';
 import { RouteProps, Switch } from 'react-router-dom';
 
 // Material UI
@@ -27,6 +25,7 @@ import { Container } from '@material-ui/core';
 
 // Material Icons
 import {
+  TimelineOutlined as TimelineOutlinedIcon,
   DashboardOutlined as DashboardOutlinedIcon,
   PermIdentityOutlined as PermIdentityOutlinedIcon,
   DvrOutlined as DvrOutlinedIcon,
@@ -40,18 +39,20 @@ import NavDrawer from 'components/NavDrawer';
 // Routes
 import { IRoute, LabAdministrationRoutes } from 'config/routes';
 
-// Actions
-import { clearAuthData } from 'redux/authData/authDataSlice';
-
 // Utils
 import TypedKeysMap from 'utils/TypedKeysMap';
+import RouteMapping from 'components/protectedRoutes/RouteMapping';
 
 import styles from './index.module.scss';
-import RouteMapping from 'components/protectedRoutes/RouteMapping';
 
 type LabAdministrationMainPageType = RouteProps;
 
 const navDrawerItemList = [
+  {
+    name: LabAdministrationRoutes.analyticsRoute.title,
+    path: LabAdministrationRoutes.analyticsRoute.route,
+    icon: <TimelineOutlinedIcon />,
+  },
   {
     name: LabAdministrationRoutes.dashboardRoute.title,
     path: LabAdministrationRoutes.dashboardRoute.route,
@@ -75,16 +76,6 @@ const navDrawerItemList = [
 ];
 
 const LabAdministrationMainPage: React.FC<LabAdministrationMainPageType> = () => {
-  const dispatch = useDispatch();
-  const location = useLocation();
-
-  if (
-    location?.pathname.includes('login-confirmation') ||
-    location?.pathname.includes('register-confirmation')
-  ) {
-    dispatch(clearAuthData());
-  }
-
   return (
     <div className={`${styles['root']} pt-11 overflow-hidden`}>
       <Navbar />

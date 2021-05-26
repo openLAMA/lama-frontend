@@ -38,18 +38,16 @@ const OnboardingAndTrainingAdministrationOverview: React.FC<OnboardingAndTrainin
 
   return (
     <>
-      <PageContainerWithHeader
-        title={OnboardingAndTrainingAdministrationRoutes.overviewRoute.title}>
-        <ProgramMemberContainer
-          showEditButton={roleType === 'University'}
-          isUniversityOverview
-          hasStatusFiltration
-          hasTypeFiltration
-          hasQuickFilters
-          tableHeightOffset={260}
-          tableWidthOffset={250}
-        />
-      </PageContainerWithHeader>
+      <ProgramMemberContainer
+        showEditButton={roleType === 'University'}
+        isUniversityOverview
+        hasStatusFiltration
+        hasTypeFiltration
+        hasQuickFilters
+        hasWeekdayFiltration
+        tableHeightOffset={228}
+        tableWidthOffset={250}
+      />
     </>
   );
 };

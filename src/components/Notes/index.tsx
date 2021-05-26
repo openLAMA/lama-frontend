@@ -62,10 +62,11 @@ interface INotesProps {
   organizationId: string;
   isExpanded: boolean;
   setExpanded: (value: boolean) => void;
+  isReadOnly?: boolean;
 }
 
 const Notes: React.FC<INotesProps> = (props: INotesProps) => {
-  const { organizationId, isExpanded, setExpanded } = props;
+  const { organizationId, isExpanded, setExpanded, isReadOnly } = props;
   const { t } = useTranslation();
   const dispatch = useDispatch();
 
@@ -213,6 +214,7 @@ const Notes: React.FC<INotesProps> = (props: INotesProps) => {
                     maxNumberOfCharacter={500}
                     error={Boolean(errors.note?.message)}
                     errorMessage={errors.note?.message}
+                    disabled={isReadOnly}
                   />
                 </BasicFormWrapper>
               </div>
@@ -225,7 +227,7 @@ const Notes: React.FC<INotesProps> = (props: INotesProps) => {
                       fullWidth
                       color="primary"
                       variant="contained"
-                      disabled={notesStatus.requesting}
+                      disabled={notesStatus.requesting || isReadOnly}
                       isLoading={postNoteStatus.requesting}
                       text={t('common:Submit')}
                       onClick={() => handleSubmit(onSubmitNote)()}

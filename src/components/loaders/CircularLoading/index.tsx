@@ -25,35 +25,25 @@ import { Grid, CircularProgress, Typography } from '@material-ui/core';
 interface ICircularLoadingProps {
   size?: number;
   text?: string;
-  withGrid?: boolean;
-  arrayOfMessages?: string[];
+  center?: boolean;
 }
 
 const CircularLoading: React.FC<ICircularLoadingProps> = (
   props: ICircularLoadingProps,
 ) => {
-  const { size, text, withGrid, arrayOfMessages } = props;
-
-  if (!text && arrayOfMessages?.length === 0) {
-    return null;
-  }
-
-  if (!withGrid) {
-    console.log('withGrid: ', withGrid);
-    return <CircularProgress size={size || 40} />;
-  }
+  const { size, text, center } = props;
 
   return (
-    <Grid container alignItems="center" direction="column" spacing={2}>
+    <Grid
+      container
+      justify={center ? `center` : 'flex-start'}
+      alignItems={center ? `center` : 'flex-start'}
+      direction="column"
+      spacing={2}>
       <Grid item>
         <CircularProgress size={size || 40} />
       </Grid>
       {text && <Grid item>{<Typography>{text}</Typography>}</Grid>}
-      {arrayOfMessages?.map((message) => (
-        <Grid item key={message}>
-          <Typography>{message}</Typography>
-        </Grid>
-      ))}
     </Grid>
   );
 };

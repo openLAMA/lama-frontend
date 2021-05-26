@@ -131,7 +131,7 @@ const TestingPersonalInvitationConfirmationCard: React.FC = () => {
             spacing={2}>
             <Grid item>
               <Typography variant="h4">
-                {t('common:Thank you for your request!')}
+                {t('common:Thank you for your request but full!')}
               </Typography>
             </Grid>
             <Grid item>
@@ -186,19 +186,12 @@ const TestingPersonalInvitationConfirmationCard: React.FC = () => {
             spacing={2}>
             <Grid item>
               <Typography variant="h4">
-                {t('common:Thank you for your request!')}
+                {t('common:Thank you for your request success booking!')}
               </Typography>
             </Grid>
             <Grid item>
               <Card largePadding maxWidth="448px">
                 <Grid container spacing={3}>
-                  <Grid item xs={12}>
-                    <Typography gutterBottom>
-                      {t(
-                        'common:The subscription process is based on the first come first serve principle',
-                      )}
-                    </Typography>
-                  </Grid>
                   <Grid item xs={12}>
                     <Typography gutterBottom>
                       {t(
@@ -246,7 +239,7 @@ const TestingPersonalInvitationConfirmationCard: React.FC = () => {
     <>
       {testingPersonalInvitationConfirmationStatus.requesting ? (
         <CircularLoading
-          withGrid
+          center
           size={80}
           text={t('common:Checking availability!')}
         />

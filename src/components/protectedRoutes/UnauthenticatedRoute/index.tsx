@@ -28,7 +28,7 @@ interface UnauthenticatedRouteProps extends RouteProps {
   viewName: keyof typeof pages;
   redirectIfAuth?: boolean;
 }
-1;
+
 const UnauthenticatedRoute: React.FC<UnauthenticatedRouteProps> = (
   props: UnauthenticatedRouteProps,
 ) => {

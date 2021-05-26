@@ -25,6 +25,7 @@ import LoginConfirmation from 'pages/Unauthenticated/LoginConfirmation';
 import RegisterConfirmation from 'pages/Unauthenticated/RegisterConfirmation';
 import TestingPersonalInvitationConfirmation from 'pages/Unauthenticated/TestingPersonalInvitationConfirmation';
 import LoginEmailSent from 'pages/Unauthenticated/LoginEmailSent';
+import FollowUpEmailConfirmation from 'pages/Unauthenticated/FollowUpEmailConfirmation';
 
 export default {
   Login,
@@ -35,4 +36,5 @@ export default {
   RegisterConfirmation,
   TestingPersonalInvitationConfirmation,
   LoginEmailSent,
+  FollowUpEmailConfirmation,
 };

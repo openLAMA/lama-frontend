@@ -17,16 +17,18 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-import OnboardingAndTrainingAdministrationDashboard from 'pages/OnboardingAndTrainingAdministration/OnboardingAndTrainingAdministrationDashboard';
+import OnboardingAndTrainingAdministrationAnalytics from 'pages/OnboardingAndTrainingAdministration/OnboardingAndTrainingAdministrationAnalytics';
 import OnboardingAndTrainingAdministrationOverview from 'pages/OnboardingAndTrainingAdministration/OnboardingAndTrainingAdministrationOverview';
 import OnboardingAndTrainingAdministrationMyProfile from 'pages/OnboardingAndTrainingAdministration/OnboardingAndTrainingAdministrationMyProfile';
 import OnboardingAndTrainingAdministrationEditProgramMember from 'pages/OnboardingAndTrainingAdministration/OnboardingAndTrainingAdministrationEditProgramMember';
 import OnboardingAndTrainingAdministrationCapacity from 'pages/OnboardingAndTrainingAdministration/OnboardingAndTrainingAdministrationCapacity';
+import OnboardingAndTrainingAdministrationCalendar from 'pages/OnboardingAndTrainingAdministration/OnboardingAndTrainingAdministrationCalendar';
 
 export default {
-  OnboardingAndTrainingAdministrationDashboard,
+  OnboardingAndTrainingAdministrationAnalytics,
   OnboardingAndTrainingAdministrationOverview,
   OnboardingAndTrainingAdministrationMyProfile,
   OnboardingAndTrainingAdministrationEditProgramMember,
   OnboardingAndTrainingAdministrationCapacity,
+  OnboardingAndTrainingAdministrationCalendar,
 };

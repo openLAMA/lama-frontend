@@ -20,10 +20,16 @@
 import { HttpClient } from 'apiService';
 import { APIMethods } from 'apiService/types';
 
-import { GetCapacityOverviewResponseType } from 'redux/globalState/capacity/types';
+import {
+  GetCapacityOverviewResponseType,
+  GetCapacityOverviewRequestType,
+} from 'redux/globalState/capacity/types';
 
-export const getCapacityOverviewAPI = async (): Promise<GetCapacityOverviewResponseType> =>
+export const getCapacityOverviewAPI = async (
+  params?: GetCapacityOverviewRequestType,
+): Promise<GetCapacityOverviewResponseType> =>
   HttpClient.request<GetCapacityOverviewResponseType>({
     url: 'laboratory/tests',
     method: APIMethods.GET,
+    params,
   });

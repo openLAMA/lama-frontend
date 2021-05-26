@@ -35,8 +35,14 @@ import laboratoryTestingPersonalDataReducer from 'redux/laboratoryAdministration
 import editProgramMemberReducer from 'redux/onboardingAndTrainingAdministration/EditProgramMember/editProgramMemberSlice';
 import capacityReducer from 'redux/globalState/capacity/capacitySlice';
 import generalMyProfileReducer from 'redux/globalState/generalMyProfile/generalMyProfileSlice';
-import navDrawerReducers from 'redux/globalState/navDrawer/navDrawerSlice';
-import notesReducers from 'redux/onboardingAndTrainingAdministration/Notes/notesSliceSlice';
+import navDrawerReducer from 'redux/globalState/navDrawer/navDrawerSlice';
+import notesReducer from 'redux/onboardingAndTrainingAdministration/Notes/notesSliceSlice';
+import followUpEmailReducer from 'redux/followUpEmail/followUpEmailSlice';
+import followUpEmailConfirmationReducer from 'redux/followUpEmailConfirmation/followUpEmailConfirmationSlice';
+import chartsReducer from 'redux/globalState/charts/chartsSlice';
+import languageStateReducer from 'redux/globalState/languageState/languageStateSlice';
+import laboratoryAdministrationEditDaySliceReducer from 'redux/laboratoryAdministration/laboratotyAdministrationEditDay/laboratoryAdministrationEditDaySlice';
+import logisticsAdministrationDashboardSliceReducer from 'redux/logisticsAdministration/logisticsAdministrationDashboard/logisticsAdministrationDashboardSlice';
 
 const rootReducer = combineReducers({
   authData: authDataReducer,
@@ -55,8 +61,14 @@ const rootReducer = combineReducers({
   editProgramMemberData: editProgramMemberReducer,
   capacity: capacityReducer,
   generalMyProfile: generalMyProfileReducer,
-  navDrawer: navDrawerReducers,
-  notes: notesReducers,
+  navDrawer: navDrawerReducer,
+  notes: notesReducer,
+  followUpEmail: followUpEmailReducer,
+  followUpEmailConfirmation: followUpEmailConfirmationReducer,
+  charts: chartsReducer,
+  languageState: languageStateReducer,
+  laboratoryAdministrationEditDay: laboratoryAdministrationEditDaySliceReducer,
+  logisticsAdministrationDashboard: logisticsAdministrationDashboardSliceReducer,
 });
 
 export type RootState = ReturnType<typeof rootReducer>;

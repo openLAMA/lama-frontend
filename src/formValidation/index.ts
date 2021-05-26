@@ -26,7 +26,7 @@ export const fieldRequired = (value: string | number): string | undefined => {
 
 export const mustBeValidEmail = (value: string): string | undefined => {
   if (!value) {
-    return 'Field is required!';
+    return undefined;
   }
   if (
     !value.match(
@@ -40,7 +40,7 @@ export const mustBeValidEmail = (value: string): string | undefined => {
 
 export const numberMustNotBeNegative = (value: number): string | undefined => {
   if (value === undefined && value === null) {
-    return 'Field is required!';
+    return undefined;
   }
   if (value <= 0) {
     return 'Value must be greater than 0!';
@@ -52,7 +52,7 @@ export const numberMustBeGreaterThanZero = (
   value: number,
 ): string | undefined => {
   if (value === undefined && value === null) {
-    return 'Field is required!';
+    return undefined;
   }
   if (value <= 0) {
     return 'Value must be greater than 0!';
@@ -62,7 +62,7 @@ export const numberMustBeGreaterThanZero = (
 
 export const numberMustBePositive = (value: number): string | undefined => {
   if (value === undefined && value === null) {
-    return 'Field is required!';
+    return undefined;
   }
   if (value < 0) {
     return 'Value must be positive!';
@@ -81,7 +81,7 @@ export const maxNumberOfCharacters = (
   | undefined => {
   if (value.length > numberOfChars) {
     return {
-      message: 'Max number of characters allowed is',
+      message: 'Max number of characters allowed is {x}!',
       value: numberOfChars,
     };
   }
@@ -90,7 +90,7 @@ export const maxNumberOfCharacters = (
 
 export const atLeastOneItemInMultiSelect = (value: []): string | undefined => {
   if (value === undefined && value === null) {
-    return 'Field is required!';
+    return undefined;
   }
   if (value.length <= 0) {
     return 'At least one item must be selected!';

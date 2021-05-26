@@ -20,25 +20,15 @@
 import React from 'react';
 import { RouteProps } from 'react-router-dom';
 
-// Material UI
-import { Grid } from '@material-ui/core';
-
 // Custom components
-import PageContainerWithHeader from 'components/PageContainerWithHeader';
 import CapacityOverviewTable from 'components/Tables/CapacityOverviewTable';
-
-// Utils
-import { LabAdministrationRoutes } from 'config/routes';
 
 type LabAdministrationDashboardType = RouteProps;
 
 const LabAdministrationDashboard: React.FC<LabAdministrationDashboardType> = () => {
   return (
     <>
-      <PageContainerWithHeader
-        title={LabAdministrationRoutes.dashboardRoute.title}>
-        <CapacityOverviewTable isLaboratory />
-      </PageContainerWithHeader>
+      <CapacityOverviewTable isLaboratory />
     </>
   );
 };

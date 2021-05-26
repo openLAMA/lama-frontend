@@ -37,7 +37,7 @@ const SnackBarView: React.FC<ISnackBarViewProps> = React.forwardRef(
   (props: ISnackBarViewProps, ref) => {
     const { id, data } = props;
     const { t } = useTranslation();
-    const { message, messageType } = data;
+    const { message, messageType, dynamicData } = data;
     const { closeSnackbar } = useSnackbar();
 
     const handleDismiss = () => {
@@ -52,6 +52,9 @@ const SnackBarView: React.FC<ISnackBarViewProps> = React.forwardRef(
         return t(`APISuccessMessages:${message}`);
       }
       if (messageType === 'error') {
+        if (dynamicData) {
+          return t(`APIErrorMessages:${message}`, dynamicData);
+        }
         return t(`APIErrorMessages:${message}`);
       }
       return message;

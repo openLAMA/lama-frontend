@@ -40,6 +40,14 @@ export type OrganizationTypeType = {
 };
 
 export type SupportPersonType = {
+  id: string;
+  name: string;
+  email: string;
+  phoneNumber: string | null;
+  landLineNumber: string;
+};
+
+export type SupportPersonSelectType = {
   supportPersonId: string;
   name: string;
 };
@@ -51,3 +59,8 @@ export type ContactPersonType = {
   phoneNumber: string;
   landLineNumber?: string;
 };
+
+export type ChartTimePeriod = 'Today' | '7Days' | '28Days' | '90Days';
+export type OverallChartTimePeriod = 'TotalInTesting';
+
+export type ShiftType = 'None' | 'First' | 'Second' | 'FullDay';

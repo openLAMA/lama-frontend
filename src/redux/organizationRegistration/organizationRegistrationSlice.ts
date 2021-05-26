@@ -19,15 +19,17 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
 import callSnackbar from 'utils/customHooks/useSnackbar';
 
+// Types
 import { IApiStatus } from 'redux/globalTypes';
-
 import {
   RegisterOrganizationType,
   OrganizationRegistrationRequestType,
 } from 'redux/organizationRegistration/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import { organizationRegistrationAPI } from 'redux/organizationRegistration/organizationRegistrationApi';
 interface IOrganizationRegistration {
@@ -120,12 +122,9 @@ export const registerOrganization = (
     (): void => {
       dispatch(organizationRegistrationSuccess());
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(organizationRegistrationFailed());
-      callSnackbar({
-        message: 'Failed to register organization!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to register organization!');
     },
   );
 };

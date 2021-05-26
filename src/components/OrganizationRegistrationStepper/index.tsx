@@ -20,7 +20,7 @@
 import React, { useEffect, useLayoutEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 // Material UI
 import { Grid, Stepper, Step, StepLabel } from '@material-ui/core';
@@ -118,13 +118,13 @@ const OrganizationRegistrationStepper: React.FC = () => {
   const isLoading =
     citiesStatus.requesting || organizationTypesStatus.requesting;
 
-  const arrayOfMessages: string[] = [];
+  let text = '';
   if (citiesStatus.requesting) {
-    arrayOfMessages.push(t('progressMessages:Fetching cities'));
+    text = t('progressMessages:Fetching cities');
   }
 
   if (organizationTypesStatus.requesting) {
-    arrayOfMessages.push(t('progressMessages:Fetching organization types'));
+    text = t('progressMessages:Fetching organization types');
   }
 
   return (
@@ -134,7 +134,7 @@ const OrganizationRegistrationStepper: React.FC = () => {
       justify="center"
       alignItems="center"
       spacing={6}>
-      {!isLoading && !citiesStatus.failure && !organizationTypesStatus.failure && (
+      {!isLoading && citiesStatus.success && organizationTypesStatus.success ? (
         <Grid item xs={12} className="fullWidth">
           <Stepper
             activeStep={activeStep}
@@ -150,10 +150,11 @@ const OrganizationRegistrationStepper: React.FC = () => {
             })}
           </Stepper>
         </Grid>
+      ) : (
+        <CircularLoading center text={text} />
       )}
-      <CircularLoading withGrid arrayOfMessages={arrayOfMessages} />
 
-      {!citiesStatus.requesting && !organizationTypesStatus.requesting && (
+      {citiesStatus.success && organizationTypesStatus.success && (
         <Grid item xs={12}>
           {getStepsContent(activeStep)}
         </Grid>

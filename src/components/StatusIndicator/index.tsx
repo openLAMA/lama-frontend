@@ -21,7 +21,7 @@ import React from 'react';
 
 interface IStatusIndicatorProps {
   text: string;
-  variant: 'success' | 'failure';
+  variant: 'grayed' | 'information' | 'success' | 'failure' | 'temporary';
 }
 
 import styles from './StatusIndicator.module.scss';

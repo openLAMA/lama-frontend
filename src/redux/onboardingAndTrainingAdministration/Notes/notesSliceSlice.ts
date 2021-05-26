@@ -20,17 +20,17 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
 import { compareDesc, parseISO } from 'date-fns';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
-import callSnackbar from 'utils/customHooks/useSnackbar';
-
+// Types
 import { IApiStatus } from 'redux/globalTypes';
-
 import {
   NoteItemType,
   GetNotesRequestType,
   GetNotesResponseType,
   PostNoteRequestType,
 } from 'redux/onboardingAndTrainingAdministration/Notes/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import {
   getNotesAPI,
@@ -133,12 +133,9 @@ export const getNotes = (data: GetNotesRequestType): AppThunk => async (
     (response: GetNotesResponseType): void => {
       dispatch(getNotesSuccess(response));
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getNotesFailed());
-      callSnackbar({
-        message: 'Failed to get notes!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to get notes!');
     },
   );
 };
@@ -151,12 +148,9 @@ export const postNote = (data: PostNoteRequestType): AppThunk => async (
     (): void => {
       dispatch(postNoteSuccess());
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(postNoteFailed());
-      callSnackbar({
-        message: 'Failed to add a new note!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to add a new note!');
     },
   );
 };

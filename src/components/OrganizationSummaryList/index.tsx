@@ -26,6 +26,7 @@ export type OrganizationSummaryListItemType = {
   mainText: string;
   subText: string | number;
   key: string;
+  error?: boolean;
 };
 
 interface IOrganizationSummaryListProps {
@@ -61,7 +62,10 @@ const OrganizationSummaryList: React.FC<IOrganizationSummaryListProps> = (
                 if (item.subText) {
                   return (
                     <Grid item key={item.key}>
-                      <Typography>{item.subText}</Typography>
+                      <Typography
+                        className={`${item.error && 'error-color-text'}`}>
+                        {item.subText}
+                      </Typography>
                     </Grid>
                   );
                 }

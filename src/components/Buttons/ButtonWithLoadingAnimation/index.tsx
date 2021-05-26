@@ -76,9 +76,9 @@ const ButtonWithLoadingAnimation: React.FC<IButtonWithLoadingAnimationProps> = R
       <ColoredButton
         {...rest}
         disabled={isLoading || disabled}
-        className={`${fullWidth && 'fullWidth'} `}>
-        {text}
-      </ColoredButton>
+        className={`${fullWidth && 'fullWidth'} `}
+        text={text}
+      />
 
       {isLoading && (
         <CircularProgress size={24} className={styles['button-progress']} />

@@ -19,20 +19,23 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
-import callSnackbar from 'utils/customHooks/useSnackbar';
-
+// Types
 import { IApiStatus } from 'redux/globalTypes';
 import {
   CapacityOverviewType,
   GetCapacityOverviewResponseType,
+  GetCapacityOverviewRequestType,
 } from 'redux/globalState/capacity/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import { getCapacityOverviewAPI } from 'redux/globalState/capacity/capacityApi';
 
 interface ICapacityOverviewDashboard {
   capacityOverviewStatus: IApiStatus;
   capacityOverview: CapacityOverviewType[];
+  isEarliestDate: boolean;
 }
 
 const initialState = {
@@ -42,6 +45,7 @@ const initialState = {
     failure: false,
   },
   capacityOverview: [],
+  isEarliestDate: false,
 } as ICapacityOverviewDashboard;
 
 const capacitySlice = createSlice({
@@ -59,7 +63,8 @@ const capacitySlice = createSlice({
       state,
       action: PayloadAction<GetCapacityOverviewResponseType>,
     ) {
-      state.capacityOverview = action.payload;
+      state.capacityOverview = action.payload.testsData || [];
+      state.isEarliestDate = action.payload.isEarliestDate || false;
       state.capacityOverviewStatus = {
         requesting: false,
         success: true,
@@ -84,18 +89,17 @@ export const {
 
 export default capacitySlice.reducer;
 
-export const getCapacityOverview = (): AppThunk => async (dispatch) => {
+export const getCapacityOverview = (
+  params?: GetCapacityOverviewRequestType,
+): AppThunk => async (dispatch) => {
   dispatch(getCapacityOverviewRequesting());
-  getCapacityOverviewAPI().then(
+  getCapacityOverviewAPI(params).then(
     (response: GetCapacityOverviewResponseType): void => {
       dispatch(getCapacityOverviewSuccess(response));
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getCapacityOverviewFailed());
-      callSnackbar({
-        message: 'Failed to get capacity overview!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to get capacity overview!');
     },
   );
 };

@@ -18,7 +18,7 @@
 */
 
 // Generic Types
-import { SupportPersonType } from 'redux/globalTypes';
+import { SupportPersonSelectType } from 'redux/globalTypes';
 
 export type OrganizationDashboardInfo = {
   onboardingDate: string;
@@ -27,7 +27,7 @@ export type OrganizationDashboardInfo = {
   testDate3: string | null;
   testDate4: string | null;
   testDate5: string | null;
-  supportPerson: SupportPersonType;
+  supportPerson: SupportPersonSelectType;
 };
 
 export type GetOrganizationDashboardInfoRequestType = {

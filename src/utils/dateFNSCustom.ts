@@ -24,9 +24,16 @@ import {
   formatISO,
   format,
   add,
+  sub,
   getYear,
   getMonth,
   getDate,
+  setHours,
+  setMinutes,
+  setSeconds,
+  setMilliseconds,
+  isValid,
+  getWeek,
 } from 'date-fns';
 
 const locales = [enUS, de];
@@ -45,7 +52,7 @@ const getLocaleObject = (languageString?: string) => {
 
   const locale = locales.find((loc) => loc.code === languageString);
   if (!locale) {
-    console.warn(`Couldn't find locale '${languageString}', default to en-US`);
+    console.warn(`Couldn't find locale '${languageString}', default to en`);
     return enUS;
   }
   return locale;
@@ -57,10 +64,26 @@ const getLocaleObject = (languageString?: string) => {
  * @returns {String} formatted date or '-' if invalid date is passed
  */
 
+export const formatDateToFullYearDashMonthDashDay = (date: any) => {
+  const parsedDate = checkDateAndConvert(date);
+  if (!parsedDate) return '';
+  return format(parsedDate, `yyyy-LL-dd`, {
+    locale: getLocaleObject(i18next.language),
+  });
+};
+
 export const formatDateToMonthSlashDaySlashFullYear = (date: any) => {
   const parsedDate = checkDateAndConvert(date);
   if (!parsedDate) return '';
   return format(parsedDate, `d/L/yyyy`, {
+    locale: getLocaleObject(i18next.language),
+  });
+};
+
+export const formatDateToMonthDayFullYear = (date: any) => {
+  const parsedDate = checkDateAndConvert(date);
+  if (!parsedDate) return '';
+  return format(parsedDate, `ddMMyyyy`, {
     locale: getLocaleObject(i18next.language),
   });
 };
@@ -78,7 +101,11 @@ export const checkDateAndConvert = (date: any): Date | null => {
     if (date instanceof Date) {
       return date;
     } else {
-      return parseISO(date);
+      const parsedDate = parseISO(date);
+      if (isValid(parsedDate)) {
+        return parsedDate;
+      }
+      return null;
     }
   }
   return null;
@@ -110,6 +137,16 @@ export const addDays = (date: any, days: number): Date => {
   return new Date();
 };
 
+export const subtractDays = (date: any, days: number): Date => {
+  const parsedDate = checkDateAndConvert(date);
+  if (parsedDate) {
+    return sub(parsedDate, {
+      days: days,
+    });
+  }
+  return new Date();
+};
+
 export const convertDateToUTC = (date: any): string | null => {
   const parsedDate = checkDateAndConvert(date);
   if (parsedDate) {
@@ -135,4 +172,22 @@ export const convertStringDateToDate = (
     return parseISO(date);
   }
   return '';
+};
+
+export const removeTimeFromDate = (date: Date): Date => {
+  return setHours(setMinutes(setSeconds(setMilliseconds(date, 0), 0), 0), 0);
+};
+
+export const isDateValid = (date: string): boolean => {
+  if (date) {
+    const parsedDate = parseISO(date);
+    return isValid(parsedDate);
+  }
+  return false;
+};
+
+export const getWeekNumber = (date: any): number => {
+  const parsedDate = checkDateAndConvert(date);
+  if (!parsedDate) return -1;
+  return getWeek(parsedDate);
 };

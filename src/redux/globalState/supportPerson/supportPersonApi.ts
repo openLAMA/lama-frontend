@@ -26,10 +26,10 @@ import {
 } from 'redux/globalState/supportPerson/types';
 
 export const getSupportPersonAPI = async (
-  data: GetSupportPersonRequestType,
+  params: GetSupportPersonRequestType,
 ): Promise<GetSupportPersonResponseType> =>
   HttpClient.request<GetSupportPersonResponseType>({
     url: 'university/supportPerson',
     method: APIMethods.GET,
-    data,
+    params,
   });

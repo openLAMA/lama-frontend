@@ -46,7 +46,7 @@ import ErrorBoundary from 'components/ErrorBoundary';
 // Types
 import { SnackbarDataType } from 'redux/snackbar/types';
 
-import 'fontsource-roboto';
+import '@fontsource/roboto';
 import './index.scss';
 
 const theme = createMuiTheme({

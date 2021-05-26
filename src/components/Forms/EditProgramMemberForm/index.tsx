@@ -17,9 +17,9 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { useHistory } from 'react-router-dom';
+import { useHistory, useLocation } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import {
   Controller,
@@ -36,7 +36,7 @@ import {
   Button,
   TextField,
   Typography,
-  Tooltip,
+  Portal,
 } from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 
@@ -54,7 +54,6 @@ import DropdownControllerInput from 'components/FormControllerInputs/DropdownCon
 import Card from 'components/Card';
 import DatePickerControllerInput from 'components/FormControllerInputs/DatePickerControlInput';
 import ButtonWithLoadingAnimation from 'components/Buttons/ButtonWithLoadingAnimation';
-import ModalWrapper from 'components/Wrappers/ModalWrapper';
 import Notes from 'components/Notes/index';
 
 // Actions
@@ -62,8 +61,7 @@ import {
   getSupportPeople,
   updateProgramMember,
   clearUpdateProgramData,
-  deactivateProgramMember,
-  pushToEpaadProgramMember,
+  getProgramMember,
 } from 'redux/onboardingAndTrainingAdministration/EditProgramMember/editProgramMemberSlice';
 
 // Routes
@@ -72,7 +70,11 @@ import { OnboardingAndTrainingAdministrationRoutes } from 'config/routes';
 // Types
 import { CityType } from 'redux/globalState/citiesData/types';
 import { PutProgramMemberType } from 'redux/onboardingAndTrainingAdministration/EditProgramMember/types';
-import { ContactPersonType, OrganizationTypeType } from 'redux/globalTypes';
+import {
+  ContactPersonType,
+  OrganizationTypeType,
+  SupportPersonSelectType,
+} from 'redux/globalTypes';
 
 // Utils
 import { findCity } from 'utils/findCity';
@@ -82,6 +84,7 @@ import {
   convertDateWithoutTime,
   convertStringDateToDate,
 } from 'utils/dateFNSCustom';
+import organizationTypesEnum from 'utils/organizationTypesEnum';
 
 // Form validations
 import { fieldRequired } from 'formValidation';
@@ -109,25 +112,34 @@ const schoolsTypes = [
   },
 ];
 
-const EditProgramMemberForm: React.FC = () => {
+type EditProgramMemberFormTypes = {
+  onOpenFollowUpModal: () => void;
+  disableFollowUpModal: () => void;
+};
+
+const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
+  props: EditProgramMemberFormTypes,
+) => {
+  const { onOpenFollowUpModal, disableFollowUpModal } = props;
   const dispatch = useDispatch();
   const history = useHistory();
+  const location = useLocation();
   const { t } = useTranslation();
+
+  const notesPortalRef = useRef(null);
 
   const [
     initialGetSupportPerson,
     setInitialGetSupportPerson,
   ] = useState<boolean>(false);
 
-  const [showDeactivateModal, setShowDeactivateModal] = useState<boolean>(
-    false,
-  );
+  const [onSaveRedirect, setOnSaveRedirect] = useState<boolean>(false);
 
   const [isNotesExpanded, setNotesExpanded] = useState<boolean>(false);
 
   const citiesList = useSelector((state: RootState) => state.cities.cities);
 
-  const organizationTypes = useSelector(
+  const organizationTypesList = useSelector(
     (state: RootState) => state.organizationTypes.organizationTypes,
   );
 
@@ -146,32 +158,6 @@ const EditProgramMemberForm: React.FC = () => {
   const updateProgramMemberStatus = useSelector(
     (state: RootState) => state.editProgramMemberData.updateProgramMemberStatus,
   );
-
-  const deactivateProgramMemberStatus = useSelector(
-    (state: RootState) =>
-      state.editProgramMemberData.deactivateProgramMemberStatus,
-  );
-
-  const pushToEpaadProgramMemberStatus = useSelector(
-    (state: RootState) =>
-      state.editProgramMemberData.pushToEpaadProgramMemberStatus,
-  );
-
-  const onSendToEpaad = () => {
-    dispatch(pushToEpaadProgramMember(programMember));
-  };
-
-  const onShowDeactivateModal = () => {
-    setShowDeactivateModal(true);
-  };
-
-  const onDeactivate = () => {
-    const data = {
-      id: programMember.id,
-      isActive: false,
-    };
-    dispatch(deactivateProgramMember(data));
-  };
 
   const onCancelEditProgramMemberForm = () => {
     history.push(OnboardingAndTrainingAdministrationRoutes.overviewRoute.route);
@@ -244,6 +230,12 @@ const EditProgramMemberForm: React.FC = () => {
   const watchExclusionEndDate = watch('exclusionEndDate');
 
   useEffect(() => {
+    return () => {
+      dispatch(clearUpdateProgramData());
+    };
+  }, []);
+
+  useEffect(() => {
     if (
       (watchExclusionStartDate && watchExclusionEndDate) ||
       (!watchExclusionStartDate && !watchExclusionEndDate)
@@ -297,34 +289,92 @@ const EditProgramMemberForm: React.FC = () => {
         setInitialGetSupportPerson(true);
       }
     }
-  }, [supportPeopleStatus]);
+  }, [supportPeopleStatus.requesting]);
 
   useEffect(() => {
     if (updateProgramMemberStatus.success) {
-      dispatch(clearUpdateProgramData());
-      history.push(
-        OnboardingAndTrainingAdministrationRoutes.overviewRoute.route,
-      );
+      if (onSaveRedirect) {
+        history.push(
+          OnboardingAndTrainingAdministrationRoutes.overviewRoute.route,
+        );
+      } else {
+        dispatch(getProgramMember(programMember.id));
+      }
     }
   }, [updateProgramMemberStatus]);
 
   useEffect(() => {
-    if (deactivateProgramMemberStatus.success) {
-      dispatch(clearUpdateProgramData());
-      history.push(
-        OnboardingAndTrainingAdministrationRoutes.overviewRoute.route,
-      );
+    const locState: any = location.state;
+    if (locState?.openFollowUpModal && !programMember.isOnboardingEmailSent) {
+      switch (programMember.organizationTypeId) {
+        case organizationTypesEnum.SME: {
+          let openFollowUpModal = true;
+          if (!Boolean(programMember.area)) {
+            setError('area', {
+              type: 'manual',
+              message: t('formValidation:Field is required!'),
+            });
+            openFollowUpModal = false;
+            disableFollowUpModal();
+          }
+          if (!Boolean(programMember.onboardingTimestamp)) {
+            setError('onboardingTimestamp', {
+              type: 'manual',
+              message: t('formValidation:Field is required!'),
+            });
+            openFollowUpModal = false;
+            disableFollowUpModal();
+          }
+          if (!Boolean(programMember.organizationShortcutName)) {
+            setError('organizationShortcutName', {
+              type: 'manual',
+              message: t('formValidation:Field is required!'),
+            });
+            openFollowUpModal = false;
+            disableFollowUpModal();
+          }
+          if (!Boolean(programMember.firstTestTimestamp)) {
+            setError('firstTestTimestamp', {
+              type: 'manual',
+              message: t('formValidation:Field is required!'),
+            });
+            openFollowUpModal = false;
+            disableFollowUpModal();
+          }
+          if (openFollowUpModal) {
+            onOpenFollowUpModal();
+          }
+          break;
+        }
+        case organizationTypesEnum.Company: {
+          let openFollowUpModal = true;
+          if (!Boolean(programMember.supportPersonId)) {
+            setError('supportPersonId', {
+              type: 'manual',
+              message: t('formValidation:Field is required!'),
+            });
+            openFollowUpModal = false;
+            disableFollowUpModal();
+          }
+          if (!Boolean(programMember.organizationShortcutName)) {
+            setError('organizationShortcutName', {
+              type: 'manual',
+              message: t('formValidation:Field is required!'),
+            });
+            openFollowUpModal = false;
+            disableFollowUpModal();
+          }
+          if (openFollowUpModal) {
+            onOpenFollowUpModal();
+          }
+          break;
+        }
+        default: {
+          console.log();
+        }
+      }
     }
-  }, [deactivateProgramMemberStatus]);
-
-  useEffect(() => {
-    if (pushToEpaadProgramMemberStatus.success) {
-      dispatch(clearUpdateProgramData());
-      history.push(
-        OnboardingAndTrainingAdministrationRoutes.overviewRoute.route,
-      );
-    }
-  }, [pushToEpaadProgramMemberStatus]);
+  }, [location]);
 
   const onSubmitForm = (values: any) => {
     if (values.exclusionStartDate && !values.exclusionEndDate) {
@@ -381,66 +431,31 @@ const EditProgramMemberForm: React.FC = () => {
     }
   };
 
+  const isReadOnly = programMember.status === programMemberStatusEnum.NotActive;
+  const registeredEmployees = programMember?.registeredEmployees || 0;
+  const disableShortCutField = Boolean(registeredEmployees);
+  const disableOrgType = Boolean(registeredEmployees);
   const isUpdating = updateProgramMemberStatus.requesting;
 
   return (
     <>
       <Grid container spacing={2}>
-        <Grid item xs={12}>
-          <Grid container justify="flex-end" spacing={2}>
-            <Grid item>
-              <ButtonWithLoadingAnimation
-                variant="contained"
-                color="primary"
-                isLoading={pushToEpaadProgramMemberStatus.requesting}
-                onClick={onSendToEpaad}
-                text={t('common:Send to Epaad')}
-                backgroundColor="#FAC710"
-                hoverBackgroundColor="#c29700"
-                textColor="#000"
-                disabled={
-                  Boolean(programMember.epaadId) ||
-                  programMember.status === programMemberStatusEnum.NotActive
-                }
-              />
-            </Grid>
-            <Grid item>
-              <Tooltip
-                title={
-                  programMember.status === programMemberStatusEnum.NotActive
-                    ? `${t('common:Program member is deactivated!')}`
-                    : `${t('common:Deactivate program member')}`
-                }>
-                <ButtonWithLoadingAnimation
-                  variant="contained"
-                  color="primary"
-                  isLoading={deactivateProgramMemberStatus.requesting}
-                  onClick={onShowDeactivateModal}
-                  text={t('common:Deactivate')}
-                  backgroundColor="#9510AC"
-                  hoverBackgroundColor="#62007c"
-                  disabled={
-                    programMember.status ===
-                      programMemberStatusEnum.NotActive ||
-                    deactivateProgramMemberStatus.success
-                  }
-                />
-              </Tooltip>
-            </Grid>
-          </Grid>
-        </Grid>
         <Grid
           item
           xs={12}
           className="overflow-auto"
-          style={{ height: 'calc(100vh - 224px)' }}>
+          style={{ height: 'calc(100vh - 240px)' }}>
           <BasicFormWrapper>
             <Grid container direction="column" spacing={2}>
               <Grid item>
                 <Card>
                   <Grid container spacing={2} className="relative">
                     <Grid item xs={12} md={6} lg={3}>
-                      <Grid container direction="column" spacing={2}>
+                      <Grid
+                        container
+                        direction="column"
+                        spacing={2}
+                        className="grid-column-items-full-width">
                         <Grid item>
                           <Typography variant="h6">
                             {t('common:General information')}
@@ -456,7 +471,7 @@ const EditProgramMemberForm: React.FC = () => {
                             maxNumberOfCharacter={100}
                             error={Boolean(errors?.name?.message)}
                             errorMessage={errors?.name?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -469,7 +484,7 @@ const EditProgramMemberForm: React.FC = () => {
                             fieldRequired
                             error={Boolean(errors?.organizationTypeId?.message)}
                             errorMessage={errors?.organizationTypeId?.message}
-                            menuItems={organizationTypes?.map(
+                            menuItems={organizationTypesList?.map(
                               (orgType: OrganizationTypeType) => {
                                 return (
                                   <MenuItem key={orgType.id} value={orgType.id}>
@@ -478,7 +493,9 @@ const EditProgramMemberForm: React.FC = () => {
                                 );
                               },
                             )}
-                            disabled={isUpdating}
+                            disabled={
+                              isUpdating || isReadOnly || disableOrgType
+                            }
                           />
                         </Grid>
                         <Grid item>
@@ -521,11 +538,17 @@ const EditProgramMemberForm: React.FC = () => {
                                         label={t('common:City')}
                                         variant="outlined"
                                         error={Boolean(errors?.city?.message)}
-                                        helperText={errors?.city?.message}
+                                        helperText={
+                                          Boolean(errors?.city?.message)
+                                            ? t(
+                                                `formValidation:${errors?.city?.message}`,
+                                              )
+                                            : ''
+                                        }
                                       />
                                     );
                                   }}
-                                  disabled={isUpdating}
+                                  disabled={isUpdating || isReadOnly}
                                 />
                               );
                             }}
@@ -552,7 +575,7 @@ const EditProgramMemberForm: React.FC = () => {
                             fieldRequired
                             error={Boolean(errors?.address?.message)}
                             errorMessage={errors?.address?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -563,7 +586,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="manager-input"
                             error={Boolean(errors?.manager?.message)}
                             errorMessage={errors?.manager?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -574,7 +597,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="area-input"
                             error={Boolean(errors?.area?.message)}
                             errorMessage={errors?.area?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -585,7 +608,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="county-input"
                             error={Boolean(errors?.county?.message)}
                             errorMessage={errors?.county?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid
@@ -614,7 +637,7 @@ const EditProgramMemberForm: React.FC = () => {
                                 </MenuItem>
                               );
                             })}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -628,7 +651,7 @@ const EditProgramMemberForm: React.FC = () => {
                             error={Boolean(errors?.supportPersonId?.message)}
                             errorMessage={errors?.supportPersonId?.message}
                             menuItems={supportPeople?.map(
-                              (supportPerson: any) => {
+                              (supportPerson: SupportPersonSelectType) => {
                                 return (
                                   <MenuItem
                                     key={supportPerson.supportPersonId}
@@ -641,7 +664,7 @@ const EditProgramMemberForm: React.FC = () => {
                             showLoadingEndAdornment={
                               supportPeopleStatus.requesting
                             }
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -656,7 +679,9 @@ const EditProgramMemberForm: React.FC = () => {
                             errorMessage={
                               errors?.organizationShortcutName?.message
                             }
-                            disabled={isUpdating}
+                            disabled={
+                              isUpdating || isReadOnly || disableShortCutField
+                            }
                           />
                         </Grid>
                       </Grid>
@@ -676,7 +701,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="trainingTimestamp-date-input"
                             error={Boolean(errors?.trainingTimestamp?.message)}
                             errorMessage={errors?.trainingTimestamp?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -689,7 +714,7 @@ const EditProgramMemberForm: React.FC = () => {
                               errors?.onboardingTimestamp?.message,
                             )}
                             errorMessage={errors?.onboardingTimestamp?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -700,7 +725,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="firstTestTimestamp-date-input"
                             error={Boolean(errors?.firstTestTimestamp?.message)}
                             errorMessage={errors?.firstTestTimestamp?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -713,7 +738,7 @@ const EditProgramMemberForm: React.FC = () => {
                               errors?.secondTestTimestamp?.message,
                             )}
                             errorMessage={errors?.secondTestTimestamp?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -724,7 +749,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="thirdTestTimestamp-date-input"
                             error={Boolean(errors?.thirdTestTimestamp?.message)}
                             errorMessage={errors?.thirdTestTimestamp?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -737,7 +762,7 @@ const EditProgramMemberForm: React.FC = () => {
                               errors?.fourthTestTimestamp?.message,
                             )}
                             errorMessage={errors?.fourthTestTimestamp?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -748,7 +773,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="fifthTestTimestamp-date-input"
                             error={Boolean(errors?.fifthTestTimestamp?.message)}
                             errorMessage={errors?.fifthTestTimestamp?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -759,7 +784,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="exclusionStartDate-date-input"
                             error={Boolean(errors?.exclusionStartDate?.message)}
                             errorMessage={errors?.exclusionStartDate?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -770,7 +795,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="exclusionEndDate-date-input"
                             error={Boolean(errors?.exclusionEndDate?.message)}
                             errorMessage={errors?.exclusionEndDate?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                       </Grid>
@@ -792,7 +817,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="number-of-test-classes-input"
                             error={Boolean(errors?.numberOfSamples?.message)}
                             errorMessage={errors?.numberOfSamples?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid item>
@@ -800,10 +825,10 @@ const EditProgramMemberForm: React.FC = () => {
                             control={control}
                             name="numberOfPools"
                             label={t('common:Number of pools')}
-                            id="number-of-test-classes-input"
+                            id="number-of-pools-input"
                             error={Boolean(errors?.numberOfPools?.message)}
                             errorMessage={errors?.numberOfPools?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid
@@ -819,7 +844,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="students-count-input"
                             error={Boolean(errors?.studentsCount?.message)}
                             errorMessage={errors?.studentsCount?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                         <Grid
@@ -835,7 +860,7 @@ const EditProgramMemberForm: React.FC = () => {
                             id="employees-count-input"
                             error={Boolean(errors?.employeesCount?.message)}
                             errorMessage={errors?.employeesCount?.message}
-                            disabled={isUpdating}
+                            disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
                       </Grid>
@@ -856,10 +881,10 @@ const EditProgramMemberForm: React.FC = () => {
                           </Typography>
                         </Grid>
                         <Grid item xs={12}>
-                          <Notes
-                            organizationId={programMember?.id || ''}
-                            isExpanded={isNotesExpanded}
-                            setExpanded={setNotesExpanded}
+                          <div
+                            id="notes-form-portal"
+                            className="fullHeight"
+                            ref={notesPortalRef}
                           />
                         </Grid>
                       </Grid>
@@ -889,36 +914,42 @@ const EditProgramMemberForm: React.FC = () => {
                                   }`}
                                 </Typography>
                               </Grid>
-                              <Grid item>
-                                <Button
-                                  color="secondary"
-                                  startIcon={<AddCircleOutlineIcon />}
-                                  onClick={() =>
-                                    contactsFieldArray.append({
-                                      name: '',
-                                      email: '',
-                                      phoneNumber: '',
-                                      landLineNumber: '',
-                                    })
-                                  }>
-                                  <Typography>
-                                    {t('common:Add another contact')}
-                                  </Typography>
-                                </Button>
-                              </Grid>
+                              {index <= 0 && !isReadOnly && (
+                                <Grid item>
+                                  <Button
+                                    color="secondary"
+                                    startIcon={<AddCircleOutlineIcon />}
+                                    onClick={() =>
+                                      contactsFieldArray.append({
+                                        name: '',
+                                        email: '',
+                                        phoneNumber: '',
+                                        landLineNumber: '',
+                                      })
+                                    }>
+                                    <Typography>
+                                      {t('common:Add another contact')}
+                                    </Typography>
+                                  </Button>
+                                </Grid>
+                              )}
                             </Grid>
                           </Grid>
                           <Grid item xs={12}>
                             <Grid container justify="flex-end">
                               <Grid item>
-                                <Button
-                                  color="primary"
-                                  startIcon={<DeleteOutlineIcon />}
-                                  onClick={() =>
-                                    contactsFieldArray.remove(index)
-                                  }>
-                                  <Typography>{t('common:Delete')}</Typography>
-                                </Button>
+                                {!isReadOnly && (
+                                  <Button
+                                    color="primary"
+                                    startIcon={<DeleteOutlineIcon />}
+                                    onClick={() =>
+                                      contactsFieldArray.remove(index)
+                                    }>
+                                    <Typography>
+                                      {t('common:Delete')}
+                                    </Typography>
+                                  </Button>
+                                )}
                               </Grid>
                             </Grid>
                           </Grid>
@@ -930,20 +961,20 @@ const EditProgramMemberForm: React.FC = () => {
                                   defaultValue={item.id}
                                   name={`contacts[${index}].id`}
                                   label={t('common:id')}
-                                  id="contact-person-id-input"
+                                  id={`contact-person-id-input-${item.id}`}
                                   hidden
-                                  disabled={isUpdating}
+                                  disabled={isUpdating || isReadOnly}
                                 />
                                 <TextControllerInput
                                   control={control}
                                   name={`contacts[${index}].name`}
                                   label={t('common:Name')}
-                                  id="contact-person-input"
+                                  id={`contact-person-name-input-${item.id}`}
                                   defaultValue={item.name}
                                   fieldRequired
                                   error={Boolean(contactsErrors?.name?.message)}
                                   errorMessage={contactsErrors?.name?.message}
-                                  disabled={isUpdating}
+                                  disabled={isUpdating || isReadOnly}
                                 />
                               </Grid>
                               <Grid item xs={12} md={6}>
@@ -951,7 +982,7 @@ const EditProgramMemberForm: React.FC = () => {
                                   control={control}
                                   name={`contacts[${index}].email`}
                                   label={t('common:Email')}
-                                  id="contact-email-input"
+                                  id={`contact-person-email-input-${item.id}`}
                                   defaultValue={item.email}
                                   mustBeValidEmailValidation
                                   fieldRequired
@@ -959,7 +990,7 @@ const EditProgramMemberForm: React.FC = () => {
                                     contactsErrors?.email?.message,
                                   )}
                                   errorMessage={contactsErrors?.email?.message}
-                                  disabled={isUpdating}
+                                  disabled={isUpdating || isReadOnly}
                                 />
                               </Grid>
                             </Grid>
@@ -971,7 +1002,7 @@ const EditProgramMemberForm: React.FC = () => {
                                   control={control}
                                   name={`contacts[${index}].landLineNumber`}
                                   label={t('common:Land line number')}
-                                  id="contact-land-phone-input"
+                                  id={`contact-person-lang-phone-input-${item.id}`}
                                   maxNumberOfCharacter={20}
                                   fieldRequired
                                   defaultValue={item.landLineNumber}
@@ -981,7 +1012,7 @@ const EditProgramMemberForm: React.FC = () => {
                                   errorMessage={
                                     contactsErrors?.landLineNumber?.message
                                   }
-                                  disabled={isUpdating}
+                                  disabled={isUpdating || isReadOnly}
                                 />
                               </Grid>
                               <Grid item xs={12} md={6}>
@@ -989,7 +1020,7 @@ const EditProgramMemberForm: React.FC = () => {
                                   control={control}
                                   name={`contacts[${index}].phoneNumber`}
                                   label={t('common:Phone')}
-                                  id="contact-phone-input"
+                                  id={`contact-person-phone-input-${item.id}`}
                                   defaultValue={item.phoneNumber}
                                   error={Boolean(
                                     contactsErrors?.phoneNumber?.message,
@@ -997,7 +1028,7 @@ const EditProgramMemberForm: React.FC = () => {
                                   errorMessage={
                                     contactsErrors?.phoneNumber?.message
                                   }
-                                  disabled={isUpdating}
+                                  disabled={isUpdating || isReadOnly}
                                 />
                               </Grid>
                             </Grid>
@@ -1015,21 +1046,23 @@ const EditProgramMemberForm: React.FC = () => {
                             </Typography>
                           </Grid>
                           <Grid item>
-                            <Button
-                              color="secondary"
-                              startIcon={<AddCircleOutlineIcon />}
-                              onClick={() =>
-                                contactsFieldArray.append({
-                                  name: '',
-                                  email: '',
-                                  phoneNumber: '',
-                                  landLineNumber: '',
-                                })
-                              }>
-                              <Typography>
-                                {t('common:Add another contact')}
-                              </Typography>
-                            </Button>
+                            {!isReadOnly && (
+                              <Button
+                                color="secondary"
+                                startIcon={<AddCircleOutlineIcon />}
+                                onClick={() =>
+                                  contactsFieldArray.append({
+                                    name: '',
+                                    email: '',
+                                    phoneNumber: '',
+                                    landLineNumber: '',
+                                  })
+                                }>
+                                <Typography>
+                                  {t('common:Add another contact')}
+                                </Typography>
+                              </Button>
+                            )}
                           </Grid>
                         </Grid>
                       </Grid>
@@ -1048,7 +1081,9 @@ const EditProgramMemberForm: React.FC = () => {
         <Grid item xs={12}>
           <Grid container justify="flex-end" spacing={2}>
             <Grid item>
-              <Button onClick={onCancelEditProgramMemberForm}>
+              <Button
+                onClick={onCancelEditProgramMemberForm}
+                disabled={isReadOnly}>
                 {t('common:Cancel')}
               </Button>
             </Grid>
@@ -1057,34 +1092,39 @@ const EditProgramMemberForm: React.FC = () => {
                 variant="contained"
                 color="primary"
                 isLoading={isUpdating}
-                onClick={() => handleSubmit(onSubmitForm)()}
+                onClick={() => {
+                  setOnSaveRedirect(false);
+                  handleSubmit(onSubmitForm)();
+                }}
                 text={t('common:Save changes')}
+                disabled={isReadOnly}
+              />
+            </Grid>
+            <Grid item>
+              <ButtonWithLoadingAnimation
+                variant="contained"
+                color="primary"
+                isLoading={isUpdating}
+                onClick={() => {
+                  setOnSaveRedirect(true);
+                  handleSubmit(onSubmitForm)();
+                }}
+                text={t('common:Save changes and return')}
+                disabled={isReadOnly}
               />
             </Grid>
           </Grid>
         </Grid>
       </Grid>
-      {showDeactivateModal && (
-        <ModalWrapper
-          isOpen
-          type="primary"
-          title={t('modals:Deactivate this program member?')}
-          loading={deactivateProgramMemberStatus.requesting}
-          onCancel={(event: any) => {
-            event.stopPropagation();
-            setShowDeactivateModal(false);
-          }}
-          onOK={(event: any) => {
-            event.stopPropagation();
-            onDeactivate();
-          }}>
-          <Typography variant="body2">
-            {t(
-              'modals:Are you sure you want to deactivate this program member?',
-            )}
-          </Typography>
-        </ModalWrapper>
-      )}
+
+      <Portal container={notesPortalRef.current}>
+        <Notes
+          organizationId={programMember?.id || ''}
+          isExpanded={isNotesExpanded}
+          setExpanded={setNotesExpanded}
+          isReadOnly={isReadOnly}
+        />
+      </Portal>
     </>
   );
 };

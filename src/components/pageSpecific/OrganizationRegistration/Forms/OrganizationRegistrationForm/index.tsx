@@ -322,7 +322,13 @@ const OrganizationRegistrationForm: React.FC<IOrganizationRegistrationFormProps>
                                             error={Boolean(
                                               errors.city?.message,
                                             )}
-                                            helperText={errors.city?.message}
+                                            helperText={
+                                              Boolean(errors.city?.message)
+                                                ? t(
+                                                    `formValidation:${errors.city?.message}`,
+                                                  )
+                                                : ''
+                                            }
                                           />
                                         );
                                       }}

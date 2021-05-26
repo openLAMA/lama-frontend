@@ -20,7 +20,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
-import { useHistory } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 // Material UI
 import {
@@ -32,16 +32,21 @@ import {
   TableRow,
   IconButton,
   Grid,
+  Tooltip,
 } from '@material-ui/core';
 
 // Material Icons
-import { EditOutlined as EditOutlineIcon } from '@material-ui/icons';
+import {
+  EditOutlined as EditOutlineIcon,
+  AddCommentOutlined as AddCommentOutlinedIcon,
+} from '@material-ui/icons';
 
 // Custom components
 import StatusIndicator from 'components/StatusIndicator';
 import LoadingAnimationOverlay from 'components/loaders/LoadingAnimationOverlay';
 import TableEnhancers from 'components/TableEnhancers';
 import withErrorHandler from 'components/Wrappers/ErrorBoundaryWrapper';
+import NoResultsFound from '../NoResultsFound';
 
 // Actions
 import { setFilter } from 'redux/globalState/programMembers/programMembersSlice';
@@ -53,6 +58,8 @@ import {
   formatDateToMonthDotDayDotFullYear,
   getDayName,
 } from 'utils/dateFNSCustom';
+import programMemberStatusEnum from 'utils/programMemberStatusEnum';
+import organizationTypesEnum from 'utils/organizationTypesEnum';
 
 // Types
 import {
@@ -65,24 +72,14 @@ interface IProgramMembersTableProps {
   showEditButton?: boolean;
   tableHeightOffset: number;
   tableWidthOffset: number;
-  getTranslatedStatus: (status: string) => string;
-  getTranslatedOrganizationType: (status: string) => string;
 }
 
 const ProgramMembersTable: React.FC<IProgramMembersTableProps> = (
   props: IProgramMembersTableProps,
 ) => {
   const dispatch = useDispatch();
-  const history = useHistory();
   const { t } = useTranslation();
-  const {
-    data,
-    showEditButton,
-    tableHeightOffset,
-    tableWidthOffset,
-    getTranslatedStatus,
-    getTranslatedOrganizationType,
-  } = props;
+  const { data, showEditButton, tableHeightOffset, tableWidthOffset } = props;
 
   const isDrawerOpen = useSelector(
     (state: RootState) => state.navDrawer.isDrawerOpen,
@@ -115,10 +112,6 @@ const ProgramMembersTable: React.FC<IProgramMembersTableProps> = (
     }
     newFilter.orderBy = property;
     setNewFilter(newFilter);
-  };
-
-  const onEditProgramMember = (id: string) => {
-    history.push(`/university/edit-program-member/${id}`);
   };
 
   return (
@@ -165,8 +158,17 @@ const ProgramMembersTable: React.FC<IProgramMembersTableProps> = (
                           sortable: true,
                         },
                         {
+                          id: 'followUpStatus',
+                          label: t('common:Follow up'),
+                        },
+                        {
                           id: 'epaadstatus',
                           label: t('common:Epaad Status'),
+                        },
+                        {
+                          id: 'supportPerson',
+                          label: t('common:Support person'),
+                          sortable: true,
                         },
                         {
                           id: 'createdOn',
@@ -183,25 +185,6 @@ const ProgramMembersTable: React.FC<IProgramMembersTableProps> = (
                           label: t('common:Organization key'),
                         },
                         {
-                          id: 'contactPerson',
-                          label: t('common:Contact person'),
-                        },
-                        { id: 'email', label: t('common:Email') },
-                        {
-                          id: 'phone',
-                          label: t('common:Mobile phone number'),
-                        },
-                        {
-                          id: 'studentsCount',
-                          label: t('common:Number of students'),
-                          sortable: true,
-                        },
-                        {
-                          id: 'employeesCount',
-                          label: t('common:Number of employees'),
-                          sortable: true,
-                        },
-                        {
                           id: 'numberOfSamples',
                           label: t('common:Total people'),
                           sortable: true,
@@ -212,8 +195,19 @@ const ProgramMembersTable: React.FC<IProgramMembersTableProps> = (
                           sortable: true,
                         },
                         {
+                          id: 'contactPerson',
+                          label: t('common:Contact person'),
+                        },
+                        { id: 'email', label: t('common:Email') },
+                        {
+                          id: 'phone',
+                          label: t('common:Mobile phone number'),
+                        },
+
+                        {
                           id: 'trainingTimestamp',
                           label: t('common:Information event date'),
+                          sortable: true,
                         },
                         {
                           id: 'onboardingTimestamp',
@@ -254,88 +248,161 @@ const ProgramMembersTable: React.FC<IProgramMembersTableProps> = (
                     />
 
                     <TableBody>
-                      {data.map((item: ProgramMemberType) => (
-                        <TableRow key={item.id}>
-                          {showEditButton && (
+                      {data.map((item: ProgramMemberType) => {
+                        const isFollowUpActionVisible =
+                          (item.organizationTypeId ===
+                            organizationTypesEnum.Company ||
+                            item.organizationTypeId ===
+                              organizationTypesEnum.SME) &&
+                          !item.isOnboardingEmailSent &&
+                          item.status !== programMemberStatusEnum.NotActive;
+
+                        let followUpStatus:
+                          | 'grayed'
+                          | 'information'
+                          | 'success'
+                          | 'failure' = 'grayed';
+                        if (item.isOnboardingEmailSent) {
+                          followUpStatus = 'success';
+                        }
+
+                        return (
+                          <TableRow key={item.id}>
+                            {showEditButton && (
+                              <TableCell>
+                                <Grid container wrap="nowrap" spacing={1}>
+                                  <Grid item>
+                                    <Link
+                                      to={{
+                                        pathname: `/university/edit-program-member/${item.id}`,
+                                      }}>
+                                      <IconButton color="primary" size="small">
+                                        <EditOutlineIcon />
+                                      </IconButton>
+                                    </Link>
+                                  </Grid>
+                                  <Grid item>
+                                    {isFollowUpActionVisible ? (
+                                      <Link
+                                        to={{
+                                          pathname: `/university/edit-program-member/${item.id}`,
+                                          state: {
+                                            openFollowUpModal: true,
+                                          },
+                                        }}>
+                                        <Tooltip
+                                          title={`${t(
+                                            'common:Send a follow-up email',
+                                          )}`}>
+                                          <IconButton
+                                            color="primary"
+                                            size="small">
+                                            <AddCommentOutlinedIcon />
+                                          </IconButton>
+                                        </Tooltip>
+                                      </Link>
+                                    ) : (
+                                      <Tooltip
+                                        title={`${t(
+                                          'common:Send a follow-up email',
+                                        )}`}>
+                                        <span>
+                                          <IconButton
+                                            color="primary"
+                                            size="small"
+                                            disabled>
+                                            <AddCommentOutlinedIcon />
+                                          </IconButton>
+                                        </span>
+                                      </Tooltip>
+                                    )}
+                                  </Grid>
+                                </Grid>
+                              </TableCell>
+                            )}
                             <TableCell>
-                              {
-                                <IconButton
-                                  color="primary"
-                                  onClick={() => onEditProgramMember(item.id)}>
-                                  <EditOutlineIcon />
-                                </IconButton>
-                              }
+                              {t(`common:${item.organizationType.name}`)}
                             </TableCell>
-                          )}
-                          <TableCell>
-                            {getTranslatedOrganizationType(
-                              item.organizationType.name,
-                            )}
-                          </TableCell>
 
-                          <TableCell>
-                            {getTranslatedStatus(item.status)}
-                          </TableCell>
-                          <TableCell>
-                            <StatusIndicator
-                              text={
-                                item.epaadId
-                                  ? t('common:Completed')
-                                  : t('common:Pending')
-                              }
-                              variant={item.epaadId ? 'success' : 'failure'}
-                            />
-                          </TableCell>
-                          <TableCell>
-                            {formatDateToMonthDotDayDotFullYear(item.createdOn)}
-                          </TableCell>
-                          <TableCell>{item.name}</TableCell>
-                          <TableCell>
-                            {item.organizationShortcutName || '-'}
-                          </TableCell>
-                          <TableCell>{item?.contacts[0]?.name}</TableCell>
-                          <TableCell>{item?.contacts[0]?.email}</TableCell>
-                          <TableCell>
-                            {item?.contacts[0]?.phoneNumber}
-                          </TableCell>
-                          <TableCell>{item.studentsCount}</TableCell>
-                          <TableCell>{item.employeesCount}</TableCell>
-                          <TableCell>{item.numberOfSamples}</TableCell>
-                          <TableCell>{item.registeredEmployees}</TableCell>
-                          <TableCell>
-                            {formatDateToMonthDotDayDotFullYear(
-                              item.trainingTimestamp,
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {formatDateToMonthDotDayDotFullYear(
-                              item.onboardingTimestamp,
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {formatDateToMonthDotDayDotFullYear(
-                              item.firstTestTimestamp,
-                            )}
-                          </TableCell>
-                          <TableCell>
-                            {getDayName(item.firstTestTimestamp)}
-                          </TableCell>
-                          <TableCell>{item.area}</TableCell>
+                            <TableCell>{t(`common:${item.status}`)}</TableCell>
+                            <TableCell>
+                              <StatusIndicator
+                                text={
+                                  item.isOnboardingEmailSent
+                                    ? t('common:Sent')
+                                    : t(`common:NotSent`)
+                                }
+                                variant={followUpStatus}
+                              />
+                            </TableCell>
+                            <TableCell>
+                              <StatusIndicator
+                                text={
+                                  item.epaadId
+                                    ? t('common:Completed')
+                                    : t('common:Pending')
+                                }
+                                variant={item.epaadId ? 'success' : 'failure'}
+                              />
+                            </TableCell>
+                            <TableCell>{item.supportPerson.name}</TableCell>
+                            <TableCell>
+                              {formatDateToMonthDotDayDotFullYear(
+                                item.createdOn,
+                              )}
+                            </TableCell>
+                            <TableCell>{item.name}</TableCell>
+                            <TableCell>
+                              {item.organizationShortcutName || '-'}
+                            </TableCell>
+                            <TableCell>{item.numberOfSamples}</TableCell>
+                            <TableCell>{item.registeredEmployees}</TableCell>
+                            <TableCell>{item?.contacts[0]?.name}</TableCell>
+                            <TableCell>{item?.contacts[0]?.email}</TableCell>
+                            <TableCell>
+                              {item?.contacts[0]?.phoneNumber}
+                            </TableCell>
 
-                          <TableCell>{item.address}</TableCell>
-                          <TableCell>{item.zip}</TableCell>
-                          <TableCell>
-                            {findCity(citiesList, item.cityId)?.name || '-'}
-                          </TableCell>
-                          <TableCell>{item.schoolType}</TableCell>
-                          <TableCell>{item.manager}</TableCell>
-                        </TableRow>
-                      ))}
+                            <TableCell>
+                              {formatDateToMonthDotDayDotFullYear(
+                                item.trainingTimestamp,
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {formatDateToMonthDotDayDotFullYear(
+                                item.onboardingTimestamp,
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {formatDateToMonthDotDayDotFullYear(
+                                item.firstTestTimestamp,
+                              )}
+                            </TableCell>
+                            <TableCell>
+                              {getDayName(item.firstTestTimestamp)}
+                            </TableCell>
+                            <TableCell>{item.area}</TableCell>
+
+                            <TableCell>{item.address}</TableCell>
+                            <TableCell>{item.zip}</TableCell>
+                            <TableCell>
+                              {findCity(citiesList, item.cityId)?.name || '-'}
+                            </TableCell>
+                            <TableCell>{item.schoolType}</TableCell>
+                            <TableCell>{item.manager}</TableCell>
+                          </TableRow>
+                        );
+                      })}
                     </TableBody>
                   </Table>
                 </TableContainer>
               </Paper>
             </Grid>
+            {!programMembersStatus.requesting && data.length === 0 && (
+              <Grid item xs={12}>
+                <NoResultsFound />
+              </Grid>
+            )}
           </Grid>
         </Grid>
       </Grid>

@@ -45,6 +45,7 @@ interface ICustomSelectProps {
   disabled?: boolean;
   showLoadingAdornment?: boolean;
   inputRef?: React.Ref<any>;
+  minWidth?: string;
 }
 
 const CustomSelect: React.FC<ICustomSelectProps> = (
@@ -66,6 +67,7 @@ const CustomSelect: React.FC<ICustomSelectProps> = (
     disabled,
     showLoadingAdornment,
     inputRef,
+    minWidth,
   } = props;
 
   return (
@@ -73,7 +75,8 @@ const CustomSelect: React.FC<ICustomSelectProps> = (
       fullWidth={fullWidth}
       variant={variant}
       className={className}
-      error={error}>
+      error={error}
+      style={{ minWidth }}>
       <InputLabel
         id={labelId}
         className={inputLabelClassName}

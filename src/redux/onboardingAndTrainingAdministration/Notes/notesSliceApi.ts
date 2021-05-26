@@ -26,7 +26,6 @@ import {
   PostNoteRequestType,
 } from 'redux/onboardingAndTrainingAdministration/Notes/types';
 
-// TODO update
 export const getNotesAPI = async (
   params: GetNotesRequestType,
 ): Promise<GetNotesResponseType> =>

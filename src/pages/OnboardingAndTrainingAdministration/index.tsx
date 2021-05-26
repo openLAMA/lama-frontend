@@ -17,20 +17,26 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-import React, { useEffect } from 'react';
+import React from 'react';
 import { useDispatch } from 'react-redux';
-import { useLocation } from 'react-router-dom';
-import { RouteProps, Switch, Route, Redirect } from 'react-router-dom';
+import {
+  useLocation,
+  RouteProps,
+  Switch,
+  Route,
+  Redirect,
+} from 'react-router-dom';
 
 // Material UI
 import { Container } from '@material-ui/core';
 
 // Material Icons
 import {
-  DashboardOutlined as DashboardOutlinedIcon,
+  TimelineOutlined as TimelineOutlinedIcon,
   PermIdentityOutlined as PermIdentityOutlinedIcon,
   DvrOutlined as DvrOutlinedIcon,
   PeopleOutlined as PeopleOutlinedIcon,
+  EventNote as EventNoteIcon,
 } from '@material-ui/icons';
 
 // Custom components
@@ -46,9 +52,6 @@ import {
 // Pages
 import NotFoundPage from 'pages/Unauthenticated/NotFound';
 
-// Actions
-import { clearAuthData } from 'redux/authData/authDataSlice';
-
 // Utils
 import TypedKeysMap from 'utils/TypedKeysMap';
 
@@ -61,7 +64,7 @@ const navDrawerItemList = [
   {
     name: OnboardingAndTrainingAdministrationRoutes.dashboardRoute.title,
     path: OnboardingAndTrainingAdministrationRoutes.dashboardRoute.route,
-    icon: <DashboardOutlinedIcon />,
+    icon: <TimelineOutlinedIcon />,
   },
   {
     name: OnboardingAndTrainingAdministrationRoutes.overviewRoute.title,
@@ -78,25 +81,21 @@ const navDrawerItemList = [
     path: OnboardingAndTrainingAdministrationRoutes.myProfileRoute.route,
     icon: <PermIdentityOutlinedIcon />,
   },
+  {
+    name: OnboardingAndTrainingAdministrationRoutes.calendarRoute.title,
+    path: OnboardingAndTrainingAdministrationRoutes.calendarRoute.route,
+    icon: <EventNoteIcon />,
+  },
 ];
 
 const OnboardingAndTrainingMainPage: React.FC<OnboardingAndTrainingMainPageType> = () => {
-  const dispatch = useDispatch();
   const location = useLocation();
-
-  useEffect(() => {
-    if (
-      location?.pathname.includes('login-confirmation') ||
-      location?.pathname.includes('register-confirmation')
-    ) {
-      dispatch(clearAuthData());
-    }
-  }, []);
 
   return (
     <div className={`${styles['root']} pt-11 overflow-hidden`}>
       <Navbar />
       <NavDrawer navItems={navDrawerItemList} />
+
       <Container
         maxWidth={false}
         className="pt-6 main-container-max-height overflow-auto">

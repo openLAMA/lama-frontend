@@ -18,6 +18,7 @@
 */
 
 @import 'styles/colors.scss';
+@import '@fontsource/roboto/100.css';
 
 /* http://meyerweb.com/eric/tools/css/reset/ 
    v2.0 | 20110126
@@ -217,6 +218,14 @@ code {
   background-color: $white;
 }
 
+.bg-color-gray {
+  background-color: $site-background-color;
+}
+
+.font-skinny {
+  font-weight: 300;
+}
+
 .bold {
   font-weight: 700;
 }
@@ -302,6 +311,52 @@ code {
   flex: 1;
   min-height: 0;
   overflow: scroll;
+}
+
+.grid-column-items-full-width {
+  .MuiGrid-item {
+    width: 100%;
+  }
+}
+
+.align-start {
+  align-items: flex-start;
+}
+
+.font-size-zero75rem {
+  font-size: 0.75rem;
+}
+
+.custom-switch-label-color {
+  color: rgba(0, 0, 0, 0.54);
+}
+
+.chart-container {
+  position: relative;
+  height: 400px;
+  canvas {
+    width: 100% !important;
+  }
+}
+
+.error-color-text {
+  color: $primary-color;
+}
+
+.strike-through {
+  text-decoration: line-through;
+}
+
+.capacity-table-header-color-0 {
+  background-color: #d7fbd8;
+}
+
+.capacity-table-header-color-1 {
+  background-color: #e5f2fd;
+}
+
+.header-font-size-small {
+  font-size: 1em;
 }
 
 @mixin generate($prefix, $property) {

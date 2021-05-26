@@ -404,8 +404,14 @@ const MyOrganizationForm: React.FC = () => {
                                               ?.message,
                                           )}
                                           helperText={
-                                            errors?.myOrganizationData?.city
-                                              ?.message
+                                            Boolean(
+                                              errors?.myOrganizationData?.city
+                                                ?.message,
+                                            )
+                                              ? t(
+                                                  `formValidation:${errors?.myOrganizationData?.city?.message}`,
+                                                )
+                                              : ''
                                           }
                                         />
                                       );

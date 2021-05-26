@@ -20,7 +20,7 @@
 import React, { useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 // Material UI
 import { Grid, Button } from '@material-ui/core';
@@ -37,6 +37,7 @@ import { UnauthenticatedRoutes } from 'config/routes';
 // Utils
 import { RootState } from 'redux/combineReducers';
 import { registerOrganization } from 'redux/organizationRegistration/organizationRegistrationSlice';
+
 interface IOrganizationRegistrationSummary {
   onHandleBack: () => void;
   onCancelRegistration: () => void;

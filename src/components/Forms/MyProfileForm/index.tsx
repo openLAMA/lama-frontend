@@ -27,6 +27,7 @@ import {
   useForm,
   Controller,
 } from 'react-hook-form';
+import { v4 as uuidv4 } from 'uuid';
 
 // Material UI
 import { Grid, Button, Typography, TextField } from '@material-ui/core';
@@ -92,7 +93,7 @@ const MyProfileForm: React.FC<IMyProfileFormProps> = (
     (state: RootState) => state.generalMyProfile.updateGeneralMyProfileStatus,
   );
 
-  const { control, handleSubmit, errors, setError } = useForm<any>({
+  const { control, handleSubmit, errors, setError, watch } = useForm<any>({
     criteriaMode: 'all',
     mode: 'onChange',
     defaultValues: {
@@ -104,6 +105,7 @@ const MyProfileForm: React.FC<IMyProfileFormProps> = (
         landLineNumber: generalMyPersonalData.landLineNumber,
         supportDefaultOrganizationTypes:
           generalMyPersonalData.supportDefaultOrganizationTypes || [],
+        uuidKey: generalMyPersonalData.uuidKey,
       },
       myProfileData: {
         users: generalMyProfileData.users,
@@ -152,9 +154,11 @@ const MyProfileForm: React.FC<IMyProfileFormProps> = (
   const isLoading = updateGeneralMyProfileStatus.requesting;
 
   return (
-    <Grid container spacing={4}>
+    <Grid container spacing={2}>
       <Grid item xs={12}>
-        <Card>
+        <Card
+          className="overflow-auto"
+          style={{ height: 'calc(100vh - 156px)' }}>
           <Grid container>
             <Grid item xs={12}>
               <BasicFormWrapper>
@@ -300,9 +304,15 @@ const MyProfileForm: React.FC<IMyProfileFormProps> = (
                                               ?.message,
                                           )}
                                           helperText={
-                                            errors.myPersonalData
-                                              ?.supportDefaultOrganizationTypes
-                                              ?.message
+                                            Boolean(
+                                              errors.myPersonalData
+                                                ?.supportDefaultOrganizationTypes
+                                                ?.message,
+                                            )
+                                              ? t(
+                                                  `formValidation:${errors.myPersonalData?.supportDefaultOrganizationTypes?.message}`,
+                                                )
+                                              : ''
                                           }
                                         />
                                       );
@@ -331,7 +341,7 @@ const MyProfileForm: React.FC<IMyProfileFormProps> = (
                         }
 
                         return (
-                          <Grid key={item.id} container spacing={2}>
+                          <Grid key={item.uuidKey} container spacing={2}>
                             <Grid item xs={12}>
                               <Grid container justify="space-between">
                                 <Grid item>
@@ -349,10 +359,14 @@ const MyProfileForm: React.FC<IMyProfileFormProps> = (
                                       disabled={isLoading}
                                       onClick={() =>
                                         usersFieldArray.append({
+                                          id:
+                                            '00000000-0000-0000-0000-000000000000',
                                           name: '',
                                           email: '',
                                           phoneNumber: '',
                                           landLineNumber: '',
+                                          supportDefaultOrganizationTypes: [],
+                                          uuidKey: uuidv4(),
                                         })
                                       }>
                                       <Typography>
@@ -389,6 +403,15 @@ const MyProfileForm: React.FC<IMyProfileFormProps> = (
                                     name={`myProfileData.users[${index}].id`}
                                     label={t('common:id')}
                                     id="contact-person-id-input"
+                                    hidden
+                                    disabled={isLoading}
+                                  />
+                                  <TextControllerInput
+                                    control={control}
+                                    defaultValue={item.uuidKey}
+                                    name={`myProfileData.users[${index}].uuidKey`}
+                                    label={t('common:id')}
+                                    id="key-for-react"
                                     hidden
                                     disabled={isLoading}
                                   />
@@ -528,9 +551,15 @@ const MyProfileForm: React.FC<IMyProfileFormProps> = (
                                                     ?.message,
                                                 )}
                                                 helperText={
-                                                  errors
-                                                    .supportDefaultOrganizationTypes
-                                                    ?.message
+                                                  Boolean(
+                                                    errors
+                                                      .supportDefaultOrganizationTypes
+                                                      ?.message,
+                                                  )
+                                                    ? t(
+                                                        `formValidation:${errors.supportDefaultOrganizationTypes?.message}`,
+                                                      )
+                                                    : ''
                                                 }
                                               />
                                             );
@@ -562,10 +591,13 @@ const MyProfileForm: React.FC<IMyProfileFormProps> = (
                                 disabled={isLoading}
                                 onClick={() =>
                                   usersFieldArray.append({
+                                    id: '00000000-0000-0000-0000-000000000000',
                                     name: '',
                                     email: '',
                                     phoneNumber: '',
                                     landLineNumber: '',
+                                    supportDefaultOrganizationTypes: [],
+                                    uuidKey: uuidv4(),
                                   })
                                 }>
                                 <Typography>
@@ -583,27 +615,24 @@ const MyProfileForm: React.FC<IMyProfileFormProps> = (
                       </Grid>
                     )}
                   </Grid>
-
-                  <Grid item xs={12}>
-                    <Grid container justify="flex-end">
-                      <Grid item>
-                        <ButtonWithLoadingAnimation
-                          variant="contained"
-                          color="primary"
-                          isLoading={isLoading}
-                          onClick={() =>
-                            handleSubmit(onSubmitGeneralMyProfileData)()
-                          }
-                          text={t('common:Save changes')}
-                        />
-                      </Grid>
-                    </Grid>
-                  </Grid>
                 </Grid>
               </BasicFormWrapper>
             </Grid>
           </Grid>
         </Card>
+      </Grid>
+      <Grid item xs={12}>
+        <Grid container justify="flex-end">
+          <Grid item>
+            <ButtonWithLoadingAnimation
+              variant="contained"
+              color="primary"
+              isLoading={isLoading}
+              onClick={() => handleSubmit(onSubmitGeneralMyProfileData)()}
+              text={t('common:Save changes')}
+            />
+          </Grid>
+        </Grid>
       </Grid>
     </Grid>
   );

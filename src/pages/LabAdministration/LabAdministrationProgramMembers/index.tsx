@@ -35,13 +35,7 @@ type AdministrationProgramMembersType = RouteProps;
 const AdministrationProgramMembers: React.FC<AdministrationProgramMembersType> = () => {
   return (
     <>
-      <PageContainerWithHeader
-        title={LabAdministrationRoutes.programMembersRoute.title}>
-        <ProgramMemberContainer
-          tableHeightOffset={210}
-          tableWidthOffset={280}
-        />
-      </PageContainerWithHeader>
+      <ProgramMemberContainer tableHeightOffset={210} tableWidthOffset={280} />
     </>
   );
 };

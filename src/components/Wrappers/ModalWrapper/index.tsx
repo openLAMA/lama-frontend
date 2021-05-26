@@ -40,9 +40,12 @@ interface IModalWrapperProps {
   onDone?: (event: any) => void;
   onCancel?: (event: any) => void;
   onDelete?: (event: any) => void;
+  onSend?: (event: any) => void;
   loading?: boolean;
+  dialogWidth?: string;
   minHeight?: string;
   disabledSaveButton?: boolean;
+  disabledSendButton?: boolean;
   type: 'error' | 'warning' | 'primary';
   children: React.ReactNode;
 }
@@ -61,9 +64,12 @@ const ModalWrapper: React.FC<IModalWrapperProps> = (
     onDone,
     onCancel,
     onDelete,
+    onSend,
     loading,
+    dialogWidth,
     minHeight,
     disabledSaveButton,
+    disabledSendButton,
     children,
     type,
   } = props;
@@ -71,11 +77,14 @@ const ModalWrapper: React.FC<IModalWrapperProps> = (
 
   return (
     <Dialog
-      maxWidth="xs"
+      maxWidth={false}
       aria-labelledby="confirmation-dialog"
       open={Boolean(isOpen)}
       className={styles['dialog-root']}
-      classes={{ paper: styles['paper-root'] }}>
+      classes={{ paper: styles['paper-root'] }}
+      PaperProps={{
+        style: { width: dialogWidth },
+      }}>
       {loading && (
         <div className={styles['loading-overlay']}>
           <CircularProgress />
@@ -138,7 +147,8 @@ const ModalWrapper: React.FC<IModalWrapperProps> = (
             variant="contained"
             onClick={onOK}
             color="primary"
-            className={styles[`button-${type}`]}>
+            className={styles[`button-${type}`]}
+            disabled={loading}>
             {t('common:OK')}
           </Button>
         )}
@@ -147,8 +157,19 @@ const ModalWrapper: React.FC<IModalWrapperProps> = (
             variant="contained"
             onClick={onDone}
             color="primary"
-            className={styles[`button-${type}`]}>
+            className={styles[`button-${type}`]}
+            disabled={loading}>
             {t('common:Done')}
+          </Button>
+        )}
+        {onSend && (
+          <Button
+            variant="contained"
+            onClick={onSend}
+            color="primary"
+            className={styles[`button-${type}`]}
+            disabled={loading || disabledSendButton}>
+            {t('common:Send')}
           </Button>
         )}
       </DialogActions>

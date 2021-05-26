@@ -82,8 +82,8 @@ const StudentInviteModal: React.FC<IStudentInviteModalProps> = (
     const data: SendInvitationForTestingPeopleType = {
       sendByUserId: loggedInUserId,
       date: forDate,
-      requiredPersonnelCountShift1: values.requiredPersonnelCountShift1,
-      requiredPersonnelCountShift2: values.requiredPersonnelCountShift2,
+      requiredPersonnelCountShift1: values.requiredPersonnelCountShift1 || 0,
+      requiredPersonnelCountShift2: values.requiredPersonnelCountShift2 || 0,
     };
     dispatch(inviteLaboratoryCapacityStudents(data));
   };
@@ -108,6 +108,7 @@ const StudentInviteModal: React.FC<IStudentInviteModalProps> = (
             <NumberControllerInput
               control={control}
               name="requiredPersonnelCountShift1"
+              fieldRequired
               numberMustBePositive
               label={t('common:Morning')}
               id="morning"
@@ -120,6 +121,7 @@ const StudentInviteModal: React.FC<IStudentInviteModalProps> = (
             <NumberControllerInput
               control={control}
               name="requiredPersonnelCountShift2"
+              fieldRequired
               numberMustBePositive
               label={t('common:Afternoon')}
               id="afternoon"

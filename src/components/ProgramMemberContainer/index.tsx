@@ -19,7 +19,6 @@
 
 import React, { useLayoutEffect, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useTranslation } from 'react-i18next';
 
 // Material UI
 import { Grid } from '@material-ui/core';
@@ -38,7 +37,7 @@ import { getCities } from 'redux/globalState/citiesData/citiesDataSlice';
 // Utils
 import { RootState } from 'redux/combineReducers';
 import programMemberStatusEnum from 'utils/programMemberStatusEnum';
-import organizationTypesEnum from 'utils/organizationTypesEnum';
+import { parseISO, format } from 'date-fns';
 
 // Types
 import { ProgramMemberFilterType } from 'redux/globalState/programMembers/types';
@@ -50,6 +49,7 @@ interface IProgramMembersContainerProps {
   hasTypeFiltration?: boolean;
   hasStatusFiltration?: boolean;
   hasQuickFilters?: boolean;
+  hasWeekdayFiltration?: boolean;
   tableHeightOffset: number;
   tableWidthOffset: number;
 }
@@ -64,11 +64,13 @@ const ProgramMemberContainer: React.FC<IProgramMembersContainerProps> = (
     hasTypeFiltration,
     hasStatusFiltration,
     hasQuickFilters,
+    hasWeekdayFiltration,
     tableHeightOffset,
     tableWidthOffset,
   } = props;
   const dispatch = useDispatch();
-  const { t } = useTranslation();
+
+  const userId = useSelector((state: RootState) => state.authData.userId);
 
   const citiesStatus = useSelector(
     (state: RootState) => state.cities.citiesStatus,
@@ -76,6 +78,10 @@ const ProgramMemberContainer: React.FC<IProgramMembersContainerProps> = (
 
   const programMembersTableData = useSelector(
     (state: RootState) => state.programMembersData.programMembers,
+  );
+
+  const followUpEmailStatus = useSelector(
+    (state: RootState) => state.followUpEmail.followUpEmailStatus,
   );
 
   const filter = useSelector(
@@ -125,12 +131,23 @@ const ProgramMemberContainer: React.FC<IProgramMembersContainerProps> = (
     }
   }, [citiesStatus]);
 
+  useEffect(() => {
+    if (followUpEmailStatus.success) {
+      fetchData();
+    }
+  }, [followUpEmailStatus]);
+
   let filteredResults = programMembersTableData.result;
 
   if (isUniversityOverview) {
     if (filter.filterEpaadStatusPending) {
       filteredResults = filteredResults.filter(
         (item) => !Boolean(item.epaadId),
+      );
+    }
+    if (filter.filterAssignedToMe) {
+      filteredResults = filteredResults.filter(
+        (item) => item.supportPersonId === userId,
       );
     }
     if (filter.filterType !== -1) {
@@ -143,49 +160,23 @@ const ProgramMemberContainer: React.FC<IProgramMembersContainerProps> = (
         (item) => item.status === filter.filterStatus,
       );
     }
+    if (filter.showAllOrganizations) {
+      filteredResults = filteredResults.filter(
+        (item) => item.status !== programMemberStatusEnum.NotActive,
+      );
+    }
+    if (filter.filterWeekday !== 'Weekday') {
+      filteredResults = filteredResults.filter((item) => {
+        if (item.firstTestTimestamp) {
+          return (
+            format(parseISO(item.firstTestTimestamp), `EEEE`) ===
+            filter.filterWeekday
+          );
+        }
+        return false;
+      });
+    }
   }
-
-  const getTranslatedStatus = (status: string): string => {
-    if (status) {
-      switch (status) {
-        case programMemberStatusEnum.NotActive:
-          return t('common:Not active');
-        case programMemberStatusEnum.NotConfirmed:
-          return t('common:Not confirmed');
-        case programMemberStatusEnum.Onboarded:
-          return t('common:Onboarded');
-        case programMemberStatusEnum.PendingContact:
-          return t('common:Pending contacts');
-        case programMemberStatusEnum.PendingOnboarding:
-          return t('common:Pending onboarding');
-        case programMemberStatusEnum.TrainingDateSet:
-          return t('common:Training date set');
-        default:
-          return t('common:Unknown');
-      }
-    }
-    return t('common:Unknown');
-  };
-
-  const getTranslatedOrganizationType = (organizationType: string): string => {
-    if (organizationType) {
-      switch (organizationType) {
-        case organizationTypesEnum.Company:
-          return t('common:Company');
-        case organizationTypesEnum.Pharmacy:
-          return t('common:Pharmacy');
-        case organizationTypesEnum.School:
-          return t('common:School');
-        case organizationTypesEnum.NursingHome:
-          return t('common:Nursing home');
-        case organizationTypesEnum.Hospital:
-          return t('common:Hospital');
-        default:
-          return t('common:Unknown');
-      }
-    }
-    return t('common:Unknown');
-  };
 
   return (
     <Grid container spacing={2}>
@@ -196,8 +187,7 @@ const ProgramMemberContainer: React.FC<IProgramMembersContainerProps> = (
           hasTypeFiltration={hasTypeFiltration}
           hasStatusFiltration={hasStatusFiltration}
           hasQuickFilters={hasQuickFilters}
-          getTranslatedStatus={getTranslatedStatus}
-          getTranslatedOrganizationType={getTranslatedOrganizationType}
+          hasWeekdayFiltration={hasWeekdayFiltration}
         />
       </Grid>
       <Grid item xs={12} className="overflow-auto">
@@ -206,10 +196,9 @@ const ProgramMemberContainer: React.FC<IProgramMembersContainerProps> = (
           showEditButton={showEditButton}
           tableHeightOffset={tableHeightOffset}
           tableWidthOffset={tableWidthOffset}
-          getTranslatedStatus={getTranslatedStatus}
-          getTranslatedOrganizationType={getTranslatedOrganizationType}
         />
       </Grid>
+      {/* TODO maybe add the folow up modal here */}
     </Grid>
   );
 };

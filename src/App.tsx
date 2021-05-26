@@ -24,7 +24,7 @@ import i18next from 'i18next';
 import AuthenticatedRoute from 'components/protectedRoutes/AuthenticatedRoute';
 import SnackbarAlert from 'components/Snackbar';
 import LazyRouteLoadingBar from 'components/loaders/LazyRouteLoadingBar/index.jsx';
-
+import MainDataLoadingContainerWrapper from 'components/MainDataLoadingContainerWrapper';
 // Pages
 import UnauthenticatedMainPage from 'pages/Unauthenticated';
 
@@ -44,6 +44,10 @@ const LabAdministrationMainPage = React.lazy(
   () => import('pages/LabAdministration'),
 );
 
+const LogisticsAdministrationMainPage = React.lazy(
+  () => import('pages/LogisticsAdministration'),
+);
+
 const App: React.FC = () => {
   useEffect(() => {
     if (Env.get() === 'development') {
@@ -58,24 +62,31 @@ const App: React.FC = () => {
       <BrowserRouter>
         <SnackbarAlert />
         <Suspense fallback={<LazyRouteLoadingBar />}>
-          <Switch>
-            <AuthenticatedRoute
-              path="/university"
-              authKey="University"
-              component={OnboardingAndTrainingMainPage}
-            />
-            <AuthenticatedRoute
-              path="/laboratory"
-              authKey="Laboratory"
-              component={LabAdministrationMainPage}
-            />
-            <AuthenticatedRoute
-              path="/organization"
-              authKey="Organization"
-              component={OrganizationAdministrationMainPage}
-            />
-            <Route path="/" component={UnauthenticatedMainPage} />
-          </Switch>
+          <MainDataLoadingContainerWrapper>
+            <Switch>
+              <AuthenticatedRoute
+                path="/university"
+                authKey="University"
+                component={OnboardingAndTrainingMainPage}
+              />
+              <AuthenticatedRoute
+                path="/laboratory"
+                authKey="Laboratory"
+                component={LabAdministrationMainPage}
+              />
+              <AuthenticatedRoute
+                path="/organization"
+                authKey="Organization"
+                component={OrganizationAdministrationMainPage}
+              />
+              <AuthenticatedRoute
+                path="/logistics"
+                authKey="logistics"
+                component={LogisticsAdministrationMainPage}
+              />
+              <Route path="/" component={UnauthenticatedMainPage} />
+            </Switch>
+          </MainDataLoadingContainerWrapper>
         </Suspense>
       </BrowserRouter>
     </>

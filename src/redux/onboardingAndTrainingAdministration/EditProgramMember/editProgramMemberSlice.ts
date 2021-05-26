@@ -19,13 +19,13 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
 import callSnackbar from 'utils/customHooks/useSnackbar';
 
-import { IApiStatus, SupportPersonType } from 'redux/globalTypes';
-
+// Types
+import { IApiStatus, SupportPersonSelectType } from 'redux/globalTypes';
 import { ProgramMemberType } from 'redux/globalState/programMembers/types';
-
 import {
   GetProgramMemberRequestType,
   GetProgramMemberResponseType,
@@ -34,7 +34,9 @@ import {
   PutSupportPeopleForOrganizationRequestType,
   DeactivateProgramMemberRequestType,
   PushToEpaadProgramMemberRequestType,
+  PutFollowUpStatus,
 } from 'redux/onboardingAndTrainingAdministration/EditProgramMember/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import {
   getProgramMemberAPI,
@@ -42,16 +44,18 @@ import {
   putSupportPeopleForOrganizationAPI,
   deactivateProgramMemberAPI,
   pushToEpaadProgramMemberAPI,
+  putFollowUpStatusAPI,
 } from 'redux/onboardingAndTrainingAdministration/EditProgramMember/editProgramMemberApi';
 
 interface IEditProgramMember {
   programMember: ProgramMemberType;
   programMemberStatus: IApiStatus;
-  supportPeople: SupportPersonType[];
+  supportPeople: SupportPersonSelectType[];
   supportPeopleStatus: IApiStatus;
   updateProgramMemberStatus: IApiStatus;
   deactivateProgramMemberStatus: IApiStatus;
   pushToEpaadProgramMemberStatus: IApiStatus;
+  updateFollowUpStatusStatus: IApiStatus;
 }
 
 const initialState = {
@@ -77,6 +81,11 @@ const initialState = {
     failure: false,
   },
   pushToEpaadProgramMemberStatus: {
+    requesting: false,
+    success: false,
+    failure: false,
+  },
+  updateFollowUpStatusStatus: {
     requesting: false,
     success: false,
     failure: false,
@@ -200,6 +209,27 @@ const editProgramMemberSlice = createSlice({
         failure: true,
       };
     },
+    updateFollowUpStatusRequesting(state) {
+      state.updateFollowUpStatusStatus = {
+        requesting: true,
+        success: false,
+        failure: false,
+      };
+    },
+    updateFollowUpStatusSuccess(state) {
+      state.updateFollowUpStatusStatus = {
+        requesting: false,
+        success: true,
+        failure: false,
+      };
+    },
+    updateFollowUpStatusFailed(state) {
+      state.updateFollowUpStatusStatus = {
+        requesting: false,
+        success: false,
+        failure: true,
+      };
+    },
     clearUpdateProgramData(state) {
       state.programMember = initialState.programMember;
       state.programMemberStatus = initialState.programMemberStatus;
@@ -230,6 +260,9 @@ export const {
   pushToEpaadProgramMemberRequesting,
   pushToEpaadProgramMemberSuccess,
   pushToEpaadProgramMemberFailed,
+  updateFollowUpStatusRequesting,
+  updateFollowUpStatusSuccess,
+  updateFollowUpStatusFailed,
   clearUpdateProgramData,
 } = editProgramMemberSlice.actions;
 
@@ -245,11 +278,7 @@ export const getProgramMember = (
     },
     (error): void => {
       dispatch(getProgramMemberFailed());
-      callSnackbar({
-        message: 'Failed to get program member data!',
-
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to get program member data!');
     },
   );
 };
@@ -262,13 +291,9 @@ export const getSupportPeople = (
     (response: GetSupportPeopleForOrganizationResponseType): void => {
       dispatch(getSupportPeopleSuccess(response));
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getSupportPeopleFailed());
-      callSnackbar({
-        message: 'Failed to get support people data!',
-
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to get support people data!');
     },
   );
 };
@@ -286,12 +311,9 @@ export const updateProgramMember = (
         messageType: 'success',
       });
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(updateProgramMemberFailed());
-      callSnackbar({
-        message: 'Failed to update program member!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to update program member!');
     },
   );
 };
@@ -309,13 +331,9 @@ export const deactivateProgramMember = (
         messageType: 'success',
       });
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(deactivateProgramMemberFailed());
-      callSnackbar({
-        message: 'Failed to deactivate a program member!',
-
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to deactivate a program member!');
     },
   );
 };
@@ -329,17 +347,31 @@ export const pushToEpaadProgramMember = (
       dispatch(pushToEpaadProgramMemberSuccess());
       callSnackbar({
         message: 'Successfully pushed program member data to Epaad!',
-
         messageType: 'success',
       });
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(pushToEpaadProgramMemberFailed());
-      callSnackbar({
-        message: 'Failed to push program member to Epaad!',
+      extractErrorMessage(error, 'Failed to push program member to Epaad!');
+    },
+  );
+};
 
-        messageType: 'error',
+export const updateFollowUpStatus = (
+  data: PutFollowUpStatus,
+): AppThunk => async (dispatch) => {
+  dispatch(updateFollowUpStatusRequesting());
+  putFollowUpStatusAPI(data).then(
+    (): void => {
+      dispatch(updateFollowUpStatusSuccess());
+      callSnackbar({
+        message: 'Successfully updated follow up status!',
+        messageType: 'success',
       });
+    },
+    (error: ErrorObjectType): void => {
+      dispatch(updateFollowUpStatusFailed());
+      extractErrorMessage(error, 'Failed to update follow up status!');
     },
   );
 };

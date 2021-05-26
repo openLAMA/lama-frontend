@@ -23,7 +23,6 @@ export type NoteItemType = {
   id: string;
   organizationId: string;
   text: string;
-  userId: string;
 };
 
 export type GetNotesRequestType = {

@@ -25,6 +25,10 @@ import { HttpStatusCode } from 'apiService/types';
 
 // Actions
 import { clearAuthData } from 'redux/authData/authDataSlice';
+import callSnackbar from 'utils/customHooks/useSnackbar';
+
+// Types
+import { ErrorObjectType } from 'apiService/types';
 
 const config: AxiosRequestConfig = {
   baseURL: process.env.REACT_APP_API_ENDPOINT_URL,
@@ -44,7 +48,7 @@ axiosInstance.interceptors.request.use(
     }
     return requestConfig;
   },
-  (error) => {
+  (error: any) => {
     Promise.reject(error);
   },
 );
@@ -86,39 +90,95 @@ const handleAPIError = (error: AxiosError) => {
       return error;
   }
 };
+interface IErrorMessagesMapping {
+  [key: string]: {
+    message: string;
+    dynamicDataKey: string;
+  };
+}
+
+const errorMessagesMapping: IErrorMessagesMapping = {
+  'User has duplicate area of responsibility': {
+    message: 'Invitation for X has already been sent',
+    dynamicDataKey: 'date',
+  },
+  'Invitation for the date has already been sent': {
+    message: 'Invitation for X has already been sent',
+    dynamicDataKey: 'date',
+  },
+  'Already existing emails': {
+    message: 'Emails already exist',
+    dynamicDataKey: 'emails',
+  },
+  'Testing personnel with this email already exists': {
+    message: 'Testing personnel with email X already exists',
+    dynamicDataKey: 'email',
+  },
+  'Fixed testing personnel with email was not found': {
+    message: 'Fixed testing personnel with email X was not found',
+    dynamicDataKey: 'email',
+  },
+  'Cancelation for testing personnel for date already exists': {
+    message: 'Cancelation for testing personnel for date X already exists',
+    dynamicDataKey: 'date',
+  },
+  'User that you want to delete is assigned to an Organization': {
+    message: 'User that you want to delete is assigned to an Organization',
+    dynamicDataKey: 'emails',
+  },
+};
+
+const getErrorMessage = (error: AxiosError) => {
+  const errorData = error?.response?.data || null;
+  let errorObject: ErrorObjectType = {
+    showGenericMessage: true,
+  };
+  let hasDynamicError = false;
+  if (!errorData || typeof errorData === 'string') return errorObject;
+
+  Object.keys(errorMessagesMapping).forEach((key) => {
+    if (errorData.errors[key]) {
+      const datesList = errorData.errors[key];
+      if (datesList instanceof Array && datesList.length !== 0) {
+        const errorMessageData = errorMessagesMapping[key];
+        errorObject = {
+          dynamicData: {
+            [`${errorMessageData.dynamicDataKey}`]: datesList[0],
+          },
+          message: errorMessageData.message,
+        };
+      }
+      hasDynamicError = true;
+    }
+  });
+
+  if (hasDynamicError) {
+    return errorObject;
+  }
+
+  const errorKeys = Object.keys(errorData.errors);
+  if (errorKeys.length === 0) return error;
+  errorObject = {
+    message: errorData.errors[errorKeys[0]][0],
+  };
+  return errorObject;
+};
 
 const handle400 = (error: AxiosError) => {
-  const errorData = error?.response?.data || null;
-  if (!errorData) return error;
-  if (errorData?.errors?.length === 0) return error;
-  const errorObject = {};
-  return errorObject;
+  return getErrorMessage(error);
 };
 
 const handle401 = (error: AxiosError) => {
-  const errorData = error?.response?.data || null;
   store.dispatch(clearAuthData());
-
-  if (!errorData) return error;
-  if (errorData?.errors?.length === 0) return error;
-  const errorObject = {};
-  return errorObject;
+  return getErrorMessage(error);
 };
 
 const handle404 = (error: AxiosError) => {
-  const errorData = error?.response?.data || null;
-  if (!errorData) return error;
-  if (errorData?.errors?.length === 0) return error;
-  const errorObject = {};
-  return errorObject;
+  return getErrorMessage(error);
 };
 
 const handle409 = (error: AxiosError) => {
-  const errorData = error?.response?.data || null;
-  if (!errorData) return error;
-  if (errorData?.errors?.length === 0) return error;
-  const errorObject = {};
-  return errorObject;
+  return getErrorMessage(error);
 };
 
 const handle500 = () => {
@@ -127,3 +187,26 @@ const handle500 = () => {
 };
 
 export default axiosInstance;
+
+export const extractErrorMessage = (
+  error: ErrorObjectType,
+  errorMessage: string,
+) => {
+  if (error?.dynamicData) {
+    callSnackbar({
+      message: error.message,
+      dynamicData: error.dynamicData,
+      messageType: 'error',
+    });
+  } else if (error?.message) {
+    callSnackbar({
+      message: error.message,
+      messageType: 'error',
+    });
+  } else {
+    callSnackbar({
+      message: errorMessage,
+      messageType: 'error',
+    });
+  }
+};

@@ -19,9 +19,12 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
+import { v4 as uuidv4 } from 'uuid';
 
 import callSnackbar from 'utils/customHooks/useSnackbar';
 
+// Types
 import { IApiStatus } from 'redux/globalTypes';
 import {
   GetGeneralMyProfileType,
@@ -30,6 +33,7 @@ import {
   GetGeneralMyProfileRequestType,
   UpdateGeneralMyProfileRequestType,
 } from 'redux/globalState/generalMyProfile/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import {
   getGeneralMyProfileAPI,
@@ -116,6 +120,13 @@ const generalMyProfileSlice = createSlice({
         failure: true,
       };
     },
+    clearUpdateGeneralMyProfileFlags(state) {
+      state.updateGeneralMyProfileStatus = {
+        requesting: false,
+        success: false,
+        failure: false,
+      };
+    },
     resetMyProfileData(state) {
       state = initialState;
     },
@@ -129,6 +140,7 @@ export const {
   updateGeneralMyProfileRequesting,
   updateGeneralMyProfileSuccess,
   updateGeneralMyProfileError,
+  clearUpdateGeneralMyProfileFlags,
   resetMyProfileData,
 } = generalMyProfileSlice.actions;
 
@@ -146,9 +158,15 @@ export const getGeneralMyProfile = (
       if (response.users.length !== 0) {
         myPersonalData = response.users.find((user) => user.id === userId);
       }
+      if (myPersonalData) {
+        myPersonalData.uuidKey = uuidv4();
+      }
       const filteredContactPeople =
         response.users.filter((users) => users.id !== userId) || [];
-      response.users = filteredContactPeople;
+      response.users = filteredContactPeople.map((user) => {
+        user.uuidKey = uuidv4();
+        return user;
+      });
       dispatch(
         getGeneralMyProfileSuccess({
           myPersonalData: myPersonalData,
@@ -156,12 +174,9 @@ export const getGeneralMyProfile = (
         }),
       );
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getGeneralMyProfileError());
-      callSnackbar({
-        message: 'Failed to fetch my profile details',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to fetch my profile details!');
     },
   );
 };
@@ -178,12 +193,9 @@ export const updateMyGeneralProfile = (
         messageType: 'success',
       });
     },
-    (error): void => {
+    (error: ErrorObjectType): void => {
       dispatch(updateGeneralMyProfileError());
-      callSnackbar({
-        message: 'Failed to update my profile details!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to update my profile details!');
     },
   );
 };

@@ -19,37 +19,26 @@
 
 import React from 'react';
 import { RouteProps } from 'react-router-dom';
-import { useSelector } from 'react-redux';
 
-// Material UI
-import { Grid } from '@material-ui/core';
+type OnboardingAndTrainingAdministrationCalendarType = RouteProps;
 
-// Custom components
-import PageContainerWithHeader from 'components/PageContainerWithHeader';
-import ProgramMemberContainer from 'components/ProgramMemberContainer';
-
-// Utils
-import { OnboardingAndTrainingAdministrationRoutes } from 'config/routes';
-import { RootState } from 'redux/combineReducers';
-
-type OnboardingAndTrainingAdministrationDashboardType = RouteProps;
-
-const OnboardingAndTrainingAdministrationDashboard: React.FC<OnboardingAndTrainingAdministrationDashboardType> = () => {
-  const roleType = useSelector((state: RootState) => state.authData.roleType);
-
+const OnboardingAndTrainingAdministrationCalendar: React.FC<OnboardingAndTrainingAdministrationCalendarType> = () => {
   return (
     <>
-      <PageContainerWithHeader
-        title={OnboardingAndTrainingAdministrationRoutes.dashboardRoute.title}>
-        <ProgramMemberContainer
-          showEditButton={roleType === 'University'}
-          isUniversityDashboard
-          tableHeightOffset={210}
-          tableWidthOffset={280}
-        />
-      </PageContainerWithHeader>
+      {/* <iframe
+        title="Calendar"
+        frameBorder="0"
+        height="98%"
+        width="100%"
+        src="https://kalender.digital/412f07c91ef64afb4977?iframe=true"></iframe> */}
+      <iframe
+        title="Calendar-edit"
+        frameBorder="0"
+        height="98%"
+        width="100%"
+        src="https://kalender.digital/d4edf3b8189664a654f7?iframe=true"></iframe>
     </>
   );
 };
 
-export default OnboardingAndTrainingAdministrationDashboard;
+export default OnboardingAndTrainingAdministrationCalendar;

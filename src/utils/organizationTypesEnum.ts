@@ -18,11 +18,12 @@
 */
 
 enum organizationTypes {
-  Company = 'Company',
-  Pharmacy = 'Pharmacy',
-  School = 'School',
-  NursingHome = 'Nursing Home',
-  Hospital = 'Hospital',
+  Company = 82000,
+  Pharmacy = 82001,
+  School = 82002,
+  NursingHome = 82003,
+  Hospital = 82004,
+  SME = 99990,
 }
 
 export default organizationTypes;

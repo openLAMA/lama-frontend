@@ -1,10 +1,13 @@
 {
   "Successfully updated organization details!": "Daten wurden erfolgreich aktualisiert.",
-  "Successfully added a new testing person!": "Neu Person efolgreich hinzugefÃƒÂ¼gt.",
+  "Successfully added a new testing person!": "Neue Person erfolgreich hinzugefügt",
   "Successfully sent invitation!": "Einladung wurde erfolgreich versendet.",
   "Successfully remove testing person!": "Person wurde erfolgreich entfernt.",
   "Successfully updated a program member!": "Aktualisierung war erfolgreich",
   "Successfully deactivated a program member!": "Erfolgreich deaktiviert.",
   "Successfully updated my profile details!": "Profil wurde erfolgreich aktualisiert",
-  "Successfully pushed program member data to Epaad!": "Übertragung an ePaad erfolgreich."
+  "Successfully pushed program member data to Epaad!": "Übertragung an ePaad erfolgreich.",
+  "Successfully sent follow up emails!": "Email wurde erfolgreich versendet.",
+  "Successfully updated follow up status!": "Der Status wurde erfolgreich aktualisiert.",
+  "Successfully removed person from shift!": "Person wurde entfernt"
 }

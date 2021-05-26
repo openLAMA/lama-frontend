@@ -17,26 +17,24 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-import React, { useLayoutEffect } from 'react';
+import React, { useLayoutEffect, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
 import { RouteProps } from 'react-router-dom';
 
-// Material UI
-import { Grid } from '@material-ui/core';
-
 // Custom components
-import PageContainerWithHeader from 'components/PageContainerWithHeader';
 import MyProfileForm from 'components/Forms/MyProfileForm';
 import LoadingSwapComponent from 'components/loaders/LoadingSwapComponent';
 
 // Utils
-import { LabAdministrationRoutes } from 'config/routes';
 import { RootState } from 'redux/combineReducers';
 
 // Actions
 import { getOrganizationTypes } from 'redux/globalState/organizationTypes/organizationTypesSlice';
-import { getGeneralMyProfile } from 'redux/globalState/generalMyProfile/generalMyProfileSlice';
+import {
+  getGeneralMyProfile,
+  clearUpdateGeneralMyProfileFlags,
+} from 'redux/globalState/generalMyProfile/generalMyProfileSlice';
 
 type OrganizationAdministrationMyProfileType = RouteProps;
 
@@ -56,6 +54,10 @@ const OrganizationAdministrationMyProfile: React.FC<OrganizationAdministrationMy
     (state: RootState) => state.organizationTypes.organizationTypesStatus,
   );
 
+  const updateGeneralMyProfileStatus = useSelector(
+    (state: RootState) => state.generalMyProfile.updateGeneralMyProfileStatus,
+  );
+
   useLayoutEffect(() => {
     if (
       !organizationTypesStatus.requesting &&
@@ -67,28 +69,29 @@ const OrganizationAdministrationMyProfile: React.FC<OrganizationAdministrationMy
     dispatch(getGeneralMyProfile({ id: organizationId }));
   }, []);
 
+  useEffect(() => {
+    if (updateGeneralMyProfileStatus.success) {
+      dispatch(getGeneralMyProfile({ id: organizationId }));
+      dispatch(clearUpdateGeneralMyProfileFlags());
+    }
+  }, [updateGeneralMyProfileStatus]);
+
   const isLoading =
     getGeneralMyProfileStatus.requesting || organizationTypesStatus.requesting;
 
-  const arrayOfMessages = [];
+  let text = '';
   if (organizationTypesStatus.requesting) {
-    arrayOfMessages.push(t('progressMessages:Fetching organization types'));
+    text = t('progressMessages:Fetching organization types');
   }
   if (getGeneralMyProfileStatus.requesting) {
-    arrayOfMessages.push(t('progressMessages:Fetching my profile data'));
+    text = t('progressMessages:Fetching my profile data');
   }
 
   return (
     <>
-      <PageContainerWithHeader
-        title={LabAdministrationRoutes.myProfileRoute.title}>
-        <LoadingSwapComponent
-          isLoading={isLoading}
-          withGrid
-          arrayOfMessages={arrayOfMessages}>
-          <MyProfileForm removeAreaOfResponsibility />
-        </LoadingSwapComponent>
-      </PageContainerWithHeader>
+      <LoadingSwapComponent isLoading={isLoading} center text={text}>
+        <MyProfileForm removeAreaOfResponsibility />
+      </LoadingSwapComponent>
     </>
   );
 };

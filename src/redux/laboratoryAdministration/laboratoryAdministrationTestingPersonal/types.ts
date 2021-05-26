@@ -17,6 +17,15 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
+import { ShiftType } from 'redux/globalTypes';
+
+export type WorkingAreaType = {
+  area: string;
+  id: string;
+};
+
+export type TestingPersonnelType = 'Normal' | 'Fixed' | 'Temporary';
+
 export type LaboratoryTestingPersonalResultType = {
   id: string;
   firstName: string;
@@ -24,12 +33,13 @@ export type LaboratoryTestingPersonalResultType = {
   email: string;
   statusId: string;
   employer: string;
-  workingAreas: [
-    {
-      area: string;
-      id: string;
-    },
-  ];
+  workingAreas: WorkingAreaType[];
+  type: TestingPersonnelType;
+  mondayShift: ShiftType;
+  tuesdayShift: ShiftType;
+  wednesdayShift: ShiftType;
+  thursdayShift: ShiftType;
+  fridayShift: ShiftType;
 };
 
 export type AddLaboratoryTestingPersonalType = {
@@ -38,7 +48,15 @@ export type AddLaboratoryTestingPersonalType = {
   email: string;
   statusId: string;
   employeer: string;
-  workingAreas: string[];
+  workingAreas: {
+    workingArea: string;
+  }[];
+  type: TestingPersonnelType;
+  mondayShift: ShiftType;
+  tuesdayShift: ShiftType;
+  wednesdayShift: ShiftType;
+  thursdayShift: ShiftType;
+  fridayShift: ShiftType;
 };
 
 export type GetLaboratoryTestingPersonalType = {

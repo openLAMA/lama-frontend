@@ -19,12 +19,12 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
-import callSnackbar from 'utils/customHooks/useSnackbar';
-
+// Types
 import { IApiStatus } from 'redux/globalTypes';
+import { ErrorObjectType } from 'apiService/types';
 
-import { ErrorObject } from 'apiService';
 import { loginAPI, confirmLoginAPI, confirmRegistrationAPI } from './authAPI';
 
 import {
@@ -165,12 +165,9 @@ export const login = (data: LoginRequestType): AppThunk => async (dispatch) => {
     (response: LoginResponseType): void => {
       dispatch(loginSuccess());
     },
-    (error: ErrorObject): void => {
+    (error: ErrorObjectType): void => {
       dispatch(loginFailed());
-      callSnackbar({
-        message: 'Failed to send email!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to send email!');
     },
   );
 };
@@ -185,7 +182,7 @@ export const confirmLogin = (data: ConfirmLoginRequestType): AppThunk => async (
       dispatch(setAuthData(response));
       dispatch(confirmLoginSuccess());
     },
-    (error: ErrorObject): void => {
+    (error: ErrorObjectType): void => {
       dispatch(confirmLoginFailed());
     },
   );
@@ -200,7 +197,7 @@ export const confirmRegistration = (
       dispatch(setAuthData(response));
       dispatch(confirmRegistrationSuccess());
     },
-    (error: ErrorObject): void => {
+    (error: ErrorObjectType): void => {
       dispatch(confirmRegistrationFailed());
     },
   );

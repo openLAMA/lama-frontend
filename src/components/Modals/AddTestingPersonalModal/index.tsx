@@ -23,7 +23,13 @@ import { Controller, useForm } from 'react-hook-form';
 import { useSelector, useDispatch } from 'react-redux';
 
 // Material UI
-import { Grid, MenuItem, TextField } from '@material-ui/core';
+import {
+  FormControlLabel,
+  Grid,
+  MenuItem,
+  TextField,
+  Switch,
+} from '@material-ui/core';
 import { Autocomplete } from '@material-ui/lab';
 
 // Custom components
@@ -42,18 +48,19 @@ import {
 import { RootState } from 'redux/combineReducers';
 
 // Types
+import { ShiftType } from 'redux/globalTypes';
 import { AddLaboratoryTestingPersonalType } from 'redux/laboratoryAdministration/laboratoryAdministrationTestingPersonal/types';
 
 // Form validations
 import { atLeastOneItemInMultiSelect } from 'formValidation';
+import shiftEnum from 'utils/shiftsEnum';
 
 interface ITestingPersonalModalProps {
   onClose: () => void;
 }
 
-type workingAreaType = {
-  id: number;
-  workingArea: string;
+type shiftSelectType = {
+  id: ShiftType;
 };
 
 const selectEmployer = [
@@ -67,20 +74,24 @@ const selectEmployer = [
   },
 ];
 
-const selectWorkingAreas: workingAreaType[] = [
+const selectWorkingAreas: string[] = ['Pooling', 'Labor', 'Admin'];
+
+const selectShift: shiftSelectType[] = [
   {
-    id: 0,
-    workingArea: 'Pooling',
+    id: shiftEnum.None,
   },
   {
-    id: 1,
-    workingArea: 'Labor',
+    id: shiftEnum.First,
   },
   {
-    id: 2,
-    workingArea: 'Admin',
+    id: shiftEnum.Second,
+  },
+  {
+    id: shiftEnum.FullDay,
   },
 ];
+
+const employeeTypes: string[] = ['Normal', 'Fixed', 'Temporary'];
 
 const AddTestingPersonalModal: React.FC<ITestingPersonalModalProps> = (
   props: ITestingPersonalModalProps,
@@ -99,7 +110,12 @@ const AddTestingPersonalModal: React.FC<ITestingPersonalModalProps> = (
       state.laboratoryTestingPersonalData.addLaboratoryTestingPersonalStatus,
   );
 
-  const { control, handleSubmit, errors } = useForm<any>({
+  const testingPersonalTableData = useSelector(
+    (state: RootState) =>
+      state.laboratoryTestingPersonalData.testingPersonalsTableData,
+  );
+
+  const { control, handleSubmit, errors, setError, watch } = useForm<any>({
     criteriaMode: 'all',
     mode: 'onChange',
     defaultValues: {
@@ -111,8 +127,15 @@ const AddTestingPersonalModal: React.FC<ITestingPersonalModalProps> = (
       statusText: '',
       employer: '',
       workingAreas: [],
+      type: 'Normal',
+      mondayShift: 'None',
+      tuesdayShift: 'None',
+      wednesdayShift: 'None',
+      thursdayShift: 'None',
+      fridayShift: 'None',
     },
   });
+  const watchType = watch('type');
 
   useEffect(() => {
     if (testingPersonalStatus.success) {
@@ -122,19 +145,45 @@ const AddTestingPersonalModal: React.FC<ITestingPersonalModalProps> = (
   }, [testingPersonalStatus]);
 
   const onSubmitForm = (values: any) => {
+    const foundSameUser = testingPersonalTableData?.result?.find(
+      (user) => user.email === values.email,
+    );
+    if (foundSameUser) {
+      setError('email', {
+        type: 'manual',
+        message: t('formValidation:This email address is already being used!'),
+        shouldFocus: true,
+      });
+      return;
+    }
     const data: AddLaboratoryTestingPersonalType = {
       firstName: values.firstName,
       lastName: values.lastName,
       email: values.email,
       statusId: values.statusId,
       employeer: values.employer,
-      workingAreas: values.workingAreas.map((item: any) => {
-        return {
-          workingArea: item.id,
-        };
-      }),
+      workingAreas: values.workingAreas
+        ? values.workingAreas.map((item: string) => {
+            return {
+              workingArea: item,
+            };
+          })
+        : [],
+      type: values.type,
+      mondayShift: values.mondayShift,
+      tuesdayShift: values.tuesdayShift,
+      wednesdayShift: values.wednesdayShift,
+      thursdayShift: values.thursdayShift,
+      fridayShift: values.fridayShift,
     };
-
+    if (values.type === 'Temporary') {
+      data.workingAreas = [
+        {
+          workingArea: 'Pooling',
+        },
+      ];
+      data.employeer = 'None';
+    }
     dispatch(addLaboratoryTestingPerson(data));
   };
 
@@ -156,6 +205,26 @@ const AddTestingPersonalModal: React.FC<ITestingPersonalModalProps> = (
         <BasicFormWrapper>
           <Grid item xs={12}>
             <Grid container spacing={2}>
+              <Grid item xs={12}>
+                <DropdownControllerInput
+                  control={control}
+                  name="type"
+                  label={t('common:Type')}
+                  labelId="testing-personnel-type"
+                  id="testing-personnel-select"
+                  fieldRequired
+                  error={Boolean(errors?.type?.message)}
+                  errorMessage={errors?.type?.message}
+                  menuItems={employeeTypes?.map((type) => {
+                    return (
+                      <MenuItem key={type} value={type}>
+                        {t(`common:${type}`)}
+                      </MenuItem>
+                    );
+                  })}
+                  disabled={testingPersonalStatus.requesting}
+                />
+              </Grid>
               <Grid item xs={12} md={6}>
                 <TextControllerInput
                   control={control}
@@ -195,27 +264,29 @@ const AddTestingPersonalModal: React.FC<ITestingPersonalModalProps> = (
                   disabled={testingPersonalStatus.requesting}
                 />
               </Grid>
-              <Grid item xs={12} md={6}>
-                <DropdownControllerInput
-                  control={control}
-                  name="employer"
-                  label={t('common:Employer')}
-                  labelId="employer"
-                  id="employer-select"
-                  fieldRequired
-                  error={Boolean(errors?.employer?.message)}
-                  errorMessage={errors?.employer?.message}
-                  menuItems={selectEmployer?.map((employer) => {
-                    return (
-                      <MenuItem key={employer.id} value={employer.id}>
-                        {employer.employer}
-                      </MenuItem>
-                    );
-                  })}
-                  disabled={testingPersonalStatus.requesting}
-                />
-              </Grid>
-              <Grid item xs={12} md={6}>
+              {watchType !== 'Temporary' && (
+                <Grid item xs={12} md={6}>
+                  <DropdownControllerInput
+                    control={control}
+                    name="employer"
+                    label={t('common:Employer')}
+                    labelId="employer"
+                    id="employer-select"
+                    fieldRequired
+                    error={Boolean(errors?.employer?.message)}
+                    errorMessage={errors?.employer?.message}
+                    menuItems={selectEmployer?.map((employer) => {
+                      return (
+                        <MenuItem key={employer.id} value={employer.id}>
+                          {employer.employer}
+                        </MenuItem>
+                      );
+                    })}
+                    disabled={testingPersonalStatus.requesting}
+                  />
+                </Grid>
+              )}
+              <Grid item xs={12} md={watchType === 'Temporary' ? 12 : 6}>
                 <DropdownControllerInput
                   control={control}
                   name="statusId"
@@ -235,47 +306,171 @@ const AddTestingPersonalModal: React.FC<ITestingPersonalModalProps> = (
                   disabled={testingPersonalStatus.requesting}
                 />
               </Grid>
-              <Grid item xs={12}>
-                <Controller
+              {watchType !== 'Temporary' && (
+                <Grid item xs={12}>
+                  <Controller
+                    control={control}
+                    name="workingAreas"
+                    rules={{
+                      validate: {
+                        atLeastOneItemInMultiSelect,
+                      },
+                    }}
+                    render={({ ref, onChange, ...rest }) => {
+                      return (
+                        <Autocomplete
+                          {...rest}
+                          multiple
+                          id="workingAreas"
+                          options={selectWorkingAreas}
+                          getOptionLabel={(option: any) => {
+                            return option || '';
+                          }}
+                          onChange={(event: any, newValue: any) => {
+                            onChange(newValue);
+                            return newValue;
+                          }}
+                          filterSelectedOptions
+                          renderOption={(option: any) => {
+                            return <span>{option}</span>;
+                          }}
+                          renderInput={(params) => {
+                            return (
+                              <TextField
+                                {...params}
+                                label={t('common:Working area')}
+                                variant="outlined"
+                                error={Boolean(errors.workingAreas?.message)}
+                                helperText={
+                                  Boolean(errors.workingAreas?.message)
+                                    ? t(
+                                        `formValidation:${errors.workingAreas?.message}`,
+                                      )
+                                    : ''
+                                }
+                              />
+                            );
+                          }}
+                        />
+                      );
+                    }}
+                  />
+                </Grid>
+              )}
+
+              <Grid
+                item
+                xs={12}
+                className={`${watchType !== 'Fixed' && 'display-none'}`}>
+                <DropdownControllerInput
                   control={control}
-                  name="workingAreas"
-                  rules={{
-                    validate: {
-                      atLeastOneItemInMultiSelect,
-                    },
-                  }}
-                  render={({ ref, onChange, ...rest }) => {
+                  name="mondayShift"
+                  label={t('common:Monday')}
+                  labelId="monday"
+                  id="monday-shift-select"
+                  fieldRequired
+                  error={Boolean(errors?.mondayShift?.message)}
+                  errorMessage={errors?.mondayShift?.message}
+                  menuItems={selectShift.map((shift) => {
                     return (
-                      <Autocomplete
-                        {...rest}
-                        multiple
-                        id="workingAreas"
-                        options={selectWorkingAreas}
-                        getOptionLabel={(option: any) => {
-                          return option.workingArea || '';
-                        }}
-                        onChange={(event: any, newValue: any) => {
-                          onChange(newValue);
-                          return newValue;
-                        }}
-                        filterSelectedOptions
-                        renderOption={(option: any) => {
-                          return <span>{option.workingArea}</span>;
-                        }}
-                        renderInput={(params) => {
-                          return (
-                            <TextField
-                              {...params}
-                              label={t('common:Working area')}
-                              variant="outlined"
-                              error={Boolean(errors.workingAreas?.message)}
-                              helperText={errors.workingAreas?.message}
-                            />
-                          );
-                        }}
-                      />
+                      <MenuItem key={shift.id} value={shift.id}>
+                        {t(`common:shiftName.${shift.id}`)}
+                      </MenuItem>
                     );
-                  }}
+                  })}
+                  disabled={testingPersonalStatus.requesting}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                className={`${watchType !== 'Fixed' && 'display-none'}`}>
+                <DropdownControllerInput
+                  control={control}
+                  name="tuesdayShift"
+                  label={t('common:Tuesday')}
+                  labelId="tuesday"
+                  id="tuesday-shift-select"
+                  fieldRequired
+                  error={Boolean(errors?.tuesdayShift?.message)}
+                  errorMessage={errors?.tuesdayShift?.message}
+                  menuItems={selectShift.map((shift) => {
+                    return (
+                      <MenuItem key={shift.id} value={shift.id}>
+                        {t(`common:shiftName.${shift.id}`)}
+                      </MenuItem>
+                    );
+                  })}
+                  disabled={testingPersonalStatus.requesting}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                className={`${watchType !== 'Fixed' && 'display-none'}`}>
+                <DropdownControllerInput
+                  control={control}
+                  name="wednesdayShift"
+                  label={t('common:Wednesday')}
+                  labelId="wednesday"
+                  id="wednesday-shift-select"
+                  fieldRequired
+                  error={Boolean(errors?.wednesdayShift?.message)}
+                  errorMessage={errors?.wednesdayShift?.message}
+                  menuItems={selectShift.map((shift) => {
+                    return (
+                      <MenuItem key={shift.id} value={shift.id}>
+                        {t(`common:shiftName.${shift.id}`)}
+                      </MenuItem>
+                    );
+                  })}
+                  disabled={testingPersonalStatus.requesting}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                className={`${watchType !== 'Fixed' && 'display-none'}`}>
+                <DropdownControllerInput
+                  control={control}
+                  name="thursdayShift"
+                  label={t('common:Thursday')}
+                  labelId="thursday"
+                  id="thursday-shift-select"
+                  fieldRequired
+                  error={Boolean(errors?.thursdayShift?.message)}
+                  errorMessage={errors?.thursdayShift?.message}
+                  menuItems={selectShift.map((shift) => {
+                    return (
+                      <MenuItem key={shift.id} value={shift.id}>
+                        {t(`common:shiftName.${shift.id}`)}
+                      </MenuItem>
+                    );
+                  })}
+                  disabled={testingPersonalStatus.requesting}
+                />
+              </Grid>
+              <Grid
+                item
+                xs={12}
+                className={`${watchType !== 'Fixed' && 'display-none'}`}>
+                <DropdownControllerInput
+                  control={control}
+                  name="fridayShift"
+                  label={t('common:Friday')}
+                  labelId="friday"
+                  id="friday-shift-select"
+                  fieldRequired
+                  error={Boolean(errors?.fridayShift?.message)}
+                  errorMessage={errors?.fridayShift?.message}
+                  menuItems={selectShift.map((shift) => {
+                    return (
+                      <MenuItem key={shift.id} value={shift.id}>
+                        {t(`common:shiftName.${shift.id}`)}
+                      </MenuItem>
+                    );
+                  })}
+                  disabled={testingPersonalStatus.requesting}
                 />
               </Grid>
             </Grid>

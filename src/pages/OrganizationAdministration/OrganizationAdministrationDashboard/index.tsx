@@ -38,24 +38,21 @@ type OrganizationAdministrationDashboardType = RouteProps;
 const OrganizationAdministrationDashboard: React.FC<OrganizationAdministrationDashboardType> = () => {
   return (
     <>
-      <PageContainerWithHeader
-        title={OrganizationAdministrationRoutes.dashboardRoute.title}>
-        <Grid container direction="column">
-          <Grid item>
-            <DashboardInfo />
-          </Grid>
-          <Grid item>
-            <Grid container spacing={2}>
-              <Grid item xs={12} md={4}>
-                <SupportPersonCard />
-              </Grid>
-              <Grid item xs={12} md={8}>
-                <ImportantLinks />
-              </Grid>
+      <Grid container direction="column">
+        <Grid item>
+          <DashboardInfo />
+        </Grid>
+        <Grid item>
+          <Grid container spacing={2}>
+            <Grid item xs={12} md={4}>
+              <SupportPersonCard />
+            </Grid>
+            <Grid item xs={12} md={8}>
+              <ImportantLinks />
             </Grid>
           </Grid>
         </Grid>
-      </PageContainerWithHeader>
+      </Grid>
     </>
   );
 };

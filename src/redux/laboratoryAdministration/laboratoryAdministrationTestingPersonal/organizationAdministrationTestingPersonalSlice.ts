@@ -19,11 +19,12 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
 import callSnackbar from 'utils/customHooks/useSnackbar';
 
+// Types
 import { IApiStatus } from 'redux/globalTypes';
-
 import {
   GetLaboratoryTestingPersonalType,
   LaboratoryTestingPersonalStatusType,
@@ -32,6 +33,7 @@ import {
   AddLaboratoryTestingPersonalRequestType,
   DeleteLaboratoryTestingPersonRequestType,
 } from 'redux/laboratoryAdministration/laboratoryAdministrationTestingPersonal/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import {
   getTestingPersonalAPI,
@@ -217,13 +219,9 @@ export const getLaboratoryTestingPersonal = (): AppThunk => async (
     (response: GetLaboratoryTestingPersonResponse): void => {
       dispatch(getLaboratoryTestingPersonalSuccess(response));
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getLaboratoryTestingPersonalFailed());
-      callSnackbar({
-        message: 'Failed to get laboratory testing data!',
-
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to get laboratory testing data!');
     },
   );
 };
@@ -236,13 +234,9 @@ export const getTestingPersonalStatusTypesList = (): AppThunk => async (
     (response: GetLaboratoryTestingPersonalStatusTypesListResponse): void => {
       dispatch(getLaboratoryTestingPersonalStatusTypesListSuccess(response));
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getLaboratoryTestingPersonalStatusTypesListFailed());
-      callSnackbar({
-        message: 'Failed to get testing personal statuses!',
-
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to get testing personal statuses!');
     },
   );
 };
@@ -256,17 +250,12 @@ export const addLaboratoryTestingPerson = (
       dispatch(addLaboratoryTestingPersonalSuccess());
       callSnackbar({
         message: 'Successfully added a new testing person!',
-
         messageType: 'success',
       });
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(addLaboratoryTestingPersonalFailed());
-      callSnackbar({
-        message: 'Failed to added a new testing person!',
-
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to added a new testing person!');
     },
   );
 };
@@ -284,13 +273,9 @@ export const deleteLaboratoryTestingPerson = (
         messageType: 'success',
       });
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(deleteLaboratoryTestingPersonFailed());
-      callSnackbar({
-        message: 'Failed to delete testing personal!',
-
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to delete testing personal!');
     },
   );
 };

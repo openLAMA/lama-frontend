@@ -35,10 +35,7 @@ type OnboardingAndTrainingAdministrationCapacityType = RouteProps;
 const OnboardingAndTrainingAdministrationCapacity: React.FC<OnboardingAndTrainingAdministrationCapacityType> = () => {
   return (
     <>
-      <PageContainerWithHeader
-        title={OnboardingAndTrainingAdministrationRoutes.capacityRoute.title}>
-        <CapacityOverviewTable />
-      </PageContainerWithHeader>
+      <CapacityOverviewTable />
     </>
   );
 };

@@ -19,12 +19,13 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
-import { OrganizationTypeType } from 'redux/globalTypes';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
-import callSnackbar from 'utils/customHooks/useSnackbar';
-
+// Types
 import { IApiStatus } from 'redux/globalTypes';
+import { OrganizationTypeType } from 'redux/globalTypes';
 import { GetOrganizationTypesResponseType } from 'redux/globalState/organizationTypes/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import { getOrganizationTypesAPI } from 'redux/globalState/organizationTypes/organizationTypesApi';
 
@@ -88,12 +89,9 @@ export const getOrganizationTypes = (): AppThunk => async (dispatch) => {
     (response: GetOrganizationTypesResponseType): void => {
       dispatch(getOrganizationTypesSuccess(response));
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getOrganizationTypesFailed());
-      callSnackbar({
-        message: 'Failed to fetch organization types list',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to fetch organization types list!');
     },
   );
 };

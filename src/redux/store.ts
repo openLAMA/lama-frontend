@@ -37,9 +37,9 @@ const persistConfig = {
 const store = configureStore({
   reducer: persistReducer(persistConfig, rootReducer),
   middleware: (getDefaultMiddleware) => {
-    if (Env.get() === 'development') {
-      return getDefaultMiddleware().prepend().concat(logger);
-    }
+    // if (Env.get() === 'development') {
+    //   return getDefaultMiddleware().prepend().concat(logger);
+    // }
     return getDefaultMiddleware();
   },
 });

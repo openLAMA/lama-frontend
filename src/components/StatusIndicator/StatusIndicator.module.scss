@@ -26,13 +26,28 @@
   justify-content: center;
   padding: 6px 12px;
 
+  &.grayed {
+    background-color: rgba(0, 0, 0, 0.12);
+    color: rgba(0, 0, 0, 0.26);
+  }
+
+  &.information {
+    background-color: #fff6e7;
+    color: #ff9800;
+  }
+
   &.success {
-    background-color: #f2fbf8;
+    background-color: #f1fcf6;
     color: #12b278;
   }
 
   &.failure {
-    background-color: #fef6f6;
+    background-color: #fff4f1;
     color: #f36060;
+  }
+
+  &.temporary {
+    background-color: #f5ecff;
+    color: #8626ed;
   }
 }

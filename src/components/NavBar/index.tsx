@@ -20,8 +20,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch, useSelector } from 'react-redux';
-import { useHistory } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 
 // Material UI
 import { AppBar, Button, Grid, Toolbar, Typography } from '@material-ui/core';
@@ -34,9 +33,14 @@ import CompanyLogo from 'components/CompanyLogo';
 
 // Actions
 import { clearAuthData } from 'redux/authData/authDataSlice';
+import {
+  setOnChangeLanguage,
+  setOnChangeLanguageComplete,
+} from 'redux/globalState/languageState/languageStateSlice';
 
 // Utils
 import { RootState } from 'redux/combineReducers';
+import { Env } from 'utils/environment';
 
 // Routes
 import { UnauthenticatedRoutes } from 'config/routes';
@@ -46,7 +50,7 @@ import styles from './Navbar.module.scss';
 const Navbar: React.FC = () => {
   const dispatch = useDispatch();
   const history = useHistory();
-  const { t } = useTranslation();
+  const { t, i18n } = useTranslation();
 
   const userData = useSelector((state: RootState) => state.authData.userData);
 
@@ -55,13 +59,19 @@ const Navbar: React.FC = () => {
     history.push(UnauthenticatedRoutes.loginRoute.route);
   };
 
-  // const changeLang = () => {
-  //   if (i18next.language === 'en-US') {
-  //     i18next.changeLanguage('de');
-  //   } else {
-  //     i18next.changeLanguage('en-US');
-  //   }
-  // };
+  const changeLang = () => {
+    if (i18n.language === 'en-US') {
+      dispatch(setOnChangeLanguage());
+      i18n.changeLanguage('de').then(() => {
+        dispatch(setOnChangeLanguageComplete());
+      });
+    } else {
+      dispatch(setOnChangeLanguage());
+      i18n.changeLanguage('en-US').then(() => {
+        dispatch(setOnChangeLanguageComplete());
+      });
+    }
+  };
 
   return (
     <div className={styles.root}>
@@ -77,9 +87,11 @@ const Navbar: React.FC = () => {
             </Grid>
             <Grid item>
               <Grid container spacing={2} alignItems="center">
-                {/* <Grid item>
-                  <Button onClick={changeLang}>Change lang</Button>
-                </Grid> */}
+                {Env.get() === 'development' && (
+                  <Grid item>
+                    <Button onClick={changeLang}>Change lang</Button>
+                  </Grid>
+                )}
                 <Grid item>
                   <Typography>{userData?.name}</Typography>
                 </Grid>

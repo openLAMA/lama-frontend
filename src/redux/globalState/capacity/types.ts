@@ -17,23 +17,36 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-type CapacityOverviewShiftConfirmedEmployeeType = {
+export type CapacityShiftType = 'First' | 'Second';
+
+export type CapacityOverviewShiftConfirmedEmployeeType = {
   email: string;
   firstName: string;
   lastName: string;
+  isCanceled: boolean;
 };
 
-type CapacityOverviewShiftType = {
-  shiftNumber: 'First' | 'Second';
+export type CapacityOverviewShiftType = {
+  shiftNumber: CapacityShiftType;
   requiredPersonnelCountShift: number;
+  confirmedNotCanceledEmployeesCount: number;
   confirmedEmployees: CapacityOverviewShiftConfirmedEmployeeType[];
+  fixedEmployees: CapacityOverviewShiftConfirmedEmployeeType[];
 };
 
 export type CapacityOverviewType = {
+  invitationId: string;
   date: string;
   samples: number;
   invitationAlreadySent: boolean;
   shifts: CapacityOverviewShiftType[];
 };
 
-export type GetCapacityOverviewResponseType = CapacityOverviewType[];
+export type GetCapacityOverviewResponseType = {
+  isEarliestDate: boolean;
+  testsData: CapacityOverviewType[];
+};
+
+export type GetCapacityOverviewRequestType = {
+  startDate: string;
+};

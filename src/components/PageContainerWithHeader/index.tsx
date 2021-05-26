@@ -18,7 +18,6 @@
 */
 
 import React from 'react';
-import { useTranslation } from 'react-i18next';
 
 // Material UI
 import { Grid, Typography } from '@material-ui/core';
@@ -32,13 +31,12 @@ const PageContainerWithHeader: React.FC<IPageContainerWithHeaderProps> = (
   props: IPageContainerWithHeaderProps,
 ) => {
   const { title, children } = props;
-  const { t } = useTranslation();
 
   return (
     <>
-      <Grid container>
+      <Grid container spacing={2}>
         <Grid item xs={12}>
-          <Typography variant="h5">{t(`common:${title}`)}</Typography>
+          <Typography variant="h5">{title}</Typography>
         </Grid>
         <Grid item xs={12}>
           {children}

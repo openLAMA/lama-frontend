@@ -18,10 +18,10 @@
 */
 
 // Generic Types
-import { SupportPersonType } from 'redux/globalTypes';
+import { SupportPersonSelectType } from 'redux/globalTypes';
 
 export type GetSupportPersonRequestType = {
   organizationTypeId: number | '';
 };
 
-export type GetSupportPersonResponseType = SupportPersonType;
+export type GetSupportPersonResponseType = SupportPersonSelectType;

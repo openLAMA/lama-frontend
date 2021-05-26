@@ -19,14 +19,17 @@
 
 import { createSlice } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
+
 import callSnackbar from 'utils/customHooks/useSnackbar';
 
+// Types
 import { IApiStatus } from 'redux/globalTypes';
-
 import {
   InviteLaboratoryCapacityStudentsRequestType,
   InviteLaboratoryCapacityStudentsResponseType,
 } from 'redux/laboratoryAdministration/laboratoryAdministrationDashboard/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import { inviteLaboratoryCapacityStudentsAPI } from 'redux/laboratoryAdministration/laboratoryAdministrationDashboard/laboratoryAdministrationDashboardApi';
 
@@ -86,16 +89,13 @@ export const inviteLaboratoryCapacityStudents = (
     (response: InviteLaboratoryCapacityStudentsResponseType): void => {
       dispatch(inviteLaboratoryCapacityStudentsSuccess());
       callSnackbar({
-        message: 'APISuccessMessages:Successfully sent invitation!',
+        message: 'Successfully sent invitation!',
         messageType: 'success',
       });
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(inviteLaboratoryCapacityStudentsFailed());
-      callSnackbar({
-        message: 'APIErrorMessages:Failed to send invite!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to send invite!');
     },
   );
 };

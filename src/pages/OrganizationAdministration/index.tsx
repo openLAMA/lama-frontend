@@ -18,9 +18,8 @@
 */
 
 import React, { useEffect } from 'react';
-import { useSelector, useDispatch } from 'react-redux';
-import { useLocation, useHistory } from 'react-router-dom';
-import { RouteProps, Switch } from 'react-router-dom';
+import { useSelector } from 'react-redux';
+import { useHistory, RouteProps, Switch } from 'react-router-dom';
 
 // Material UI
 import { Container } from '@material-ui/core';
@@ -37,9 +36,6 @@ import NavDrawer from 'components/NavDrawer';
 
 // Routes
 import { IRoute, OrganizationAdministrationRoutes } from 'config/routes';
-
-// Actions
-import { clearAuthData } from 'redux/authData/authDataSlice';
 
 // Utils
 import TypedKeysMap from 'utils/TypedKeysMap';
@@ -64,16 +60,7 @@ const navDrawerItemList = [
 ];
 
 const OrganizationAdministrationMainPage: React.FC<OrganizationAdministrationMainPageType> = () => {
-  const dispatch = useDispatch();
-  const location = useLocation();
   const history = useHistory();
-
-  if (
-    location?.pathname.includes('login-confirmation') ||
-    location?.pathname.includes('register-confirmation')
-  ) {
-    dispatch(clearAuthData());
-  }
 
   const confirmLoginStatus = useSelector(
     (state: RootState) => state.auth.confirmLoginStatus,

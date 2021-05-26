@@ -20,10 +20,10 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector } from 'react-redux';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
 // Material UI
-import { Grid, Typography } from '@material-ui/core';
+import { Button, Grid, Typography } from '@material-ui/core';
 
 // Material Icons
 import { CheckCircleOutline as CheckCircleOutlineIcon } from '@material-ui/icons';
@@ -49,6 +49,10 @@ const OrganizationRegistrationComplete: React.FC = () => {
     history.push(UnauthenticatedRoutes.organizationRegistrationRoute.route);
   }
 
+  const onRedirectToLogin = () => {
+    history.push(UnauthenticatedRoutes.loginRoute.route);
+  };
+
   return (
     <>
       <Grid
@@ -70,8 +74,18 @@ const OrganizationRegistrationComplete: React.FC = () => {
             {t('common:Your request was successfully sent')}
           </Typography>
           <Typography variant="body1" align="center">
-            {`${t('common:Please visit your email for activation link')}`}
+            {`${t(
+              'common:You are now able to login into the portal with the provided email address',
+            )}`}
           </Typography>
+        </Grid>
+        <Grid item>
+          <Button
+            variant="outlined"
+            color="primary"
+            onClick={onRedirectToLogin}>
+            {t('common:Go to login page')}
+          </Button>
         </Grid>
 
         <Grid item xs={12} className="fullWidth">

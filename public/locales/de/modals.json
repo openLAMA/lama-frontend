@@ -3,5 +3,10 @@
   "Number of people for the day!": "Anzahl person pro Tag.",
   "Add testing personal": "Person hinzufügen",
   "Deactivate this program member?": "Teilnehmer Deaktivieren?",
-  "Are you sure you want to deactivate this program member?": "Soll der Teilnehmer deaktiviert werden?"
+  "Are you sure you want to deactivate this program member?": "Soll der Teilnehmer deaktiviert werden?",
+  "Follow up email": "Infoveranstaltung Follow-Up",
+  "Are you sure you want to remove this person?": "Soll die person wirklich entfernt werden?",
+  "Remove X from this date": "'{{username}}' vom Einsatz entfernen",
+  "Add employee to morning shift": "Person hinzufügen",
+  "Add employee to afternoon shift": "Person hinzufügen"
 }

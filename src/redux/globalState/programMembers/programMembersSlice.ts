@@ -19,9 +19,9 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
-import callSnackbar from 'utils/customHooks/useSnackbar';
-
+// Types
 import { IApiStatus } from 'redux/globalTypes';
 import {
   GetProgramMembersType,
@@ -29,6 +29,7 @@ import {
   GetProgramMembersRequestType,
   GetProgramMembersResponseType,
 } from 'redux/globalState/programMembers/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import { getProgramMembersAPI } from 'redux/globalState/programMembers/programMembersApi';
 
@@ -56,7 +57,10 @@ const initialState = {
     orderBy: '',
     filterType: -1,
     filterStatus: 'All',
+    filterWeekday: 'Weekday',
     filterEpaadStatusPending: false,
+    filterAssignedToMe: false,
+    showAllOrganizations: true,
   },
 } as IProgramMembersPersonal;
 
@@ -112,12 +116,9 @@ export const getProgramMembers = (
     (response: GetProgramMembersResponseType): void => {
       dispatch(programMembersSuccess(response));
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(programMembersFailed());
-      callSnackbar({
-        message: 'Failed to get program members data!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to get program members data!');
     },
   );
 };

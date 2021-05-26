@@ -21,23 +21,36 @@
 
 .root {
   position: absolute;
-  top: 2px;
-  right: 2px;
-  width: 16px;
-  height: 16px;
+  top: 6px;
+  left: 15px;
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
-.circle {
-  border-radius: 50%;
+.box {
+  height: 18px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   padding: 4px;
+  border-radius: 8px;
+
   color: $white;
-  background-color: $primary-color;
+}
+
+.blue {
+  width: 56px;
+  background-color: $color-primary-blue;
+  margin-right: 4px;
+}
+
+.gray {
+  width: 24px;
+  background-color: $color-light-gray;
 }
 
 .line-height {
-  line-height: 1.4;
-  font-size: 0.64rem;
+  line-height: 1.2;
+  font-size: 0.75rem;
 }

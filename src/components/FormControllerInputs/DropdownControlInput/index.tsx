@@ -75,6 +75,8 @@ const DropdownControllerInput: React.FC<IDropdownControllerInputProps> = (
       render={({ ref, ...rest }) => {
         return (
           <CustomSelect
+            {...rest}
+            inputRef={ref}
             fullWidth
             className={`${hidden && 'display-none'}`}
             variant="outlined"
@@ -87,40 +89,7 @@ const DropdownControllerInput: React.FC<IDropdownControllerInputProps> = (
             showLoadingAdornment={showLoadingEndAdornment}
             menuItems={menuItems}
             helperText={errorMessage}
-            {...rest}
-            inputRef={ref}
           />
-          // TODO remove this after testing it.
-          // <FormControl
-          //   fullWidth
-          //   variant="outlined"
-          //   error={error}
-          //   className={`${hidden && 'display-none'}`}>
-          //   <InputLabel
-          //     id={labelId}
-          //     variant="outlined"
-          //     className="bg-color-white">
-          //     {label}
-          //   </InputLabel>
-          //   <Select
-          //     {...rest}
-          //     inputRef={ref}
-          //     labelId={labelId}
-          //     id={id}
-          //     disabled={disabled || showLoadingEndAdornment}
-          //     endAdornment={
-          //       <>
-          //         {showLoadingEndAdornment ? (
-          //           <InputAdornment position="end" className="mr-6">
-          //             <CircularProgress size={20} />
-          //           </InputAdornment>
-          //         ) : null}
-          //       </>
-          //     }>
-          //     {menuItems}
-          //   </Select>
-          //   <FormHelperText>{errorMessage}</FormHelperText>
-          // </FormControl>
         );
       }}
     />

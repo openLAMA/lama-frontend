@@ -38,6 +38,7 @@ interface ITextControllerInputProps extends IFormInputProps {
   maxNumberOfCharacter?: number;
   mustBeValidEmailValidation?: boolean;
   multiline?: boolean;
+  rows?: number;
 }
 
 const TextControllerInput: React.FC<ITextControllerInputProps> = (
@@ -57,6 +58,7 @@ const TextControllerInput: React.FC<ITextControllerInputProps> = (
     error,
     errorMessage,
     hidden,
+    rows,
   } = props;
   const { t } = useTranslation();
 
@@ -82,7 +84,9 @@ const TextControllerInput: React.FC<ITextControllerInputProps> = (
                 value,
               );
               if (messageObject?.message) {
-                return t(`formValidation:${messageObject?.message} {x}!`);
+                return t(`formValidation:${messageObject?.message}`, {
+                  numberOfChars: messageObject.value,
+                });
               }
             }
             return undefined;
@@ -113,6 +117,7 @@ const TextControllerInput: React.FC<ITextControllerInputProps> = (
             helperText={errorMessage}
             disabled={disabled}
             className={`${hidden && 'display-none'}`}
+            rows={rows}
             InputLabelProps={{
               classes: {
                 root: 'custom-label-text-overflow',

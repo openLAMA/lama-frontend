@@ -22,6 +22,7 @@ import { Color } from '@material-ui/lab';
 export type SnackbarDataType = {
   message: string;
   messageType: Color;
+  dynamicData?: { [key: string]: string };
 };
 
 export type NotificationType = {

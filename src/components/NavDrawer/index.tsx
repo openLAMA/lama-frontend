@@ -20,7 +20,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { useLocation, useHistory } from 'react-router-dom';
+import { useHistory, Link } from 'react-router-dom';
 
 // Material UI
 import {
@@ -59,10 +59,11 @@ interface INavItem {
 
 interface INavDrawerProps {
   navItems: INavItem[];
+  isLogistics?: boolean;
 }
 
 const NavDrawer: React.FC<INavDrawerProps> = (props: INavDrawerProps) => {
-  const { navItems } = props;
+  const { navItems, isLogistics } = props;
   const dispatch = useDispatch();
   const history = useHistory();
   const { t } = useTranslation();
@@ -114,7 +115,8 @@ const NavDrawer: React.FC<INavDrawerProps> = (props: INavDrawerProps) => {
                     className={`${
                       isSelected ? styles['drawer-item-active'] : ''
                     }`}
-                    onClick={() => redirectTo(item.path)}>
+                    component={Link}
+                    to={item.path}>
                     <ListItemIcon>
                       {React.cloneElement(item.icon, {
                         className: `${
@@ -138,20 +140,22 @@ const NavDrawer: React.FC<INavDrawerProps> = (props: INavDrawerProps) => {
               })}
             </List>
           </Grid>
-          <Grid item>
-            <Grid container direction="column">
-              <Grid item>
-                <Divider />
-              </Grid>
-              <Grid item>
-                <img
-                  className="fullWidth pl-12 pt-8 pr-12 pb-8"
-                  src={baselLandshaftLogo}
-                  alt="basel Landshaft Logo"
-                />
+          {!isLogistics && (
+            <Grid item>
+              <Grid container direction="column">
+                <Grid item>
+                  <Divider />
+                </Grid>
+                <Grid item>
+                  <img
+                    className="fullWidth pl-12 pt-8 pr-12 pb-8"
+                    src={baselLandshaftLogo}
+                    alt="basel Landshaft Logo"
+                  />
+                </Grid>
               </Grid>
             </Grid>
-          </Grid>
+          )}
         </Grid>
       </Drawer>
     </>

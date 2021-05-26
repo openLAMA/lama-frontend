@@ -18,11 +18,14 @@
 */
 
 // Generic Types
-import { SupportPersonType } from 'redux/globalTypes';
+import { SupportPersonSelectType, ContactPersonType } from 'redux/globalTypes';
 
-import { ProgramMemberType } from 'redux/globalState/programMembers/types';
+import {
+  ProgramMemberType,
+  FollowUpStatusType,
+} from 'redux/globalState/programMembers/types';
 
-export type SupportPeopleForOrganizationType = SupportPersonType[];
+export type SupportPeopleForOrganizationType = SupportPersonSelectType[];
 
 export type PutProgramMemberType = {
   epaadId?: string;
@@ -43,14 +46,7 @@ export type PutProgramMemberType = {
   exclusionEndDate?: string | null;
   numberOfSamples: number | null;
   numberOfPools: number | null;
-  contacts: [
-    {
-      email: string;
-      name: string;
-      phoneNumber: string;
-      id: string;
-    },
-  ];
+  contacts: ContactPersonType[];
   subOrganizations: [
     {
       name: string;
@@ -60,7 +56,13 @@ export type PutProgramMemberType = {
     },
   ];
   supportPersonId: string;
-  status: string;
+  status:
+    | 'NotActive'
+    | 'NotConfirmed'
+    | 'Onboarded'
+    | 'PendingContact'
+    | 'PendingOnboarding'
+    | 'TrainingDateSet';
   manager?: string | null;
   studentsCount?: number | null;
   employeesCount?: number | null;
@@ -95,3 +97,8 @@ export type DeactivateProgramMemberRequestType = {
 };
 
 export type PushToEpaadProgramMemberRequestType = PutProgramMemberType;
+
+export type PutFollowUpStatus = {
+  organizationId: string;
+  newStatus: FollowUpStatusType;
+};

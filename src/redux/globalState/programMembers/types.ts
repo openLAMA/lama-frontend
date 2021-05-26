@@ -18,7 +18,7 @@
 */
 
 // Generic Types
-import { ContactPersonType } from 'redux/globalTypes';
+import { ContactPersonType, SupportPersonType } from 'redux/globalTypes';
 
 export type ProgramMemberType = {
   epaadId?: string;
@@ -45,14 +45,7 @@ export type ProgramMemberType = {
   exclusionEndDate?: string | null;
   numberOfSamples: number | null;
   numberOfPools: number | null;
-  contacts: [
-    {
-      email: string;
-      name: string;
-      phoneNumber: string;
-      id: string;
-    },
-  ];
+  contacts: ContactPersonType[];
   subOrganizations: [
     {
       name: string;
@@ -62,8 +55,14 @@ export type ProgramMemberType = {
     },
   ];
   supportPersonId: string;
-  supportPerson: ContactPersonType;
-  status: string;
+  supportPerson: SupportPersonType;
+  status:
+    | 'NotActive'
+    | 'NotConfirmed'
+    | 'Onboarded'
+    | 'PendingContact'
+    | 'PendingOnboarding'
+    | 'TrainingDateSet';
   manager?: string | null;
   studentsCount?: number | null;
   employeesCount?: number | null;
@@ -78,7 +77,11 @@ export type ProgramMemberType = {
   numberOfRakoBoxes?: number | null;
   pickupLocation?: string | null;
   organizationShortcutName?: string | null;
+  followUpStatus: FollowUpStatusType;
+  isOnboardingEmailSent?: boolean;
 };
+
+export type FollowUpStatusType = 'NotSent' | 'Sent' | 'Accepted' | 'Declined';
 
 export type OrderByType = {
   orderBy: string;
@@ -98,7 +101,10 @@ export type ProgramMemberFilterType = {
   orderBy: string;
   filterType: number;
   filterStatus: string;
+  filterWeekday: string;
   filterEpaadStatusPending: boolean;
+  filterAssignedToMe: boolean;
+  showAllOrganizations: boolean;
 };
 
 export type GetProgramMembersRequestType = OrderByType;

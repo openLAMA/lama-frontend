@@ -3,5 +3,10 @@
   "Number of people for the day!": "Number of people for the day!",
   "Add testing personal": "Add testing personal",
   "Deactivate this program member?": "Deactivate this program member?",
-  "Are you sure you want to deactivate this program member?": "Are you sure you want to deactivate this program member?"
+  "Are you sure you want to deactivate this program member?": "Are you sure you want to deactivate this program member?",
+  "Follow up email": "Follow up email",
+  "Are you sure you want to remove this person?": "Are you sure you want to remove this person?",
+  "Remove X from this date": "Remove '{{username}}' from date",
+  "Add employee to morning shift": "Add employee to morning shift!",
+  "Add employee to afternoon shift": "Add employee to afternoon shift!"
 }

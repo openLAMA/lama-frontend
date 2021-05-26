@@ -19,14 +19,15 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
-import callSnackbar from 'utils/customHooks/useSnackbar';
-
+// Types
 import { IApiStatus } from 'redux/globalTypes';
 import {
   CityType,
   GetCitiesResponseType,
 } from 'redux/globalState/citiesData/types';
+import { ErrorObjectType } from 'apiService/types';
 
 import { getCitiesAPI } from 'redux/globalState/citiesData/citiesDataApi';
 
@@ -87,12 +88,9 @@ export const getCities = (): AppThunk => async (dispatch) => {
     (response: GetCitiesResponseType): void => {
       dispatch(getCitiesSuccess(response));
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getCitiesFailed());
-      callSnackbar({
-        message: 'Failed to fetch cities list!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to fetch cities list!');
     },
   );
 };

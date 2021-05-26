@@ -28,12 +28,8 @@ import { Grid, Button, Typography } from '@material-ui/core';
 import { AddCircleOutline as AddCircleOutlineIcon } from '@material-ui/icons';
 
 // Custom components
-import PageContainerWithHeader from 'components/PageContainerWithHeader';
 import AddTestingPersonalModal from 'components/Modals/AddTestingPersonalModal';
 import LabTestingPersonalTable from 'components/Tables/LabTestingPersonalTable';
-
-// Utils
-import { LabAdministrationRoutes } from 'config/routes';
 
 type AdministrationTestingPersonalType = RouteProps;
 
@@ -55,30 +51,28 @@ const AdministrationTestingPersonal: React.FC<AdministrationTestingPersonalType>
 
   return (
     <>
-      <PageContainerWithHeader
-        title={LabAdministrationRoutes.testingPersonalRoute.title}>
-        <Grid container direction="column" spacing={2}>
-          <Grid item>
-            <Grid
-              container
-              direction="row"
-              justify="flex-end"
-              alignItems="center">
-              <Grid item>
-                <Button
-                  color="secondary"
-                  startIcon={<AddCircleOutlineIcon />}
-                  onClick={onOpenAddTestingPersonalModal}>
-                  <Typography>{t('common:Add new')}</Typography>
-                </Button>
-              </Grid>
+      <Grid container direction="column" spacing={2}>
+        <Grid item>
+          <Grid
+            container
+            direction="row"
+            justify="flex-end"
+            alignItems="center">
+            <Grid item>
+              <Button
+                color="secondary"
+                startIcon={<AddCircleOutlineIcon />}
+                onClick={onOpenAddTestingPersonalModal}>
+                <Typography>{t('common:Add new')}</Typography>
+              </Button>
             </Grid>
           </Grid>
-          <Grid item>
-            <LabTestingPersonalTable />
-          </Grid>
         </Grid>
-      </PageContainerWithHeader>
+        <Grid item>
+          <LabTestingPersonalTable />
+        </Grid>
+      </Grid>
+
       {showAddTestingPersonalModal && (
         <AddTestingPersonalModal onClose={onCloseAddTestingPersonalModal} />
       )}

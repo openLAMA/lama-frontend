@@ -31,6 +31,7 @@ interface ICardProps {
   maxWidth?: number | string;
   style?: React.CSSProperties;
   className?: string;
+  minHeight?: string;
 }
 
 import styles from './Card.module.scss';
@@ -45,6 +46,7 @@ const Card: React.FC<ICardProps> = (props: ICardProps) => {
     maxWidth,
     style,
     className,
+    minHeight,
   } = props;
 
   let padding = styles['card-padding'];
@@ -66,8 +68,9 @@ const Card: React.FC<ICardProps> = (props: ICardProps) => {
     ${className}
     `}
       style={{
-        maxWidth: maxWidth || 'initial',
         ...style,
+        maxWidth: maxWidth || 'initial',
+        minHeight: minHeight || 'initial',
       }}>
       {children}
     </Paper>

@@ -26,11 +26,12 @@ import { SnackbarDataType } from 'redux/snackbar/types';
 import { enqueueSnackbar } from 'redux/snackbar/snackbarSlice';
 
 export default (data: SnackbarDataType) => {
-  const { message, messageType } = data;
+  const { message, dynamicData, messageType } = data;
   state.dispatch(
     enqueueSnackbar({
       message: {
         message: message,
+        dynamicData: dynamicData,
         messageType: messageType,
       },
       options: {

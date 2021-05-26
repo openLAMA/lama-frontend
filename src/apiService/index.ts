@@ -23,30 +23,15 @@ import qs from 'qs';
 import axiosInstance from 'apiService/axiosInstance';
 
 // Types
-import { APIMethods } from 'apiService/types';
-
-interface IHttpClientRequestParameters {
-  url: string;
-  method: APIMethods;
-  data?: any;
-  params?: any;
-  formData?: any;
-  onUploadProgress?: (progressEvent: any) => void;
-}
-
-export type ErrorObject = {
-  message: string;
-  fieldErrors: {
-    [key: string]: string[];
-  };
-};
-
-export interface INoContent {
-  noContent: boolean;
-}
+import {
+  HttpClientRequestParametersType,
+  ErrorObjectType,
+} from 'apiService/types';
 
 export class HttpClient {
-  static request<T>(requestParams: IHttpClientRequestParameters): Promise<T> {
+  static request<T>(
+    requestParams: HttpClientRequestParametersType,
+  ): Promise<T> {
     return new Promise<T>((resolve, reject) => {
       const {
         url,
@@ -55,6 +40,7 @@ export class HttpClient {
         params,
         formData,
         onUploadProgress,
+        baseURL,
       } = requestParams;
 
       const requestConfig: AxiosRequestConfig = {
@@ -64,8 +50,17 @@ export class HttpClient {
         onUploadProgress,
       };
 
+      if (baseURL) {
+        requestConfig.baseURL = baseURL;
+      }
+
       if (formData) {
-        requestConfig.headers.contentType = 'multipart/form-data';
+        requestConfig.headers['Content-Type'] = 'multipart/form-data';
+        const formDataObject = new FormData();
+        Object.keys(formData).forEach((key) => {
+          formDataObject.append(key, formData[key]);
+        });
+        requestConfig.data = formDataObject;
       }
 
       if (data) {
@@ -82,7 +77,7 @@ export class HttpClient {
           resolve(response.data as T);
         })
         .catch((error: any) => {
-          reject(error);
+          reject(error as ErrorObjectType);
         });
     });
   }

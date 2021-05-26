@@ -6,5 +6,8 @@
   "Successfully updated a program member!": "Successfully updated a program member!",
   "Successfully deactivated a program member!": "Successfully deactivated a program member!",
   "Successfully updated my profile details!": "Successfully updated my profile details!",
-  "Successfully pushed program member data to Epaad!": "Successfully pushed program member data to Epaad!"
+  "Successfully pushed program member data to Epaad!": "Successfully pushed program member data to Epaad!",
+  "Successfully sent follow up emails!": "Successfully sent follow up emails!",
+  "Successfully updated follow up status!": "Successfully updated follow up status!",
+  "Successfully removed person from shift!": "Successfully removed person from shift!"
 }

@@ -19,26 +19,26 @@
 
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
-import { SupportPersonType } from 'redux/globalTypes';
+import { extractErrorMessage } from 'apiService/axiosInstance';
 
-import callSnackbar from 'utils/customHooks/useSnackbar';
-
+// Types
 import { IApiStatus } from 'redux/globalTypes';
-
 import {
   GetSupportPersonResponseType,
   GetSupportPersonRequestType,
 } from 'redux/globalState/supportPerson/types';
+import { SupportPersonSelectType } from 'redux/globalTypes';
+import { ErrorObjectType } from 'apiService/types';
 
 import { getSupportPersonAPI } from 'redux/globalState/supportPerson/supportPersonApi';
 
 interface ISupportPerson {
-  supportPerson: SupportPersonType;
+  supportPerson: SupportPersonSelectType;
   supportPersonStatus: IApiStatus;
 }
 
 const initialState = {
-  supportPerson: { name: '' },
+  supportPerson: { supportPersonId: '', name: '' },
   supportPersonStatus: {
     requesting: false,
     success: false,
@@ -50,7 +50,7 @@ const supportPersonSlice = createSlice({
   name: 'supportPerson',
   initialState,
   reducers: {
-    setSupportPerson(state, action: PayloadAction<SupportPersonType>) {
+    setSupportPerson(state, action: PayloadAction<SupportPersonSelectType>) {
       state.supportPerson = action.payload;
     },
     getSupportPersonRequest(state) {
@@ -95,19 +95,16 @@ export const {
 export default supportPersonSlice.reducer;
 
 export const getSupportPerson = (
-  data: GetSupportPersonRequestType,
+  params: GetSupportPersonRequestType,
 ): AppThunk => async (dispatch) => {
   dispatch(getSupportPersonRequest());
-  getSupportPersonAPI(data).then(
+  getSupportPersonAPI(params).then(
     (response: GetSupportPersonResponseType): void => {
       dispatch(getSupportPersonSuccess(response));
     },
-    (error: any): void => {
+    (error: ErrorObjectType): void => {
       dispatch(getSupportPersonFailed());
-      callSnackbar({
-        message: 'Failed to fetch support person data!',
-        messageType: 'error',
-      });
+      extractErrorMessage(error, 'Failed to fetch support person data!');
     },
   );
 };

@@ -131,11 +131,7 @@ const RegisterConfirmationCard: React.FC = () => {
   return (
     <>
       {confirmRegistrationStatus.requesting ? (
-        <CircularLoading
-          withGrid
-          size={80}
-          text={t('common:Signing you in!')}
-        />
+        <CircularLoading center size={80} text={t('common:Signing you in!')} />
       ) : (
         data
       )}

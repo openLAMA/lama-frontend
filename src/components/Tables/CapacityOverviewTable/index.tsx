@@ -2,7 +2,7 @@
  * openLAMA is an open source platform which has been developed by the
  * Swiss Kanton Basel Landschaft, with the goal of automating and managing
  * large scale Covid testing programs or any other pandemic/viral infections.
-
+ 
  * Copyright(C) 2021 Kanton Basel Landschaft, Switzerland
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published
@@ -15,12 +15,13 @@
  * See LICENSE.md in the project root for license information.
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see https://www.gnu.org/licenses/.
-*/
+ */
 
 import React, { useState, useLayoutEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { v4 as uuidv4 } from 'uuid';
+import { Link } from 'react-router-dom';
 
 // Material UI
 import {
@@ -33,12 +34,20 @@ import {
   TableHead,
   TableRow,
   Typography,
-  Button,
   Tooltip,
+  IconButton,
 } from '@material-ui/core';
 
+// Material Icons
+import {
+  Edit as EditIcon,
+  MailOutline as MailOutlineIcon,
+  ArrowForwardIos as ArrowForwardIosIcon,
+  Replay as ReplayIcon,
+} from '@material-ui/icons';
+
 // Custom components
-import CircleNumber from 'components/RequiredPeopleIndicator';
+import RequiredPeopleIndicator from 'components/RequiredPeopleIndicator';
 import LoadingSwapComponent from 'components/loaders/LoadingSwapComponent';
 import StudentInviteModal from 'components/Modals/StudentsInviteModal';
 import withErrorHandler from 'components/Wrappers/ErrorBoundaryWrapper';
@@ -46,17 +55,24 @@ import withErrorHandler from 'components/Wrappers/ErrorBoundaryWrapper';
 // Actions
 import { getCapacityOverview } from 'redux/globalState/capacity/capacitySlice';
 
-// Utils
-import {
-  formatDateToMonthSlashDaySlashFullYear,
-  getDayName,
-} from 'utils/dateFNSCustom';
-
 // Types
-import { CapacityOverviewType } from 'redux/globalState/capacity/types';
+import {
+  CapacityOverviewType,
+  CapacityOverviewShiftType,
+  GetCapacityOverviewRequestType,
+} from 'redux/globalState/capacity/types';
 
 // Utils
 import { RootState } from 'redux/combineReducers';
+import {
+  formatDateToMonthSlashDaySlashFullYear,
+  getDayName,
+  formatDateToFullYearDashMonthDashDay,
+  getWeekNumber,
+  checkDateAndConvert,
+  subtractDays,
+} from 'utils/dateFNSCustom';
+import separateNumberWithCommas from 'utils/separateNumberWithCommas';
 
 interface ICapacityOverviewTableProps {
   isLaboratory?: boolean;
@@ -80,8 +96,12 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
     (state: RootState) => state.capacity.capacityOverview,
   );
 
-  const initialDispatch = () => {
-    dispatch(getCapacityOverview());
+  const isEarliestDate = useSelector(
+    (state: RootState) => state.capacity.isEarliestDate,
+  );
+
+  const initialDispatch = (params?: GetCapacityOverviewRequestType) => {
+    dispatch(getCapacityOverview(params));
   };
 
   useLayoutEffect(() => {
@@ -102,11 +122,91 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
     initialDispatch();
   };
 
+  const onRefreshTableData = () => {
+    initialDispatch();
+  };
+
+  const onGoBackFiveDays = () => {
+    const earliestDate = capacityOverviewData[0].date;
+    if (earliestDate) {
+      const parsedDate = checkDateAndConvert(earliestDate);
+      if (parsedDate) {
+        const params: GetCapacityOverviewRequestType = {
+          startDate: formatDateToFullYearDashMonthDashDay(
+            subtractDays(parsedDate, 7),
+          ),
+        };
+        initialDispatch(params);
+      }
+    }
+  };
+
+  let color = 0;
+  let currentWeekNumber = 0;
+
   const tableHeaders = capacityOverviewData?.map(
     (item: CapacityOverviewType) => {
+      const weekNumber = getWeekNumber(item.date);
+      if (currentWeekNumber !== weekNumber) {
+        currentWeekNumber = weekNumber;
+        if (color === 0) {
+          color = 1;
+        } else {
+          color = 0;
+        }
+      }
+
+      const element = (
+        <div key={item.date}>
+          <Grid container wrap="nowrap" justify="flex-start">
+            <Grid item>
+              <Tooltip
+                title={`${t('common:Edit')}`}
+                key={item.date}
+                enterDelay={300}>
+                <span>
+                  <Link
+                    to={{
+                      pathname: `/laboratory/edit-day/${formatDateToFullYearDashMonthDashDay(
+                        item.date,
+                      )}`,
+                    }}>
+                    <IconButton color="primary" size="small">
+                      <EditIcon style={{ fontSize: 20 }} />
+                    </IconButton>
+                  </Link>
+                </span>
+              </Tooltip>
+            </Grid>
+            <Grid item>
+              <Tooltip
+                title={
+                  item.invitationAlreadySent
+                    ? `${t('common:Invitation already sent')}`
+                    : `${t('common:Send invitation')}`
+                }
+                key={item.date}
+                enterDelay={300}>
+                <span>
+                  <IconButton
+                    color="primary"
+                    disabled={item.invitationAlreadySent}
+                    size="small"
+                    onClick={() => onSendInvitation(item.date)}>
+                    <MailOutlineIcon style={{ fontSize: 20 }} />
+                  </IconButton>
+                </span>
+              </Tooltip>
+            </Grid>
+          </Grid>
+        </div>
+      );
+
       return {
         day: getDayName(item.date),
         date: formatDateToMonthSlashDaySlashFullYear(item.date),
+        color,
+        element,
       };
     },
   );
@@ -120,24 +220,59 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
     }[];
   };
 
-  const convertShiftsData = (shift: any, invitationAlreadySent: boolean) => {
-    let requiredNumberOfPeople;
-    if (invitationAlreadySent) {
-      requiredNumberOfPeople = (
-        <CircleNumber number={shift.requiredPersonnelCountShift} />
-      );
-    }
+  const convertShiftsData = (
+    shift: CapacityOverviewShiftType,
+    invitationAlreadySent: boolean,
+  ) => {
+    const fixedNonCanceledFixedEmployeesCount = shift.fixedEmployees.reduce<number>(
+      (peopleCount, item) => {
+        if (!item.isCanceled) {
+          return peopleCount + 1;
+        }
+        return peopleCount;
+      },
+      0,
+    );
+    const requiredNumberOfPeople = (
+      <RequiredPeopleIndicator
+        invitationAlreadySent={invitationAlreadySent}
+        current={shift.confirmedNotCanceledEmployeesCount}
+        max={shift.requiredPersonnelCountShift}
+        total={
+          shift.confirmedNotCanceledEmployeesCount +
+            fixedNonCanceledFixedEmployeesCount || 0
+        }
+      />
+    );
+
     let employeeNames;
-    if (shift?.confirmedEmployees?.length !== 0) {
+    if (
+      shift?.confirmedEmployees?.length !== 0 ||
+      shift?.fixedEmployees?.length !== 0
+    ) {
       employeeNames = (
-        <Grid container spacing={1}>
+        <Grid container spacing={1} className="pt-4">
           {shift.confirmedEmployees.map((employee: any) => {
             return (
               <Grid key={employee.email} item xs={12}>
                 <Typography
                   noWrap
                   variant="body2"
-                  className="font-size-tiny">{`${employee.firstName} ${employee.lastName}`}</Typography>
+                  className={`font-size-tiny ${
+                    employee.isCanceled && 'strike-through'
+                  }`}>{`${employee.firstName} ${employee.lastName}`}</Typography>
+              </Grid>
+            );
+          })}
+          {shift.fixedEmployees.map((employee: any) => {
+            return (
+              <Grid key={employee.email} item xs={12}>
+                <Typography
+                  noWrap
+                  variant="body2"
+                  className={`font-size-tiny color-gray ${
+                    employee.isCanceled && 'strike-through'
+                  }`}>{`${employee.firstName} ${employee.lastName}`}</Typography>
               </Grid>
             );
           })}
@@ -179,7 +314,7 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
           tableData: [
             {
               key: item.date,
-              element: item.samples,
+              element: separateNumberWithCommas(item.samples),
             },
           ],
         };
@@ -226,42 +361,6 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
         },
       ),
     });
-    tableData.push({
-      id: '4',
-      text: t('common:Actions'),
-      data: capacityOverviewData?.map(
-        (item: CapacityOverviewType): tableDataType => {
-          return {
-            id: item.date,
-            tableData: [
-              {
-                key: item.date,
-                element: (
-                  <Tooltip
-                    title={
-                      item.invitationAlreadySent
-                        ? `${t('common:Invitation already sent')}`
-                        : `${t('common:Send invitation')}`
-                    }
-                    key={item.date}
-                    enterDelay={300}>
-                    <span>
-                      <Button
-                        color="primary"
-                        variant="outlined"
-                        onClick={() => onSendInvitation(item.date)}
-                        disabled={item.invitationAlreadySent}>
-                        {t('common:Invite')}
-                      </Button>
-                    </span>
-                  </Tooltip>
-                ),
-              },
-            ],
-          };
-        },
-      ),
-    });
   }
 
   let text = '';
@@ -273,18 +372,67 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
     <>
       <LoadingSwapComponent
         isLoading={capacityViewStatus.requesting}
-        withGrid
+        center
         text={text}>
         <Paper>
           <TableContainer>
             <Table stickyHeader aria-label="capacity-overview">
               <TableHead className="table-header-shadow">
                 <TableRow>
-                  <TableCell></TableCell>
+                  <TableCell>
+                    <div>
+                      <Grid
+                        container
+                        justify="center"
+                        alignItems="center"
+                        wrap="nowrap"
+                        spacing={2}>
+                        <Grid item>
+                          <IconButton
+                            color="primary"
+                            size="small"
+                            disabled={isEarliestDate}
+                            onClick={onGoBackFiveDays}>
+                            <ArrowForwardIosIcon
+                              style={{
+                                fontSize: 30,
+                                transform: 'translateX(-2px) rotate(180deg)',
+                              }}
+                            />
+                          </IconButton>
+                        </Grid>
+                        <Grid item>
+                          <IconButton
+                            color="primary"
+                            size="small"
+                            onClick={onRefreshTableData}>
+                            <ReplayIcon style={{ fontSize: 30 }} />
+                          </IconButton>
+                        </Grid>
+                      </Grid>
+                    </div>
+                  </TableCell>
                   {tableHeaders.map((header: any) => (
-                    <TableCell key={header.date}>
-                      <Typography>{header.day}</Typography>
-                      <Typography>{header.date}</Typography>
+                    <TableCell
+                      key={header.date}
+                      className={`capacity-table-header-color-${header.color}`}>
+                      <Grid container>
+                        <Grid item xs={12}>
+                          <Typography className="header-font-size-small">
+                            {header.day}
+                          </Typography>
+                        </Grid>
+                        <Grid item xs={12}>
+                          <Typography className="header-font-size-small">
+                            {header.date}
+                          </Typography>
+                        </Grid>
+                        {isLaboratory && (
+                          <Grid item xs={12} className="pt-2">
+                            {header.element}
+                          </Grid>
+                        )}
+                      </Grid>
                     </TableCell>
                   ))}
                 </TableRow>

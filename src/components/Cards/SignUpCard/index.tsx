@@ -20,9 +20,8 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { useDispatch } from 'react-redux';
-import { Link } from 'react-router-dom';
+import { Link, useHistory } from 'react-router-dom';
 import { SubmitHandler, useForm } from 'react-hook-form';
-import { useHistory } from 'react-router-dom';
 
 // Material UI
 import { Grid, Button } from '@material-ui/core';

@@ -28,6 +28,7 @@ import {
   PutSupportPeopleForOrganizationRequestType,
   DeactivateProgramMemberRequestType,
   PushToEpaadProgramMemberRequestType,
+  PutFollowUpStatus,
 } from 'redux/onboardingAndTrainingAdministration/EditProgramMember/types';
 
 export const getProgramMemberAPI = async (
@@ -71,5 +72,14 @@ export const pushToEpaadProgramMemberAPI = async (
   HttpClient.request<null>({
     url: 'organizations/pushToEpaad',
     method: APIMethods.POST,
+    data,
+  });
+
+export const putFollowUpStatusAPI = async (
+  data: PutFollowUpStatus,
+): Promise<null> =>
+  HttpClient.request<null>({
+    url: 'organization/followUp',
+    method: APIMethods.PUT,
     data,
   });

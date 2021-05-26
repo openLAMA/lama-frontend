@@ -24,7 +24,7 @@ import { Redirect, Route, RouteProps } from 'react-router-dom';
 // Routes
 import { UnauthenticatedRoutes } from 'config/routes';
 
-// utils
+// Utils
 import { RootState } from 'redux/combineReducers';
 
 interface AuthenticatedRouteProps extends RouteProps {
@@ -51,7 +51,7 @@ const AuthenticatedRoute: React.FC<AuthenticatedRouteProps> = (
     );
   }
 
-  if (authKey && roleType !== authKey) {
+  if (authKey && roleType.toLowerCase() !== authKey.toLowerCase()) {
     return (
       <Redirect
         exact

@@ -131,7 +131,7 @@ const LoginConfirmationCard: React.FC = () => {
   return (
     <>
       {confirmLoginStatus.requesting ? (
-        <CircularLoading withGrid size={80} text={t('Signing you in!')} />
+        <CircularLoading center size={80} text={t('Signing you in!')} />
       ) : (
         data
       )}

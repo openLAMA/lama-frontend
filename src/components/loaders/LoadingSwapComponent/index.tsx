@@ -25,26 +25,18 @@ import CircularLoading from 'components/loaders/CircularLoading';
 interface ILoadingSwapComponentProps {
   size?: number;
   text?: string;
-  withGrid?: boolean;
   isLoading?: boolean;
-  arrayOfMessages?: string[];
   children: React.ReactNode;
+  center?: boolean;
 }
 
 const LoadingSwapComponent: React.FC<ILoadingSwapComponentProps> = (
   props: ILoadingSwapComponentProps,
 ) => {
-  const { size, text, withGrid, isLoading, arrayOfMessages, children } = props;
+  const { size, text, isLoading, children, center } = props;
 
   if (isLoading) {
-    return (
-      <CircularLoading
-        size={size}
-        text={text}
-        withGrid={withGrid}
-        arrayOfMessages={arrayOfMessages}
-      />
-    );
+    return <CircularLoading size={size} text={text} center={center} />;
   }
 
   return <>{children}</>;

@@ -1,6 +1,6 @@
 {
   "Field is required!": "Eingabe erforderlich.",
-  "Enter a valid email!": "Bitte gÃ¼ltige Email eingeben.",
+  "Enter a valid email!": "Bitte gültige Email eingeben.",
   "Value must be greater than 0!": "Eingabe darf nicht 0 sein.",
   "Max number of characters allowed is {x}!": "Maximale Anzahl von {{numberOfChars}}! Zeichen Ã¼berschritten.",
   "Value must be positive!": "Der Wert muss positiv sein.",

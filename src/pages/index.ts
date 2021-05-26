@@ -21,10 +21,12 @@ import OnboardingAndTrainingPages from 'pages/OnboardingAndTrainingAdministratio
 import OrganizationAdministrationPages from 'pages/OrganizationAdministration/pages';
 import LabAdministrationPages from 'pages/LabAdministration/pages';
 import UnauthenticatedPages from 'pages/Unauthenticated/pages';
+import LogisticsAdministrationPages from 'pages/LogisticsAdministration/pages';
 
 export default {
   ...OnboardingAndTrainingPages,
   ...OrganizationAdministrationPages,
   ...LabAdministrationPages,
   ...UnauthenticatedPages,
+  ...LogisticsAdministrationPages,
 };

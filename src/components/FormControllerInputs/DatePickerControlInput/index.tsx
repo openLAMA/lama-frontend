@@ -26,7 +26,9 @@ import {
   KeyboardDatePicker,
   MuiPickersUtilsProvider,
 } from '@material-ui/pickers';
+import { MaterialUiPickersDate } from '@material-ui/pickers/typings/date';
 import DateFnsUtils from '@date-io/date-fns';
+import locale from 'date-fns/locale/en-US';
 
 // Types
 import { IFormInputProps } from 'components/FormControllerInputs/types';
@@ -36,6 +38,14 @@ import { fieldRequired as formFieldRequired } from 'formValidation';
 
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 interface IDatePickerControllerInputProps extends IFormInputProps {}
+
+if (locale?.options) {
+  locale.options.weekStartsOn = 1;
+}
+
+const disabledWeekends = (day: MaterialUiPickersDate): boolean => {
+  return day?.getDay() === 0 || day?.getDay() === 6;
+};
 
 const DatePickerControllerInput: React.FC<IDatePickerControllerInputProps> = (
   props: IDatePickerControllerInputProps,
@@ -73,7 +83,7 @@ const DatePickerControllerInput: React.FC<IDatePickerControllerInputProps> = (
       defaultValue={defaultValue || null}
       render={({ ref, ...rest }) => {
         return (
-          <MuiPickersUtilsProvider utils={DateFnsUtils}>
+          <MuiPickersUtilsProvider utils={DateFnsUtils} locale={locale}>
             <KeyboardDatePicker
               {...rest}
               label={label}
@@ -87,6 +97,7 @@ const DatePickerControllerInput: React.FC<IDatePickerControllerInputProps> = (
               KeyboardButtonProps={{
                 'aria-label': 'change date',
               }}
+              shouldDisableDate={disabledWeekends}
               error={error}
               helperText={errorMessage}
               disabled={disabled}

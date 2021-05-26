@@ -35,6 +35,7 @@ export interface IOnboardingAndTrainingAdministrationRoutes {
   myProfileRoute: IRoute;
   editProgramMemberRoute: IRoute;
   capacityRoute: IRoute;
+  calendarRoute: IRoute;
 }
 
 const university = '/university';
@@ -62,8 +63,8 @@ export const OnboardingAndTrainingAdministrationRoutes: IOnboardingAndTrainingAd
     viewName: 'OnboardingAndTrainingAdministrationEditProgramMember',
   },
   capacityRoute: {
-    route: `${university}/my-profile/capacity`,
-    key: `${university}/my-profile/capacity`,
+    route: `${university}/capacity`,
+    key: `${university}/capacity`,
     title: 'Capacity',
     viewName: 'OnboardingAndTrainingAdministrationCapacity',
     exact: true,
@@ -71,8 +72,15 @@ export const OnboardingAndTrainingAdministrationRoutes: IOnboardingAndTrainingAd
   dashboardRoute: {
     route: `${university}`,
     key: `${university}`,
-    title: 'Dashboard',
-    viewName: 'OnboardingAndTrainingAdministrationDashboard',
+    title: 'Analytics',
+    viewName: 'OnboardingAndTrainingAdministrationAnalytics',
+    exact: true,
+  },
+  calendarRoute: {
+    route: `${university}/calendar`,
+    key: `${university}/calendar`,
+    title: 'Calendar',
+    viewName: 'OnboardingAndTrainingAdministrationCalendar',
     exact: true,
   },
 };
@@ -103,17 +111,19 @@ export const OrganizationAdministrationRoutes: IOrganizationAdministrationRoutes
 
 export interface ILabAdministrationRoutes {
   dashboardRoute: IRoute;
+  analyticsRoute: IRoute;
   myProfileRoute: IRoute;
   programMembersRoute: IRoute;
   testingPersonalRoute: IRoute;
+  editDayRoute: IRoute;
 }
 
 const laboratory = '/laboratory';
 
 export const LabAdministrationRoutes: ILabAdministrationRoutes = {
   dashboardRoute: {
-    route: `${laboratory}`,
-    key: `${laboratory}`,
+    route: `${laboratory}/dashboard`,
+    key: `${laboratory}/dashboard`,
     title: 'Dashboard',
     viewName: 'LabAdministrationDashboard',
     exact: true,
@@ -139,6 +149,19 @@ export const LabAdministrationRoutes: ILabAdministrationRoutes = {
     viewName: 'LabAdministrationTestingPersonal',
     exact: true,
   },
+  analyticsRoute: {
+    route: `${laboratory}`,
+    key: `${laboratory}`,
+    title: 'Analytics',
+    viewName: 'LabAdministrationAnalytics',
+    exact: true,
+  },
+  editDayRoute: {
+    route: `${laboratory}/edit-day/:date`,
+    key: `${laboratory}/edit-day`,
+    title: 'Edit date',
+    viewName: 'LabEditDay',
+  },
 };
 
 export interface IUnauthenticatedRoutes {
@@ -150,6 +173,7 @@ export interface IUnauthenticatedRoutes {
   registerConfirmationRoute: IRoute;
   testingPersonalInvitationRoute: IRoute;
   loginEmailSentRoute: IRoute;
+  followUpEmailConfirmationRoute: IRoute;
 }
 
 export const UnauthenticatedRoutes: IUnauthenticatedRoutes = {
@@ -191,6 +215,7 @@ export const UnauthenticatedRoutes: IUnauthenticatedRoutes = {
     title: 'Login confirmation',
     viewName: 'LoginConfirmation',
     exact: true,
+    redirectIfAuth: true,
   },
   registerConfirmationRoute: {
     route: '/register-confirmation',
@@ -213,5 +238,28 @@ export const UnauthenticatedRoutes: IUnauthenticatedRoutes = {
     viewName: 'LoginEmailSent',
     exact: true,
     redirectIfAuth: true,
+  },
+  followUpEmailConfirmationRoute: {
+    route: '/follow-up-email-confirmation',
+    key: '/follow-up-email-confirmation',
+    title: 'Follow Up Email Confirmation',
+    viewName: 'FollowUpEmailConfirmation',
+    exact: true,
+  },
+};
+
+export interface ILogisticsAdministrationRoutes {
+  dashboardRoute: IRoute;
+}
+
+const logistics = '/logistics';
+
+export const LogisticsAdministrationRoutes: ILogisticsAdministrationRoutes = {
+  dashboardRoute: {
+    route: `${logistics}`,
+    key: `${logistics}`,
+    title: 'Dashboard',
+    viewName: 'LogisticsAdministrationDashboard',
+    exact: true,
   },
 };

@@ -17,14 +17,21 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-import React, { useRef } from 'react';
+import React, { useRef, useLayoutEffect } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import { CSVLink } from 'react-csv';
 
 // Material UI
 
-import { Grid, MenuItem, FormLabel, Link } from '@material-ui/core';
+import {
+  Grid,
+  MenuItem,
+  FormLabel,
+  Link,
+  FormControlLabel,
+  Switch,
+} from '@material-ui/core';
 
 // Custom components
 import CustomSelect from 'components/CustomSelect';
@@ -32,14 +39,8 @@ import ButtonWithLoadingAnimation from 'components/Buttons/ButtonWithLoadingAnim
 
 // Actions
 import { setFilter } from 'redux/globalState/programMembers/programMembersSlice';
-
-// Utils
-import { RootState } from 'redux/combineReducers';
-import { findCity } from 'utils/findCity';
-import {
-  formatDateToMonthDotDayDotFullYear,
-  getDayName,
-} from 'utils/dateFNSCustom';
+import { getCities } from 'redux/globalState/citiesData/citiesDataSlice';
+import { getOrganizationTypes } from 'redux/globalState/organizationTypes/organizationTypesSlice';
 
 // Types
 import {
@@ -47,14 +48,23 @@ import {
   ProgramMemberType,
 } from 'redux/globalState/programMembers/types';
 
+// Utils
+import { RootState } from 'redux/combineReducers';
+import { findCity } from 'utils/findCity';
+import programMemberStatusEnum from 'utils/programMemberStatusEnum';
+import {
+  formatDateToMonthDayFullYear,
+  formatDateToMonthDotDayDotFullYear,
+  getDayName,
+} from 'utils/dateFNSCustom';
+
 interface IProgramMembersFilterProps {
   data: ProgramMemberType[];
   isUniversityDashboard?: boolean;
   hasTypeFiltration?: boolean;
   hasStatusFiltration?: boolean;
   hasQuickFilters?: boolean;
-  getTranslatedStatus: (status: string) => string;
-  getTranslatedOrganizationType: (status: string) => string;
+  hasWeekdayFiltration?: boolean;
 }
 
 const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
@@ -68,8 +78,7 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
     hasTypeFiltration,
     hasStatusFiltration,
     hasQuickFilters,
-    getTranslatedStatus,
-    getTranslatedOrganizationType,
+    hasWeekdayFiltration,
   } = props;
 
   const csvRef = useRef<any | null>(null);
@@ -78,11 +87,35 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
     (state: RootState) => state.programMembersData.filter,
   );
 
+  const citiesStatus = useSelector(
+    (state: RootState) => state.cities.citiesStatus,
+  );
+
+  const organizationTypesStatus = useSelector(
+    (state: RootState) => state.organizationTypes.organizationTypesStatus,
+  );
+
   const programMembersStatus = useSelector(
     (state: RootState) => state.programMembersData.programMembersStatus,
   );
 
+  const organizationTypesList = useSelector(
+    (state: RootState) => state.organizationTypes.organizationTypes,
+  );
+
   const citiesList = useSelector((state: RootState) => state.cities.cities);
+
+  useLayoutEffect(() => {
+    if (!citiesStatus.requesting && !citiesStatus.success) {
+      dispatch(getCities());
+    }
+    if (
+      !organizationTypesStatus.requesting &&
+      !organizationTypesStatus.success
+    ) {
+      dispatch(getOrganizationTypes());
+    }
+  }, []);
 
   const setNewFilter = (filter: ProgramMemberFilterType) => {
     dispatch(setFilter(filter));
@@ -98,6 +131,12 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
   if (isNoFilterApplied && filter.filterEpaadStatusPending) {
     isNoFilterApplied = false;
   }
+  if (isNoFilterApplied && filter.filterAssignedToMe) {
+    isNoFilterApplied = false;
+  }
+  if (isNoFilterApplied && filter.filterWeekday !== 'Weekday') {
+    isNoFilterApplied = false;
+  }
 
   const setFilterType = (filterType: number) => {
     const newFilter: ProgramMemberFilterType = { ...filter };
@@ -111,9 +150,29 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
     setNewFilter(newFilter);
   };
 
+  const setFilterWeekday = (filterWeekDay: string) => {
+    const newFilter: ProgramMemberFilterType = { ...filter };
+    newFilter.filterWeekday = filterWeekDay;
+    setNewFilter(newFilter);
+  };
+
   const setFilterEpaadStatusPending = (filterEpaadStatusPending: boolean) => {
     const newFilter: ProgramMemberFilterType = { ...filter };
     newFilter.filterEpaadStatusPending = filterEpaadStatusPending;
+    setNewFilter(newFilter);
+  };
+
+  const setFilterAssignedToMe = (filterAssignedToMe: boolean) => {
+    const newFilter: ProgramMemberFilterType = { ...filter };
+    newFilter.filterAssignedToMe = filterAssignedToMe;
+    setNewFilter(newFilter);
+  };
+
+  const setDisabledOrganizations = (
+    event: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const newFilter: ProgramMemberFilterType = { ...filter };
+    newFilter.showAllOrganizations = event.target.checked;
     setNewFilter(newFilter);
   };
 
@@ -126,13 +185,25 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
     { value: 'NotActive', text: t('common:Not active') },
   ];
 
+  const weekdayMenuItems = [
+    { value: 'Weekday', text: t('common:Weekday') },
+    { value: 'Monday', text: t('common:Monday') },
+    { value: 'Tuesday', text: t('common:Tuesday') },
+    { value: 'Wednesday', text: t('common:Wednesday') },
+    { value: 'Thursday', text: t('common:Thursday') },
+    { value: 'Friday', text: t('common:Friday') },
+    { value: 'Saturday', text: t('common:Saturday') },
+    { value: 'Sunday', text: t('common:Sunday') },
+  ];
+
   const organizationTypesMenuItems = [
-    { value: -1, text: t('common:All') },
-    { value: 82000, text: t('common:Company') },
-    { value: 82001, text: t('common:Pharmacy') },
-    { value: 82002, text: t('common:School') },
-    { value: 82003, text: t('common:Nursing home') },
-    { value: 82004, text: t('common:Hospital') },
+    { value: -1, text: 'All' },
+    ...organizationTypesList.map((orgType) => {
+      return {
+        value: orgType.id,
+        text: orgType.name,
+      };
+    }),
   ];
 
   const handleShowAll = () => {
@@ -142,12 +213,19 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
       filterStatus: 'All',
       filterType: -1,
       filterEpaadStatusPending: false,
+      filterAssignedToMe: false,
+      filterWeekday: 'Weekday',
+      showAllOrganizations: true,
     };
     setNewFilter(newFilter);
   };
 
   const handleFilterEpaadStatusPending = () => {
-    setFilterEpaadStatusPending(true);
+    setFilterEpaadStatusPending(!filter.filterEpaadStatusPending);
+  };
+
+  const handleFilterAssignedToMe = () => {
+    setFilterAssignedToMe(!filter.filterAssignedToMe);
   };
 
   const onExportToCSV = () => {
@@ -156,50 +234,56 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
     }
   };
 
-  const dataCsv = data.map((item: ProgramMemberType) => {
-    return {
-      type: getTranslatedOrganizationType(item.organizationType.name),
-      status: getTranslatedStatus(item.status),
-      epaadstatus: item.epaadId ? t('common:Completed') : t('common:Pending'),
-      createdOn: item.createdOn,
-      name: item.name,
-      organizationShortcutName: item.organizationShortcutName,
-      contactPerson: item.contacts.map((contact: any) => {
-        return contact.name;
-      }),
-      email: item.contacts.map((contact: any) => {
-        return contact.email;
-      }),
-      phone: item.contacts.map((contact: any) => {
-        return contact.phoneNumber;
-      }),
-      studentsCount: item.studentsCount,
-      employeesCount: item.employeesCount,
-      numberOfSamples: item.numberOfSamples,
-      registeredEmployees: item.registeredEmployees,
-      trainingTimestamp: formatDateToMonthDotDayDotFullYear(
-        item.trainingTimestamp,
-      ),
-      onboardingTimestamp: formatDateToMonthDotDayDotFullYear(
-        item.onboardingTimestamp,
-      ),
-      firstTestTimestamp: formatDateToMonthDotDayDotFullYear(
-        item.firstTestTimestamp,
-      ),
-      testingDay: getDayName(item.firstTestTimestamp),
-      area: item.area,
-      address: item.address,
-      zip: item.zip,
-      city: findCity(citiesList, item.cityId)?.name || '-',
-      schoolType: item.schoolType,
-      manager: item.manager,
-      prioLogistic: item.prioLogistic,
-      numberOfBags: item.numberOfBags,
-      naclLosing: item.naclLosing,
-      additionalTestTubes: item.additionalTestTubes,
-      numberOfRakoBoxes: item.numberOfRakoBoxes,
-    };
-  });
+  const dataCsv = data
+    .filter(
+      (item: ProgramMemberType) =>
+        item.status !== programMemberStatusEnum.NotActive,
+    )
+    .map((item: ProgramMemberType) => {
+      return {
+        type: t(`common:${item.organizationType.name}`),
+        status: t(`common:${item.status}`),
+        epaadstatus: item.epaadId ? t('common:Completed') : t('common:Pending'),
+        supportPerson: item.supportPerson.name,
+        createdOn: item.createdOn,
+        name: item.name,
+        organizationShortcutName: item.organizationShortcutName,
+        contactPerson: item.contacts.map((contact: any) => {
+          return contact.name;
+        }),
+        email: item.contacts.map((contact: any) => {
+          return contact.email;
+        }),
+        phone: item.contacts.map((contact: any) => {
+          return contact.phoneNumber;
+        }),
+        studentsCount: item.studentsCount,
+        employeesCount: item.employeesCount,
+        numberOfSamples: item.numberOfSamples,
+        registeredEmployees: item.registeredEmployees,
+        trainingTimestamp: formatDateToMonthDotDayDotFullYear(
+          item.trainingTimestamp,
+        ),
+        onboardingTimestamp: formatDateToMonthDotDayDotFullYear(
+          item.onboardingTimestamp,
+        ),
+        firstTestTimestamp: formatDateToMonthDotDayDotFullYear(
+          item.firstTestTimestamp,
+        ),
+        testingDay: getDayName(item.firstTestTimestamp),
+        area: item.area,
+        address: item.address,
+        zip: item.zip,
+        city: findCity(citiesList, item.cityId)?.name || '-',
+        schoolType: item.schoolType,
+        manager: item.manager,
+        prioLogistic: item.prioLogistic,
+        numberOfBags: item.numberOfBags,
+        naclLosing: item.naclLosing,
+        additionalTestTubes: item.additionalTestTubes,
+        numberOfRakoBoxes: item.numberOfRakoBoxes,
+      };
+    });
 
   const headers = [
     { key: 'type', label: t('common:Type') },
@@ -210,6 +294,10 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
     {
       key: 'epaadstatus',
       label: t('common:Epaad Status'),
+    },
+    {
+      key: 'supportPerson',
+      label: t('common:Support person'),
     },
     {
       key: 'createdOn',
@@ -226,7 +314,7 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
     { key: 'contactPerson', label: t('common:Contact person') },
 
     { key: 'email', label: t('common:Email') },
-    { key: 'phone', label: t('common:Phone') },
+    { key: 'phone', label: t('common:Mobile phone number') },
     {
       key: 'studentsCount',
       label: t('common:Number of students'),
@@ -290,96 +378,163 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
     },
   ];
 
+  let noFilters = true;
+  if (
+    hasTypeFiltration ||
+    hasStatusFiltration ||
+    hasQuickFilters ||
+    hasWeekdayFiltration
+  ) {
+    noFilters = false;
+  }
+
   return (
     <Grid container spacing={2}>
-      <Grid item xs={12}>
-        <Grid container spacing={2} alignItems="flex-end">
-          {hasTypeFiltration && (
-            <Grid item>
-              <CustomSelect
-                fullWidth
-                className="width-200"
-                error={Boolean(filter.filterType !== -1)}
-                labelId="type-filter-select-label"
-                label={t('common:Type')}
-                selectId="type-filter-select"
-                value={filter.filterType}
-                onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-                  setFilterType(event.target.value as number);
-                }}
-                menuItems={organizationTypesMenuItems.map((orgType) => (
-                  <MenuItem key={orgType.value} value={orgType.value}>
-                    {orgType.text}
-                  </MenuItem>
-                ))}
-              />
-            </Grid>
-          )}
-          {hasStatusFiltration && (
-            <Grid item>
-              <CustomSelect
-                fullWidth
-                className="width-200"
-                error={Boolean(filter.filterStatus !== 'All')}
-                labelId="status-filter-select-label"
-                label={t('common:Status')}
-                selectId="status-filter-select"
-                value={filter.filterStatus}
-                onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
-                  setFilterStatus(event.target.value as string);
-                }}
-                menuItems={statusMenuItems.map((status) => (
-                  <MenuItem key={status.value} value={status.value}>
-                    {status.text}
-                  </MenuItem>
-                ))}
-              />
-            </Grid>
-          )}
-          {hasQuickFilters && (
-            <Grid item>
-              <Grid container direction="column" className="pb-2">
-                <Grid
-                  item
-                  style={{
-                    paddingBottom: '10px',
-                  }}>
-                  <FormLabel
-                    style={{
-                      fontSize: '0.75rem',
-                    }}>
-                    {t('common:Quick filters')}
-                  </FormLabel>
-                </Grid>
-                <Grid item>
-                  <Grid container spacing={2}>
-                    <Grid item>
-                      <Link
-                        component="button"
-                        underline="always"
-                        className={`${!isNoFilterApplied && 'color-gray'}`}
-                        onClick={handleShowAll}>
-                        {t('common:Show all')}
-                      </Link>
+      {!noFilters && (
+        <Grid item xs={12}>
+          <Grid container spacing={2} alignItems="flex-end">
+            {hasTypeFiltration && (
+              <Grid item>
+                <CustomSelect
+                  fullWidth
+                  className="width-200"
+                  error={Boolean(filter.filterType !== -1)}
+                  labelId="type-filter-select-label"
+                  label={t('common:Type')}
+                  selectId="type-filter-select"
+                  value={filter.filterType}
+                  onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                    setFilterType(event.target.value as number);
+                  }}
+                  menuItems={organizationTypesMenuItems.map((orgType) => (
+                    <MenuItem key={orgType.value} value={orgType.value}>
+                      {t(`common:${orgType.text}`)}
+                    </MenuItem>
+                  ))}
+                />
+              </Grid>
+            )}
+            {hasStatusFiltration && (
+              <Grid item>
+                <CustomSelect
+                  fullWidth
+                  className="width-200"
+                  error={Boolean(filter.filterStatus !== 'All')}
+                  labelId="status-filter-select-label"
+                  label={t('common:Status')}
+                  selectId="status-filter-select"
+                  value={filter.filterStatus}
+                  onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                    setFilterStatus(event.target.value as string);
+                  }}
+                  menuItems={statusMenuItems.map((status) => (
+                    <MenuItem key={status.value} value={status.value}>
+                      {status.text}
+                    </MenuItem>
+                  ))}
+                />
+              </Grid>
+            )}
+            {hasWeekdayFiltration && (
+              <Grid item>
+                <CustomSelect
+                  fullWidth
+                  className="width-200"
+                  error={Boolean(filter.filterWeekday !== 'Weekday')}
+                  labelId="weekday-filter-select-label"
+                  label={t('common:Weekday')}
+                  selectId="weekday-filter-select"
+                  value={filter.filterWeekday}
+                  onChange={(event: React.ChangeEvent<{ value: unknown }>) => {
+                    setFilterWeekday(event.target.value as string);
+                  }}
+                  menuItems={weekdayMenuItems.map((weekDay) => (
+                    <MenuItem key={weekDay.value} value={weekDay.value}>
+                      {weekDay.text}
+                    </MenuItem>
+                  ))}
+                />
+              </Grid>
+            )}
+
+            {hasQuickFilters && (
+              <Grid item>
+                <Grid container>
+                  <Grid item>
+                    <Grid container direction="column" className="pb-2">
+                      <Grid
+                        item
+                        style={{
+                          paddingBottom: '10px',
+                        }}>
+                        <FormLabel className="font-size-zero75rem">
+                          {t('common:Quick filters')}
+                        </FormLabel>
+                      </Grid>
+                      <Grid item>
+                        <Grid container spacing={2}>
+                          <Grid item>
+                            <Link
+                              component="button"
+                              underline="always"
+                              className={`${
+                                !isNoFilterApplied && 'color-gray'
+                              }`}
+                              onClick={handleShowAll}>
+                              {t('common:Show all')}
+                            </Link>
+                          </Grid>
+                          <Grid item>
+                            <Link
+                              component="button"
+                              underline="always"
+                              className={`${
+                                !filter.filterEpaadStatusPending && 'color-gray'
+                              }`}
+                              onClick={handleFilterEpaadStatusPending}>
+                              {t('common:Pending')}
+                            </Link>
+                          </Grid>
+                          <Grid item>
+                            <Link
+                              component="button"
+                              underline="always"
+                              className={`${
+                                !filter.filterAssignedToMe && 'color-gray'
+                              }`}
+                              onClick={handleFilterAssignedToMe}>
+                              {t('common:Assigned to me')}
+                            </Link>
+                          </Grid>
+                        </Grid>
+                      </Grid>
                     </Grid>
-                    <Grid item>
-                      <Link
-                        component="button"
-                        underline="always"
-                        className={`${
-                          !filter.filterEpaadStatusPending && 'color-gray'
-                        }`}
-                        onClick={handleFilterEpaadStatusPending}>
-                        {t('common:Pending')}
-                      </Link>
-                    </Grid>
+                  </Grid>
+                  <Grid item>
+                    <FormControlLabel
+                      label={t('common:Only active organizations')}
+                      classes={{
+                        root: 'align-start pb-1',
+                        label:
+                          'font-size-zero75rem custom-switch-label-color pb-1',
+                      }}
+                      control={
+                        <Switch
+                          checked={filter.showAllOrganizations}
+                          color="primary"
+                          onChange={setDisabledOrganizations}
+                          size="small"
+                        />
+                      }
+                      labelPlacement="top"
+                    />
                   </Grid>
                 </Grid>
               </Grid>
-            </Grid>
-          )}
+            )}
+          </Grid>
         </Grid>
-      </Grid>
+      )}
       <Grid item xs={12}>
         <ButtonWithLoadingAnimation
           variant="contained"
@@ -388,7 +543,12 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
           text={t('common:Export to CSV')}
           disabled={programMembersStatus.requesting}
         />
-        <CSVLink ref={csvRef} data={dataCsv} headers={headers} />
+        <CSVLink
+          ref={csvRef}
+          data={dataCsv}
+          headers={headers}
+          filename={`Lama_${formatDateToMonthDayFullYear(new Date())}.csv`}
+        />
       </Grid>
     </Grid>
   );

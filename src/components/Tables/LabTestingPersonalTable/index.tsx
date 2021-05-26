@@ -51,8 +51,6 @@ import {
 // Utils
 import { RootState } from 'redux/combineReducers';
 
-type WorkingAreaType = 'Pooling' | 'Labor' | 'Admin';
-
 const LabCapacityOverviewTable: React.FC = () => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
@@ -121,15 +119,10 @@ const LabCapacityOverviewTable: React.FC = () => {
 
   const responseWorkingAreas =
     testingPersonalTableData?.result?.map((item: any) => {
+      // Was an array because we had more than 1 option.
       const workingAreas = [];
       workingAreas[0] =
         item.workingAreas.find((workArea: any) => workArea.area === 'Pooling')
-          ?.area || '';
-      workingAreas[1] =
-        item.workingAreas.find((workArea: any) => workArea.area === 'Labor')
-          ?.area || '';
-      workingAreas[2] =
-        item.workingAreas.find((workArea: any) => workArea.area === 'Admin')
           ?.area || '';
 
       return workingAreas;
@@ -161,12 +154,32 @@ const LabCapacityOverviewTable: React.FC = () => {
       title: t('common:Working area'),
     },
     {
-      headName: 'workingAreas',
-      title: t('common:Working area'),
+      headName: 'type',
+      title: t('common:Employee type'),
     },
     {
-      headName: 'workingAreas',
-      title: t('common:Working area'),
+      headName: 'mondayShift',
+      title: t('common:Monday'),
+    },
+    {
+      headName: 'tuesdayShift',
+      title: t('common:Tuesday'),
+    },
+    {
+      headName: 'wednesdayShift',
+      title: t('common:Wednesday'),
+    },
+    {
+      headName: 'thursdayShift',
+      title: t('common:Thursday'),
+    },
+    {
+      headName: 'fridayShift',
+      title: t('common:Friday'),
+    },
+    {
+      headName: 'actions',
+      title: t('common:Actions'),
     },
   ];
 
@@ -185,7 +198,7 @@ const LabCapacityOverviewTable: React.FC = () => {
           testingPersonalStatusTypeListsStatus.requesting ||
           testingPersonalTableStatus.requesting
         }
-        withGrid
+        center
         text={text}>
         <Paper>
           <TableContainer>
@@ -197,7 +210,6 @@ const LabCapacityOverviewTable: React.FC = () => {
                       <Typography>{t(`common:${header.title}`)}</Typography>
                     </TableCell>
                   ))}
-                  <TableCell>{t('common:Actions')}</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -215,9 +227,35 @@ const LabCapacityOverviewTable: React.FC = () => {
                         }
                       </TableCell>
                       <TableCell>{item.employeer}</TableCell>
-                      {responseWorkingAreas[i].map((el: any) => {
-                        return <TableCell key={el}>{el}</TableCell>;
+                      {responseWorkingAreas[i].map((item: any) => {
+                        return <TableCell key={item}>{item}</TableCell>;
                       })}
+                      <TableCell>{t(`common:${item.type}`)}</TableCell>
+                      <TableCell>
+                        {item.mondayShift
+                          ? t(`common:shiftName.${item.mondayShift}`)
+                          : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {item.tuesdayShift
+                          ? t(`common:shiftName.${item.tuesdayShift}`)
+                          : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {item.wednesdayShift
+                          ? t(`common:shiftName.${item.wednesdayShift}`)
+                          : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {item.thursdayShift
+                          ? t(`common:shiftName.${item.thursdayShift}`)
+                          : '-'}
+                      </TableCell>
+                      <TableCell>
+                        {item.fridayShift
+                          ? t(`common:shiftName.${item.fridayShift}`)
+                          : '-'}
+                      </TableCell>
                       <TableCell>
                         <IconButton
                           color="primary"

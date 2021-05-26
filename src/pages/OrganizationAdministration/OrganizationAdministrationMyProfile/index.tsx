@@ -82,27 +82,21 @@ const OrganizationAdministrationMyProfile: React.FC<OrganizationAdministrationMy
     organizationTypesStatus.requesting ||
     getOrganizationStatus.requesting;
 
-  const arrayOfMessages = [];
+  let text = '';
   if (citiesStatus.requesting) {
-    arrayOfMessages.push(t('progressMessages:Fetching cities'));
+    text = t('progressMessages:Fetching cities');
   }
   if (organizationTypesStatus.requesting) {
-    arrayOfMessages.push(t('progressMessages:Fetching organization types'));
+    text = t('progressMessages:Fetching organization types');
   }
   if (getOrganizationStatus.requesting) {
-    arrayOfMessages.push(t('progressMessages:Fetching organization data'));
+    text = t('progressMessages:Fetching organization data');
   }
   return (
     <>
-      <PageContainerWithHeader
-        title={OrganizationAdministrationRoutes.myProfileRoute.title}>
-        <LoadingSwapComponent
-          isLoading={isLoading}
-          withGrid
-          arrayOfMessages={arrayOfMessages}>
-          <MyOrganizationForm />
-        </LoadingSwapComponent>
-      </PageContainerWithHeader>
+      <LoadingSwapComponent isLoading={isLoading} center text={text}>
+        <MyOrganizationForm />
+      </LoadingSwapComponent>
     </>
   );
 };
