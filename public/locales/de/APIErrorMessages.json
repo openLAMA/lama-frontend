@@ -83,5 +83,16 @@
   "Cancelation for testing personnel for date X already exists": "Absage für das Datum {{date}} ist bereits vorhanden.",
   "Failed to increase shift count": "Fehler beim Erhöhen der Schichtanzahl",
   "The invitation was not found": "Die Einladung konnte nicht gefunden werden",
-  "User that you want to delete is assigned to an Organization": "Folgende Benutzer sind als Ansprechpersonen einer Organisation zugewiesen und können nicht gelöscht werden: '{{emails}}"
+  "User that you want to delete is assigned to an Organization": "Folgende Benutzer sind als Ansprechpersonen einer Organisation zugewiesen und können nicht gelöscht werden: '{{emails}}",
+  "Failed to add new state!": "Kanton konnte nicht hinzugefügtwerden.",
+  "Failed to get state!": "Kanton konnte nicht geladenwerden.",
+  "Failed to update state!": "Kanton konnte nicht aktualisiertwerden.",
+  "Failed to remove state!": "Kanton konnte nicht geladen werden",
+  "Canton with this Name already exists": "Ein Kanton mit diesem Namen existiert bereits",
+  "This canton already exists!": "Dieser Kanton existiert bereits.",
+  "Date should be greater than today": "Bitte ein Datum in der Zukunfteingeben.",
+  "Confirmation for testing personnel for date and shift already exists": "Es liegt bereits für diesen Einsatz eine Bestätigung vor",
+  "Failed to update static pooling status!": "Status konnte nicht aktualisiert werden.",
+  "Failed to set contract received status!": "Status konnte nicht aktualisiert werden.",
+  "Failed to re-activate a program member!": "Teilnehmer konnte nicht Re-aktivieren werden."
 }

@@ -48,6 +48,7 @@
   "My organization": "Meine Organisation",
   "Address": "Adresse",
   "Type": "Art Ihrer Organisation",
+  "Type of support person": "Einsatzart",
   "Contacts": "Kontakt",
   "General information": "Allgemeine Informationen",
   "Organization details": "Details der Organisation",
@@ -286,5 +287,14 @@
   "Normal": "Student",
   "Fixed": "Fix",
   "Temporary": "Temporär",
-  "Calendar": "Kalender"
+  "Calendar": "Kalender",
+  "State": "Kanton",
+  "Static pooling": "Statisches Pooling",
+  "Contract received": "Vertrag Erhalten",
+  "Analytics": "Analytics",
+  "Re-activate program member": "Organisation Re-aktivieren",
+  "Re-activate": "Re-aktivieren",
+  "Camp": "Lager/Camp",
+  "Camp summary": "Zusammenfassung",
+  "Organization contact": "Ansprechperson"
 }

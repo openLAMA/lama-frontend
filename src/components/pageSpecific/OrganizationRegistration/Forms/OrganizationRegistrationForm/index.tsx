@@ -165,7 +165,7 @@ const OrganizationRegistrationForm: React.FC<IOrganizationRegistrationFormProps>
         cityId: values.city.id,
         ZIP: values.ZIP,
         contacts: values.contactPeople,
-        numberOfSamples: parseInt(values.numberOfSamples, 10) || 0,
+        numberOfSamples: parseInt(values.numberOfSamples, 10) || null,
         numberOfPools: parseInt(values.numberOfPools, 10) || null,
         address: values.addressForPickupAndDelivery,
       };
@@ -311,7 +311,14 @@ const OrganizationRegistrationForm: React.FC<IOrganizationRegistrationFormProps>
                                           : false;
                                       }}
                                       renderOption={(option: CityType) => {
-                                        return <span>{option.name}</span>;
+                                        return (
+                                          <Grid
+                                            container
+                                            justify="space-between">
+                                            <Grid item>{option.name}</Grid>
+                                            <Grid item>{option.zipCode}</Grid>
+                                          </Grid>
+                                        );
                                       }}
                                       renderInput={(params) => {
                                         return (
@@ -541,6 +548,8 @@ const OrganizationRegistrationForm: React.FC<IOrganizationRegistrationFormProps>
                                 name="numberOfSamples"
                                 label={t('common:Number of test participants')}
                                 id="number-of-test-participants-input"
+                                fieldRequired
+                                numberMustBePositive
                                 error={Boolean(errors.numberOfSamples?.message)}
                                 errorMessage={errors.numberOfSamples?.message}
                               />

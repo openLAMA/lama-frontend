@@ -35,13 +35,13 @@ import {
 // Custom components
 import Navbar from 'components/NavBar';
 import NavDrawer from 'components/NavDrawer';
+import RouteMapping from 'components/protectedRoutes/RouteMapping';
 
 // Routes
 import { IRoute, LabAdministrationRoutes } from 'config/routes';
 
 // Utils
 import TypedKeysMap from 'utils/TypedKeysMap';
-import RouteMapping from 'components/protectedRoutes/RouteMapping';
 
 import styles from './index.module.scss';
 

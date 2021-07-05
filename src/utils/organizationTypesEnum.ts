@@ -23,6 +23,7 @@ enum organizationTypes {
   School = 82002,
   NursingHome = 82003,
   Hospital = 82004,
+  CAMP = 82006,
   SME = 99990,
 }
 

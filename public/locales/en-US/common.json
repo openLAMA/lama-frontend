@@ -48,6 +48,7 @@
   "My organization": "My organization",
   "Address": "Address",
   "Type": "Type",
+  "Type of support person": "Type of support person",
   "Contacts": "Contacts",
   "General information": "General information",
   "Organization details": "Organization details",
@@ -286,5 +287,14 @@
   "Normal": "Normal",
   "Fixed": "Fixed",
   "Temporary": "Temporary",
-  "Calendar": "Calendar"
+  "Calendar": "Calendar",
+  "State": "State",
+  "Static pooling": "Static pooling",
+  "Contract received": "Contract received",
+  "Analytics": "Analytics",
+  "Re-activate program member": "Re-activate program member",
+  "Re-activate": "Re-activate",
+  "Camp": "Camp",
+  "Camp summary": "Camp summary",
+  "Organization contact": "Organization contact"
 }

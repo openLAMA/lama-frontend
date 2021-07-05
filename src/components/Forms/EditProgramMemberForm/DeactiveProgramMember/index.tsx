@@ -33,6 +33,7 @@ import ModalWrapper from 'components/Wrappers/ModalWrapper';
 import {
   clearUpdateProgramData,
   deactivateProgramMember,
+  reActivateProgramMember,
 } from 'redux/onboardingAndTrainingAdministration/EditProgramMember/editProgramMemberSlice';
 
 // Utils
@@ -48,9 +49,7 @@ const DeactiveProgramMember: React.FC = () => {
 
   const { t } = useTranslation();
 
-  const [showDeactivateModal, setShowDeactivateModal] = useState<boolean>(
-    false,
-  );
+  const [showModal, setShowModal] = useState<string>('');
 
   const programMember = useSelector(
     (state: RootState) => state.editProgramMemberData.programMember,
@@ -61,17 +60,25 @@ const DeactiveProgramMember: React.FC = () => {
       state.editProgramMemberData.deactivateProgramMemberStatus,
   );
 
+  const reActivateProgramMemberStatus = useSelector(
+    (state: RootState) =>
+      state.editProgramMemberData.reActivateProgramMemberStatus,
+  );
+
   useEffect(() => {
-    if (deactivateProgramMemberStatus.success) {
+    if (
+      deactivateProgramMemberStatus.success ||
+      reActivateProgramMemberStatus.success
+    ) {
       dispatch(clearUpdateProgramData());
       history.push(
         OnboardingAndTrainingAdministrationRoutes.overviewRoute.route,
       );
     }
-  }, [deactivateProgramMemberStatus]);
+  }, [deactivateProgramMemberStatus, reActivateProgramMemberStatus]);
 
-  const onShowDeactivateModal = () => {
-    setShowDeactivateModal(true);
+  const onShowModal = (value: string) => {
+    setShowModal(value);
   };
 
   const onDeactivate = () => {
@@ -82,28 +89,70 @@ const DeactiveProgramMember: React.FC = () => {
     dispatch(deactivateProgramMember(data));
   };
 
-  const isReadOnly = programMember.status === programMemberStatusEnum.NotActive;
+  const onReActivate = () => {
+    const data = {
+      id: programMember.id,
+      isActive: true,
+      status: programMemberStatusEnum.Onboarded,
+    };
+    dispatch(reActivateProgramMember(data));
+  };
+
+  const isNotActive =
+    programMember.status === programMemberStatusEnum.NotActive;
 
   return (
     <>
-      <Tooltip
-        title={
-          programMember.status === programMemberStatusEnum.NotActive
-            ? `${t('common:Program member is deactivated!')}`
-            : `${t('common:Deactivate program member')}`
-        }>
-        <ButtonWithLoadingAnimation
-          variant="contained"
-          color="primary"
-          isLoading={deactivateProgramMemberStatus.requesting}
-          onClick={onShowDeactivateModal}
-          text={t('common:Deactivate')}
-          backgroundColor="#9510AC"
-          hoverBackgroundColor="#62007c"
-          disabled={isReadOnly || deactivateProgramMemberStatus.success}
-        />
-      </Tooltip>
-      {showDeactivateModal && (
+      {isNotActive ? (
+        <Tooltip title={`${t('common:Re-activate program member')}`}>
+          <ButtonWithLoadingAnimation
+            variant="contained"
+            color="primary"
+            isLoading={reActivateProgramMemberStatus.requesting}
+            onClick={() => onShowModal('re-activate')}
+            text={t('common:Re-activate')}
+            backgroundColor="#9510AC"
+            hoverBackgroundColor="#62007c"
+            disabled={reActivateProgramMemberStatus.success}
+          />
+        </Tooltip>
+      ) : (
+        <Tooltip title={`${t('common:Deactivate program member')}`}>
+          <ButtonWithLoadingAnimation
+            variant="contained"
+            color="primary"
+            isLoading={deactivateProgramMemberStatus.requesting}
+            onClick={() => onShowModal('deactivate')}
+            text={t('common:Deactivate')}
+            backgroundColor="#9510AC"
+            hoverBackgroundColor="#62007c"
+            disabled={deactivateProgramMemberStatus.success}
+          />
+        </Tooltip>
+      )}
+
+      {showModal === 're-activate' && (
+        <ModalWrapper
+          isOpen
+          type="primary"
+          title={t('modals:Re-activate this program member?')}
+          loading={reActivateProgramMemberStatus.requesting}
+          onCancel={(event: any) => {
+            event.stopPropagation();
+            setShowModal('');
+          }}
+          onOK={(event: any) => {
+            event.stopPropagation();
+            onReActivate();
+          }}>
+          <Typography variant="body2">
+            {t(
+              'modals:Are you sure you want to re-activate this program member?',
+            )}
+          </Typography>
+        </ModalWrapper>
+      )}
+      {showModal === 'deactivate' && (
         <ModalWrapper
           isOpen
           type="primary"
@@ -111,7 +160,7 @@ const DeactiveProgramMember: React.FC = () => {
           loading={deactivateProgramMemberStatus.requesting}
           onCancel={(event: any) => {
             event.stopPropagation();
-            setShowDeactivateModal(false);
+            setShowModal('');
           }}
           onOK={(event: any) => {
             event.stopPropagation();

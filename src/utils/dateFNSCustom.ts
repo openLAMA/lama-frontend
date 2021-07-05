@@ -28,12 +28,16 @@ import {
   getYear,
   getMonth,
   getDate,
+  getHours,
+  getMinutes,
   setHours,
   setMinutes,
   setSeconds,
   setMilliseconds,
   isValid,
   getWeek,
+  isPast,
+  isToday,
 } from 'date-fns';
 
 const locales = [enUS, de];
@@ -165,6 +169,22 @@ export const convertDateWithoutTime = (selectedDate: Date): string | null => {
   }`;
 };
 
+export const convertDateTimeInUTCFormat = (
+  selectedDate: Date,
+): string | null => {
+  if (!selectedDate) return null;
+  const year = getYear(selectedDate);
+  const month = getMonth(selectedDate) + 1;
+  const date = getDate(selectedDate);
+  const hours = getHours(selectedDate);
+  const minutes = getMinutes(selectedDate);
+  return `${year}-${month < 10 ? `0${month}` : month}-${
+    date < 10 ? `0${date}` : date
+  }T${hours < 10 ? `0${hours}` : hours}:${
+    minutes < 10 ? `0${minutes}` : minutes
+  }:00`;
+};
+
 export const convertStringDateToDate = (
   date: string | undefined | null,
 ): Date | string => {
@@ -190,4 +210,8 @@ export const getWeekNumber = (date: any): number => {
   const parsedDate = checkDateAndConvert(date);
   if (!parsedDate) return -1;
   return getWeek(parsedDate);
+};
+
+export const isPastDate = (date: Date): boolean => {
+  return isPast(date);
 };

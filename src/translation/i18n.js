@@ -50,7 +50,7 @@ i18n
       backends: [LocalStorageBackend, HttpApi],
       backendOptions: [
         {
-          defaultVersion: 'v0.2.32',
+          defaultVersion: 'v0.2.87',
           expirationTime: 7 * 24 * 60 * 60 * 1000,
           store: window.localStorage,
         },

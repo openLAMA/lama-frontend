@@ -26,20 +26,35 @@ export type CapacityOverviewShiftConfirmedEmployeeType = {
   isCanceled: boolean;
 };
 
+export type CapacityOverviewShiftConfirmedWithoutInvitationEmployeeType = CapacityOverviewShiftConfirmedEmployeeType & {
+  confirmationWithoutInvitationId: string;
+};
+
 export type CapacityOverviewShiftType = {
   shiftNumber: CapacityShiftType;
   requiredPersonnelCountShift: number;
   confirmedNotCanceledEmployeesCount: number;
   confirmedEmployees: CapacityOverviewShiftConfirmedEmployeeType[];
   fixedEmployees: CapacityOverviewShiftConfirmedEmployeeType[];
+  confirmedWithoutInvitation: CapacityOverviewShiftConfirmedWithoutInvitationEmployeeType[];
+};
+
+export type CantonType = {
+  cantonId: string;
+  cantonName: string;
+  cantonShortName: string;
+  samples: number;
 };
 
 export type CapacityOverviewType = {
   invitationId: string;
   date: string;
   samples: number;
+  totalSamples: number;
+  cantonsSamples: number;
   invitationAlreadySent: boolean;
   shifts: CapacityOverviewShiftType[];
+  cantonsSamplesData: CantonType[];
 };
 
 export type GetCapacityOverviewResponseType = {
@@ -49,4 +64,56 @@ export type GetCapacityOverviewResponseType = {
 
 export type GetCapacityOverviewRequestType = {
   startDate: string;
+};
+
+export type AddStateRequestType = {
+  name: string;
+  shortName: string;
+  cantonWeekdaysSamples: {
+    mondaySamples: number;
+    tuesdaySamples: number;
+    wednesdaySamples: number;
+    thursdaySamples: number;
+    fridaySamples: number;
+  };
+};
+
+export type GetStateRequestType = {
+  id: string;
+};
+
+export type GetStateResponseType = {
+  name: string;
+  shortName: string;
+  cantonWeekdaysSamples: {
+    mondaySamples: number;
+    tuesdaySamples: number;
+    wednesdaySamples: number;
+    thursdaySamples: number;
+    fridaySamples: number;
+    cantonId: string;
+    id: string;
+  };
+  countryId: string;
+  id: string;
+};
+
+export type UpdateStateRequestType = {
+  name: string;
+  shortName: string;
+  cantonWeekdaysSamples: {
+    mondaySamples: number;
+    tuesdaySamples: number;
+    wednesdaySamples: number;
+    thursdaySamples: number;
+    fridaySamples: number;
+    cantonId: string;
+    id: string;
+  };
+  countryId: string;
+  id: string;
+};
+
+export type RemoveStateRequestType = {
+  id: string;
 };

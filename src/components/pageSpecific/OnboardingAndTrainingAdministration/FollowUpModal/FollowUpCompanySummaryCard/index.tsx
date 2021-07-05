@@ -30,10 +30,6 @@ import OrganizationSummaryList from 'components/OrganizationSummaryList';
 
 // Utils
 import { RootState } from 'redux/combineReducers';
-import {
-  formatDateToMonthDotDayDotFullYear,
-  getDayName,
-} from 'utils/dateFNSCustom';
 
 const FollowUpCompanySummaryCard: React.FC = () => {
   const { t } = useTranslation();

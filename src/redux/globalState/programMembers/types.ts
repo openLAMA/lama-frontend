@@ -79,6 +79,8 @@ export type ProgramMemberType = {
   organizationShortcutName?: string | null;
   followUpStatus: FollowUpStatusType;
   isOnboardingEmailSent?: boolean;
+  isStaticPooling?: boolean;
+  isContractReceived?: boolean;
 };
 
 export type FollowUpStatusType = 'NotSent' | 'Sent' | 'Accepted' | 'Declined';
@@ -110,3 +112,7 @@ export type ProgramMemberFilterType = {
 export type GetProgramMembersRequestType = OrderByType;
 
 export type GetProgramMembersResponseType = GetProgramMembersType;
+
+export type SetContractReceivedRequestType = {
+  id: string;
+};

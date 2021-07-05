@@ -21,8 +21,8 @@ export type FollowUpEmailType = {
   organizationId: string;
   message: string;
   receivers: string[];
-  smsStartDate: string | null;
   ccReceivers: string[];
+  organizationContactPersonId: string;
 };
 
 export type PostFollowUpEmailRequestType = FollowUpEmailType;

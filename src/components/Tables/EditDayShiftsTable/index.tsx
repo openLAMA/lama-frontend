@@ -33,16 +33,21 @@ import withErrorHandler from 'components/Wrappers/ErrorBoundaryWrapper';
 import ShiftTable from './ShiftTable';
 import RemoveConfirmedEmployeeModal from 'components/Modals/RemoveConfirmedEmployeeModal';
 import AddEmployeeToShiftModal from 'components/Modals/AddEmployeeToShiftModal';
+import AddTemporaryEmployeeToShiftModal from 'components/Modals/AddTemporaryEmployeeToShiftModal';
+import RemoveTemporaryEmployeeModal from 'components/Modals/RemoveTemporaryEmployeeModal';
+import IncreaseShiftCountButton from './IncreaseShiftCountButton';
 
 // Types
 import {
   CapacityOverviewShiftConfirmedEmployeeType,
   CapacityShiftType,
+  CapacityOverviewShiftConfirmedWithoutInvitationEmployeeType,
 } from 'redux/globalState/capacity/types';
+import { GetLaboratoryAdministrationTemporaryEmployeesRequestType } from 'redux/laboratoryAdministration/laboratotyAdministrationEditDay/types';
 
 // Utils
 import { RootState } from 'redux/combineReducers';
-import IncreaseShiftCountButton from './IncreaseShiftCountButton';
+import { checkDateAndConvert, isPastDate } from 'utils/dateFNSCustom';
 
 interface IEditDayShiftsTableProps {
   isReadOnly?: boolean;
@@ -65,9 +70,20 @@ const EditDayShiftsTable: React.FC<IEditDayShiftsTableProps> = (
     setRemoveFixedEmployee,
   ] = useState<CapacityOverviewShiftConfirmedEmployeeType | null>(null);
 
+  const [
+    removeTemporaryEmployee,
+    setRemoveTemporaryEmployee,
+  ] = useState<CapacityOverviewShiftConfirmedWithoutInvitationEmployeeType | null>(
+    null,
+  );
+
   const [addEmployeeToShiftData, setAddEmployeeToShiftData] = useState<
     any | null
   >(null);
+  const [
+    addTemporaryEmployeeToShiftData,
+    setAddTemporaryEmployeeToShiftData,
+  ] = useState<any | null>(null);
 
   const editDayData = useSelector(
     (state: RootState) => state.laboratoryAdministrationEditDay.editDayData,
@@ -90,6 +106,14 @@ const EditDayShiftsTable: React.FC<IEditDayShiftsTableProps> = (
     setAddEmployeeToShiftData(null);
   };
 
+  const onCloseAddTemporaryEmployeeToShiftModal = () => {
+    setAddTemporaryEmployeeToShiftData(null);
+  };
+
+  const onCloseRemoveTemporaryEmployeeToShiftModal = () => {
+    setRemoveTemporaryEmployee(null);
+  };
+
   const onOpenAddPersonToShift = (shift: CapacityShiftType) => {
     const data = {
       shift,
@@ -100,14 +124,22 @@ const EditDayShiftsTable: React.FC<IEditDayShiftsTableProps> = (
     setAddEmployeeToShiftData(data);
   };
 
+  const onOpenTemporaryPersonToShift = (shift: CapacityShiftType) => {
+    const data: GetLaboratoryAdministrationTemporaryEmployeesRequestType = {
+      date: forDate,
+      shiftNumber: shift,
+    };
+    setAddTemporaryEmployeeToShiftData(data);
+  };
+
   let shiftOneIsFull = false;
   let shiftTwoIsFull = false;
-  if (shiftOne) {
+  if (editDayData.invitationAlreadySent && shiftOne) {
     shiftOneIsFull =
       shiftOne.confirmedNotCanceledEmployeesCount ===
       shiftOne.requiredPersonnelCountShift;
   }
-  if (shiftTwo) {
+  if (editDayData.invitationAlreadySent && shiftTwo) {
     shiftTwoIsFull =
       shiftTwo.confirmedNotCanceledEmployeesCount ===
       shiftTwo.requiredPersonnelCountShift;
@@ -144,10 +176,14 @@ const EditDayShiftsTable: React.FC<IEditDayShiftsTableProps> = (
                 <IconButton
                   aria-label="expand"
                   color="secondary"
-                  disabled={
-                    shiftOneIsFull || !editDayData.invitationAlreadySent
-                  }
-                  onClick={() => onOpenAddPersonToShift('First')}>
+                  disabled={isReadOnly || shiftOneIsFull}
+                  onClick={() => {
+                    if (editDayData.invitationAlreadySent) {
+                      onOpenAddPersonToShift('First');
+                    } else {
+                      onOpenTemporaryPersonToShift('First');
+                    }
+                  }}>
                   <PersonAddIcon />
                 </IconButton>
               </Grid>
@@ -159,6 +195,7 @@ const EditDayShiftsTable: React.FC<IEditDayShiftsTableProps> = (
               shiftData={shiftOne}
               onSetRemoveConfirmedEmployee={setRemoveConfirmedEmployee}
               onSetRemoveFixedEmployee={setRemoveFixedEmployee}
+              onSetRemoveTemporaryEmployee={setRemoveTemporaryEmployee}
             />
           </Grid>
         </Grid>
@@ -192,10 +229,14 @@ const EditDayShiftsTable: React.FC<IEditDayShiftsTableProps> = (
                 <IconButton
                   aria-label="expand"
                   color="secondary"
-                  disabled={
-                    shiftTwoIsFull || !editDayData.invitationAlreadySent
-                  }
-                  onClick={() => onOpenAddPersonToShift('Second')}>
+                  disabled={isReadOnly || shiftTwoIsFull}
+                  onClick={() => {
+                    if (editDayData.invitationAlreadySent) {
+                      onOpenAddPersonToShift('Second');
+                    } else {
+                      onOpenTemporaryPersonToShift('Second');
+                    }
+                  }}>
                   <PersonAddIcon />
                 </IconButton>
               </Grid>
@@ -207,6 +248,7 @@ const EditDayShiftsTable: React.FC<IEditDayShiftsTableProps> = (
               shiftData={shiftTwo}
               onSetRemoveConfirmedEmployee={setRemoveConfirmedEmployee}
               onSetRemoveFixedEmployee={setRemoveFixedEmployee}
+              onSetRemoveTemporaryEmployee={setRemoveTemporaryEmployee}
             />
           </Grid>
         </Grid>
@@ -226,10 +268,22 @@ const EditDayShiftsTable: React.FC<IEditDayShiftsTableProps> = (
           isFixed
         />
       )}
+      {removeTemporaryEmployee && (
+        <RemoveTemporaryEmployeeModal
+          onClose={onCloseRemoveTemporaryEmployeeToShiftModal}
+          removePersonData={removeTemporaryEmployee}
+        />
+      )}
       {addEmployeeToShiftData && (
         <AddEmployeeToShiftModal
           onClose={onCloseAddEmployeeToShiftModal}
           data={addEmployeeToShiftData}
+        />
+      )}
+      {addTemporaryEmployeeToShiftData && (
+        <AddTemporaryEmployeeToShiftModal
+          onClose={onCloseAddTemporaryEmployeeToShiftModal}
+          data={addTemporaryEmployeeToShiftData}
         />
       )}
     </Grid>

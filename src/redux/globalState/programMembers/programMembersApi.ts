@@ -23,6 +23,7 @@ import { APIMethods } from 'apiService/types';
 import {
   GetProgramMembersRequestType,
   GetProgramMembersResponseType,
+  SetContractReceivedRequestType,
 } from 'redux/globalState/programMembers/types';
 
 export const getProgramMembersAPI = async (
@@ -32,4 +33,13 @@ export const getProgramMembersAPI = async (
     url: 'organizations',
     method: APIMethods.GET,
     params,
+  });
+
+export const setContractReceivedStatusAPI = async (
+  data: SetContractReceivedRequestType,
+): Promise<null> =>
+  HttpClient.request<null>({
+    url: 'organizations/contractReceived',
+    method: APIMethods.POST,
+    data,
   });

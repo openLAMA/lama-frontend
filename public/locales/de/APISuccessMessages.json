@@ -9,5 +9,13 @@
   "Successfully pushed program member data to Epaad!": "Übertragung an ePaad erfolgreich.",
   "Successfully sent follow up emails!": "Email wurde erfolgreich versendet.",
   "Successfully updated follow up status!": "Der Status wurde erfolgreich aktualisiert.",
-  "Successfully removed person from shift!": "Person wurde entfernt"
+  "Successfully removed person from shift!": "Person wurde entfernt",
+  "Successfully added new state!": "Kanton hinzugefügt",
+  "Successfully updated state!": "Änderung erfolgreich.",
+  "Successfully removed state!": "Erfolgreichgelöscht",
+  "Successfully added a employee to shift!": "Person wurde erfolgreich hinzugefügt",
+  "Successfully updated static pooling status!": "Status wurde aktualisiert",
+  "Successfully set contract received status!": "Status wurde aktualisiert",
+  "Successfully re-activated a program member!": "Organisation erfolgreich aktiviert",
+  "Successfully sent email!": "Successfully sent email!"
 }

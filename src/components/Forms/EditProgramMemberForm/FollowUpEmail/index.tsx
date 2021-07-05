@@ -83,7 +83,11 @@ const FollowUpEmail: React.FC<FollowUpEmailPropsType> = (
   if (disabled) {
     isFollowUpActionVisible = false;
   }
-  if (
+  if (programMember.isOnboardingEmailSent) {
+    isFollowUpActionVisible = false;
+  } else if (programMember.status === programMemberStatusEnum.NotActive) {
+    isFollowUpActionVisible = false;
+  } else if (
     programMember.organizationTypeId === organizationTypesEnum.Company ||
     programMember.organizationTypeId === organizationTypesEnum.SME
   ) {
@@ -101,18 +105,15 @@ const FollowUpEmail: React.FC<FollowUpEmailPropsType> = (
         isFollowUpActionVisible = false;
       }
     }
-    if (programMember.isOnboardingEmailSent) {
-      isFollowUpActionVisible = false;
-    }
+
     if (!programMember.organizationShortcutName) {
       isFollowUpActionVisible = false;
     }
     if (!programMember.epaadId) {
       isFollowUpActionVisible = false;
     }
-    if (programMember.status === programMemberStatusEnum.NotActive) {
-      isFollowUpActionVisible = false;
-    }
+  } else if (programMember.organizationTypeId === organizationTypesEnum.CAMP) {
+    // Do nothing, just to skip setting isFollowUpActionVisible to false;
   } else {
     isFollowUpActionVisible = false;
   }

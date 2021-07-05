@@ -44,6 +44,7 @@ import NoResultsFound from 'components/Tables/NoResultsFound';
 import {
   CapacityOverviewShiftConfirmedEmployeeType,
   CapacityOverviewShiftType,
+  CapacityOverviewShiftConfirmedWithoutInvitationEmployeeType,
 } from 'redux/globalState/capacity/types';
 
 interface IShiftTableProps {
@@ -55,6 +56,9 @@ interface IShiftTableProps {
   onSetRemoveFixedEmployee: (
     item: CapacityOverviewShiftConfirmedEmployeeType,
   ) => void;
+  onSetRemoveTemporaryEmployee: (
+    item: CapacityOverviewShiftConfirmedWithoutInvitationEmployeeType,
+  ) => void;
 }
 
 const ShiftTable: React.FC<IShiftTableProps> = (props: IShiftTableProps) => {
@@ -63,6 +67,7 @@ const ShiftTable: React.FC<IShiftTableProps> = (props: IShiftTableProps) => {
     shiftData,
     onSetRemoveConfirmedEmployee,
     onSetRemoveFixedEmployee,
+    onSetRemoveTemporaryEmployee,
   } = props;
   const { t } = useTranslation();
 
@@ -76,8 +81,8 @@ const ShiftTable: React.FC<IShiftTableProps> = (props: IShiftTableProps) => {
       title: 'Status',
     },
     {
-      headName: 'fixedEmployee',
-      title: 'Fixed employee',
+      headName: 'employeeType',
+      title: 'Employee type',
     },
     {
       headName: 'actions',
@@ -108,7 +113,7 @@ const ShiftTable: React.FC<IShiftTableProps> = (props: IShiftTableProps) => {
                       ? t('common:Removed')
                       : t('common:Accepted')}
                   </TableCell>
-                  <TableCell>{t('common:Yes')}</TableCell>
+                  <TableCell>{t('common:Fixed')}</TableCell>
                   <TableCell>
                     <IconButton
                       color="primary"
@@ -131,7 +136,7 @@ const ShiftTable: React.FC<IShiftTableProps> = (props: IShiftTableProps) => {
                       ? t('common:Removed')
                       : t('common:Accepted')}
                   </TableCell>
-                  <TableCell>{t('common:No')}</TableCell>
+                  <TableCell>{t('common:Normal')}</TableCell>
                   <TableCell>
                     <IconButton
                       color="primary"
@@ -139,6 +144,31 @@ const ShiftTable: React.FC<IShiftTableProps> = (props: IShiftTableProps) => {
                         onSetRemoveConfirmedEmployee(item);
                       }}
                       disabled={isReadOnly || item.isCanceled}>
+                      <DeleteOutlineIcon />
+                    </IconButton>
+                  </TableCell>
+                </TableRow>
+              ),
+            )}
+            {shiftData?.confirmedWithoutInvitation?.map(
+              (
+                item: CapacityOverviewShiftConfirmedWithoutInvitationEmployeeType,
+              ) => (
+                <TableRow key={item.email}>
+                  <TableCell>{`${item.firstName} ${item.lastName}`}</TableCell>
+                  <TableCell>
+                    {item.isCanceled
+                      ? t('common:Removed')
+                      : t('common:Accepted')}
+                  </TableCell>
+                  <TableCell>{t('common:Temporary')}</TableCell>
+                  <TableCell>
+                    <IconButton
+                      color="primary"
+                      onClick={() => {
+                        onSetRemoveTemporaryEmployee(item);
+                      }}
+                      disabled={isReadOnly}>
                       <DeleteOutlineIcon />
                     </IconButton>
                   </TableCell>
@@ -153,7 +183,10 @@ const ShiftTable: React.FC<IShiftTableProps> = (props: IShiftTableProps) => {
         shiftData.fixedEmployees.length > 0) ||
       (shiftData &&
         shiftData.confirmedEmployees &&
-        shiftData.confirmedEmployees.length > 0) ? null : (
+        shiftData.confirmedEmployees.length > 0) ||
+      (shiftData &&
+        shiftData.confirmedWithoutInvitation &&
+        shiftData.confirmedWithoutInvitation.length > 0) ? null : (
         <NoResultsFound />
       )}
     </Paper>

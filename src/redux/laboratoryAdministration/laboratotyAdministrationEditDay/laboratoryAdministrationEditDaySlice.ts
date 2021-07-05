@@ -26,6 +26,8 @@ import callSnackbar from 'utils/customHooks/useSnackbar';
 // Types
 import { IApiStatus } from 'redux/globalTypes';
 import { LaboratoryTestingPersonalResultType } from 'redux/laboratoryAdministration/laboratoryAdministrationTestingPersonal/types';
+import { LaboratoryTemporaryEmployeeType } from 'redux/laboratoryAdministration/laboratotyAdministrationEditDay/types';
+
 import {
   GetLaboratoryAdministrationEditDayRequestType,
   GetLaboratoryAdministrationEditDayResponseType,
@@ -33,6 +35,10 @@ import {
   GetLaboratoryAdministrationEmployeesResponseType,
   AddLaboratoryAdministrationEmployeeToShiftRequestType,
   IncreaseShiftCountForDayLaboratoryAdministrationRequestType,
+  AddLaboratoryAdministrationTemporaryEmployeeToShiftRequestType,
+  GetLaboratoryAdministrationTemporaryEmployeesResponseType,
+  RemoveLaboratoryAdministrationTemporaryEmploeeRequestType,
+  GetLaboratoryAdministrationTemporaryEmployeesRequestType,
 } from 'redux/laboratoryAdministration/laboratotyAdministrationEditDay/types';
 import { ErrorObjectType } from 'apiService/types';
 
@@ -42,6 +48,9 @@ import {
   getLaboratoryAdministrationEmployeesAPI,
   addLaboratoryAdministrationEmployeeToShiftAPI,
   increaseShiftCountForDayLaboratoryAdministrationAPI,
+  addLaboratoryAdministrationTemporaryEmployeeToShiftAPI,
+  getLaboratoryAdministrationTemporaryEmployeesAPI,
+  removeLaboratoryAdministrationTemporaryEmployeeAPI,
 } from 'redux/laboratoryAdministration/laboratotyAdministrationEditDay/laboratoryAdministrationEditDayApi';
 
 interface ILaboratoryAdministrationEditDay {
@@ -52,6 +61,10 @@ interface ILaboratoryAdministrationEditDay {
   addEmployeeToShiftStatus: IApiStatus;
   employees: LaboratoryTestingPersonalResultType[] | null;
   increaseShiftCountForDayStatus: IApiStatus;
+  getTemporaryEmployeesStatus: IApiStatus;
+  addTemporaryEmployeeToShiftStatus: IApiStatus;
+  temporaryEmployees: LaboratoryTemporaryEmployeeType[] | null;
+  removeTemporaryEmployeeFromShiftStatus: IApiStatus;
 }
 
 const initialState = {
@@ -82,6 +95,22 @@ const initialState = {
     failure: false,
   },
   employees: null,
+  getTemporaryEmployeesStatus: {
+    requesting: false,
+    success: false,
+    failure: false,
+  },
+  addTemporaryEmployeeToShiftStatus: {
+    requesting: false,
+    success: false,
+    failure: false,
+  },
+  temporaryEmployees: null,
+  removeTemporaryEmployeeFromShiftStatus: {
+    requesting: false,
+    success: false,
+    failure: false,
+  },
 } as ILaboratoryAdministrationEditDay;
 
 const laboratoryAdministrationEditDaySlice = createSlice({
@@ -201,6 +230,73 @@ const laboratoryAdministrationEditDaySlice = createSlice({
         failure: true,
       };
     },
+    getTemporaryEmployeesRequesting(state) {
+      state.getTemporaryEmployeesStatus = {
+        requesting: true,
+        success: false,
+        failure: false,
+      };
+    },
+    getTemporaryEmployeesSuccess(
+      state,
+      action: PayloadAction<GetLaboratoryAdministrationTemporaryEmployeesResponseType>,
+    ) {
+      state.getTemporaryEmployeesStatus = {
+        requesting: false,
+        success: true,
+        failure: false,
+      };
+      state.temporaryEmployees = action.payload;
+    },
+    getTemporaryEmployeesFailed(state) {
+      state.getTemporaryEmployeesStatus = {
+        requesting: false,
+        success: false,
+        failure: true,
+      };
+    },
+    addTemporaryEmployeeToShiftRequesting(state) {
+      state.addTemporaryEmployeeToShiftStatus = {
+        requesting: true,
+        success: false,
+        failure: false,
+      };
+    },
+    addTemporaryEmployeeToShiftSuccess(state) {
+      state.addTemporaryEmployeeToShiftStatus = {
+        requesting: false,
+        success: true,
+        failure: false,
+      };
+    },
+    addTemporaryEmployeeToShiftFailed(state) {
+      state.addTemporaryEmployeeToShiftStatus = {
+        requesting: false,
+        success: false,
+        failure: true,
+      };
+    },
+    removeTemporaryEmployeeFromShiftRequesting(state) {
+      state.removeTemporaryEmployeeFromShiftStatus = {
+        requesting: true,
+        success: false,
+        failure: false,
+      };
+    },
+    removeTemporaryEmployeeFromShiftSuccess(state) {
+      state.removeTemporaryEmployeeFromShiftStatus = {
+        requesting: false,
+        success: true,
+        failure: false,
+      };
+    },
+    removeTemporaryEmployeeFromShiftFailed(state) {
+      state.removeTemporaryEmployeeFromShiftStatus = {
+        requesting: false,
+        success: false,
+        failure: true,
+      };
+    },
     clearAddEmployeeToShift(state) {
       state.addEmployeeToShiftStatus = initialState.addEmployeeToShiftStatus;
     },
@@ -223,6 +319,17 @@ const laboratoryAdministrationEditDaySlice = createSlice({
       state.getDayDataStatus = initialState.getDayDataStatus;
       state.removeConfirmedPersonStatus =
         initialState.removeConfirmedPersonStatus;
+    },
+    clearAddTemporaryEmployeeToShift(state) {
+      state.temporaryEmployees = null;
+      state.getTemporaryEmployeesStatus =
+        initialState.getTemporaryEmployeesStatus;
+      state.addTemporaryEmployeeToShiftStatus =
+        initialState.addTemporaryEmployeeToShiftStatus;
+    },
+    clearDeleteLaboratoryTemporaryEmployee(state) {
+      state.removeTemporaryEmployeeFromShiftStatus =
+        initialState.removeTemporaryEmployeeFromShiftStatus;
     },
   },
 });
@@ -248,6 +355,17 @@ export const {
   increaseShiftCountForDayRequesting,
   increaseShiftCountForDaySuccess,
   increaseShiftCountForDayFailed,
+  getTemporaryEmployeesRequesting,
+  getTemporaryEmployeesSuccess,
+  getTemporaryEmployeesFailed,
+  addTemporaryEmployeeToShiftRequesting,
+  addTemporaryEmployeeToShiftSuccess,
+  addTemporaryEmployeeToShiftFailed,
+  clearAddTemporaryEmployeeToShift,
+  removeTemporaryEmployeeFromShiftRequesting,
+  removeTemporaryEmployeeFromShiftSuccess,
+  removeTemporaryEmployeeFromShiftFailed,
+  clearDeleteLaboratoryTemporaryEmployee,
 } = laboratoryAdministrationEditDaySlice.actions;
 
 export default laboratoryAdministrationEditDaySlice.reducer;
@@ -255,10 +373,6 @@ export default laboratoryAdministrationEditDaySlice.reducer;
 export const getLaboratoryAdministrationEditDayData = (
   params: GetLaboratoryAdministrationEditDayRequestType,
 ): AppThunk => async (dispatch) => {
-  console.log(
-    'getLaboratoryAdministrationEditDayData:',
-    new Date().toTimeString(),
-  );
   dispatch(getDayDataRequesting());
   getLaboratoryAdministrationEditDayDataAPI(params).then(
     (response: GetLaboratoryAdministrationEditDayResponseType): void => {
@@ -313,6 +427,10 @@ export const addLaboratoryAdministrationEmployeeToShift = (
   addLaboratoryAdministrationEmployeeToShiftAPI(data).then(
     (): void => {
       dispatch(addEmployeeToShiftSuccess());
+      callSnackbar({
+        message: 'Successfully added a employee to shift!',
+        messageType: 'success',
+      });
     },
     (error: ErrorObjectType): void => {
       dispatch(addEmployeeToShiftFailed());
@@ -332,6 +450,61 @@ export const increaseShiftCountForDayLaboratoryAdministrationShift = (
     (error: ErrorObjectType): void => {
       dispatch(increaseShiftCountForDayFailed());
       extractErrorMessage(error, 'Failed to increase shift count');
+    },
+  );
+};
+
+export const addLaboratoryAdministrationTemporaryEmployeeToShift = (
+  data: AddLaboratoryAdministrationTemporaryEmployeeToShiftRequestType,
+): AppThunk => async (dispatch) => {
+  dispatch(addTemporaryEmployeeToShiftRequesting());
+  addLaboratoryAdministrationTemporaryEmployeeToShiftAPI(data).then(
+    (): void => {
+      dispatch(addTemporaryEmployeeToShiftSuccess());
+      callSnackbar({
+        message: 'Successfully added a employee to shift!',
+        messageType: 'success',
+      });
+    },
+    (error: ErrorObjectType): void => {
+      dispatch(addTemporaryEmployeeToShiftFailed());
+      extractErrorMessage(error, 'Failed to add employee to shift');
+    },
+  );
+};
+
+export const getLaboratoryAdministrationTemporaryEmployees = (
+  params: GetLaboratoryAdministrationTemporaryEmployeesRequestType,
+): AppThunk => async (dispatch) => {
+  dispatch(getTemporaryEmployeesRequesting());
+  getLaboratoryAdministrationTemporaryEmployeesAPI(params).then(
+    (
+      response: GetLaboratoryAdministrationTemporaryEmployeesResponseType,
+    ): void => {
+      dispatch(getTemporaryEmployeesSuccess(response));
+    },
+    (error: ErrorObjectType): void => {
+      dispatch(getTemporaryEmployeesFailed());
+      extractErrorMessage(error, 'Failed to get employees');
+    },
+  );
+};
+
+export const removeTemporaryEmployee = (
+  data: RemoveLaboratoryAdministrationTemporaryEmploeeRequestType,
+): AppThunk => async (dispatch) => {
+  dispatch(removeTemporaryEmployeeFromShiftRequesting());
+  removeLaboratoryAdministrationTemporaryEmployeeAPI(data).then(
+    (): void => {
+      dispatch(removeTemporaryEmployeeFromShiftSuccess());
+      callSnackbar({
+        message: 'Successfully removed person from shift!',
+        messageType: 'success',
+      });
+    },
+    (error: ErrorObjectType): void => {
+      dispatch(removeTemporaryEmployeeFromShiftFailed());
+      extractErrorMessage(error, 'Failed to remove person!');
     },
   );
 };

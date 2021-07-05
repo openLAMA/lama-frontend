@@ -27,8 +27,11 @@ import {
   GetSupportPeopleForOrganizationResponseType,
   PutSupportPeopleForOrganizationRequestType,
   DeactivateProgramMemberRequestType,
+  ReActivateProgramMemberRequestType,
   PushToEpaadProgramMemberRequestType,
   PutFollowUpStatus,
+  UpdateStaticPoolingRequestType,
+  CampSendEmailEpaadRequestType,
 } from 'redux/onboardingAndTrainingAdministration/EditProgramMember/types';
 
 export const getProgramMemberAPI = async (
@@ -66,6 +69,15 @@ export const deactivateProgramMemberAPI = async (
     data,
   });
 
+export const reActivateProgramMemberAPI = async (
+  data: ReActivateProgramMemberRequestType,
+): Promise<null> =>
+  HttpClient.request<null>({
+    url: 'organizations/activeStatus',
+    method: APIMethods.POST,
+    data,
+  });
+
 export const pushToEpaadProgramMemberAPI = async (
   data: PushToEpaadProgramMemberRequestType,
 ): Promise<null> =>
@@ -81,5 +93,24 @@ export const putFollowUpStatusAPI = async (
   HttpClient.request<null>({
     url: 'organization/followUp',
     method: APIMethods.PUT,
+    data,
+  });
+
+export const updateStaticPoolingStatusAPI = async (
+  data: UpdateStaticPoolingRequestType,
+): Promise<null> =>
+  HttpClient.request<null>({
+    url: 'organizations/setIsStaticPooling',
+    method: APIMethods.POST,
+    data,
+  });
+
+// TODO update url and data.
+export const campSendEmailEpaadAPI = async (
+  data: CampSendEmailEpaadRequestType,
+): Promise<null> =>
+  HttpClient.request<null>({
+    url: 'organizations/sendEmailForEpaad',
+    method: APIMethods.POST,
     data,
   });

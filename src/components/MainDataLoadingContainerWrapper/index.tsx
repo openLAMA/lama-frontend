@@ -16,6 +16,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
+
 import React, { useLayoutEffect } from 'react';
 
 import { useSelector, useDispatch } from 'react-redux';
@@ -23,7 +24,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 
 // Material UI
-import { Container, Grid } from '@material-ui/core';
+import { Container, Grid, Typography } from '@material-ui/core';
 
 // Custom components
 import CircularLoading from 'components/loaders/CircularLoading';
@@ -83,6 +84,14 @@ const MainDataLoadingContainerWrapper: React.FC<IMainDataLoadingContainerWrapper
 
   if (citiesStatus.success || organizationTypesStatus.success) {
     return <>{children}</>;
+  }
+
+  if (citiesStatus.failure || organizationTypesStatus.failure) {
+    return (
+      <Typography align="center" variant="h2">
+        Failed to fetch data from API!
+      </Typography>
+    );
   }
 
   return <></>;

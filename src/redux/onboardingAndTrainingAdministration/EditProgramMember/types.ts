@@ -96,9 +96,25 @@ export type DeactivateProgramMemberRequestType = {
   isActive: boolean;
 };
 
+export type ReActivateProgramMemberRequestType = {
+  id: string;
+  isActive: boolean;
+  status: string;
+};
+
 export type PushToEpaadProgramMemberRequestType = PutProgramMemberType;
 
 export type PutFollowUpStatus = {
   organizationId: string;
   newStatus: FollowUpStatusType;
+};
+
+export type UpdateStaticPoolingRequestType = {
+  id: string;
+  isStaticPooling: boolean;
+};
+
+export type CampSendEmailEpaadRequestType = {
+  organizationId: string;
+  receivers: any[];
 };

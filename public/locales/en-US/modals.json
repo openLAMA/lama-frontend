@@ -8,5 +8,15 @@
   "Are you sure you want to remove this person?": "Are you sure you want to remove this person?",
   "Remove X from this date": "Remove '{{username}}' from date",
   "Add employee to morning shift": "Add employee to morning shift!",
-  "Add employee to afternoon shift": "Add employee to afternoon shift!"
+  "Add employee to afternoon shift": "Add employee to afternoon shift!",
+  "Add state": "Add state",
+  "Edit state": "Edit state",
+  "Are you sure you want to delete this state?": "Are you sure you want to delete this state?",
+  "Remove X from this shift": "Remove {{username}} from this shift",
+  "Contract received?": "Contract received?",
+  "Are you sure organization X received the contract?": "Are you sure organization {{name}} received the contract?",
+  "Re-activate this program member?": "Re-activate this program member?",
+  "Are you sure you want to re-activate this program member?": "Are you sure you want to re-activate this program member?",
+  "Epaad onboarding date": "Epaad onboarding date",
+  "Are you sure you want to send this organization data to?": "Are you sure you want to send this organization data to?"
 }

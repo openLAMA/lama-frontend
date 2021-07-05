@@ -277,11 +277,14 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
         city: findCity(citiesList, item.cityId)?.name || '-',
         schoolType: item.schoolType,
         manager: item.manager,
-        prioLogistic: item.prioLogistic,
-        numberOfBags: item.numberOfBags,
-        naclLosing: item.naclLosing,
-        additionalTestTubes: item.additionalTestTubes,
-        numberOfRakoBoxes: item.numberOfRakoBoxes,
+        numberOfTestParticipants: item.numberOfSamples,
+        numberOfPools: item.numberOfPools,
+        isStaticPooling: item.isStaticPooling
+          ? t('common:Yes')
+          : t('common:No'),
+        isContractReceived: item.isContractReceived
+          ? t('common:Yes')
+          : t('common:No'),
       };
     });
 
@@ -357,25 +360,15 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
     },
     { key: 'manager', label: t('common:Manager') },
     {
-      key: 'prioLogistic',
-      label: t('common:Prio logistik'),
+      key: 'numberOfTestParticipants',
+      label: t('common:Number of test participants'),
     },
     {
-      key: 'numberOfBags',
-      label: t('common:Number of bags'),
+      key: 'numberOfPools',
+      label: t('common:Number of pools'),
     },
-    {
-      key: 'naclLosing',
-      label: t('common:NaCL losing'),
-    },
-    {
-      key: 'additionalTestTubes',
-      label: t('common:Additional test tubes'),
-    },
-    {
-      key: 'numberOfRakoBoxes',
-      label: t('common:Number Of Rako boxes'),
-    },
+    { key: 'isStaticPooling', label: t('common:Static pooling') },
+    { key: 'isContractReceived', label: t('common:Contract received') },
   ];
 
   let noFilters = true;

@@ -33,8 +33,11 @@ import {
   GetSupportPeopleForOrganizationResponseType,
   PutSupportPeopleForOrganizationRequestType,
   DeactivateProgramMemberRequestType,
+  ReActivateProgramMemberRequestType,
   PushToEpaadProgramMemberRequestType,
   PutFollowUpStatus,
+  UpdateStaticPoolingRequestType,
+  CampSendEmailEpaadRequestType,
 } from 'redux/onboardingAndTrainingAdministration/EditProgramMember/types';
 import { ErrorObjectType } from 'apiService/types';
 
@@ -43,8 +46,11 @@ import {
   getSupportPeopleForOrganizationAPI,
   putSupportPeopleForOrganizationAPI,
   deactivateProgramMemberAPI,
+  reActivateProgramMemberAPI,
   pushToEpaadProgramMemberAPI,
   putFollowUpStatusAPI,
+  updateStaticPoolingStatusAPI,
+  campSendEmailEpaadAPI,
 } from 'redux/onboardingAndTrainingAdministration/EditProgramMember/editProgramMemberApi';
 
 interface IEditProgramMember {
@@ -54,8 +60,11 @@ interface IEditProgramMember {
   supportPeopleStatus: IApiStatus;
   updateProgramMemberStatus: IApiStatus;
   deactivateProgramMemberStatus: IApiStatus;
+  reActivateProgramMemberStatus: IApiStatus;
   pushToEpaadProgramMemberStatus: IApiStatus;
   updateFollowUpStatusStatus: IApiStatus;
+  updateStaticPoolingStatus: IApiStatus;
+  campSendEmailEpaadStatus: IApiStatus;
 }
 
 const initialState = {
@@ -80,12 +89,27 @@ const initialState = {
     success: false,
     failure: false,
   },
+  reActivateProgramMemberStatus: {
+    requesting: false,
+    success: false,
+    failure: false,
+  },
   pushToEpaadProgramMemberStatus: {
     requesting: false,
     success: false,
     failure: false,
   },
   updateFollowUpStatusStatus: {
+    requesting: false,
+    success: false,
+    failure: false,
+  },
+  updateStaticPoolingStatus: {
+    requesting: false,
+    success: false,
+    failure: false,
+  },
+  campSendEmailEpaadStatus: {
     requesting: false,
     success: false,
     failure: false,
@@ -188,6 +212,27 @@ const editProgramMemberSlice = createSlice({
         failure: true,
       };
     },
+    reActivateProgramMemberRequesting(state) {
+      state.reActivateProgramMemberStatus = {
+        requesting: true,
+        success: false,
+        failure: false,
+      };
+    },
+    reActivateProgramMemberSuccess(state) {
+      state.reActivateProgramMemberStatus = {
+        requesting: false,
+        success: true,
+        failure: false,
+      };
+    },
+    reActivateProgramMemberFailed(state) {
+      state.reActivateProgramMemberStatus = {
+        requesting: false,
+        success: false,
+        failure: true,
+      };
+    },
     pushToEpaadProgramMemberRequesting(state) {
       state.pushToEpaadProgramMemberStatus = {
         requesting: true,
@@ -230,14 +275,62 @@ const editProgramMemberSlice = createSlice({
         failure: true,
       };
     },
+    updateStaticPoolingStatusRequesting(state) {
+      state.updateStaticPoolingStatus = {
+        requesting: true,
+        success: false,
+        failure: false,
+      };
+    },
+    updateStaticPoolingStatusSuccess(state) {
+      state.updateStaticPoolingStatus = {
+        requesting: false,
+        success: true,
+        failure: false,
+      };
+    },
+    updateStaticPoolingStatusFailed(state) {
+      state.updateStaticPoolingStatus = {
+        requesting: false,
+        success: false,
+        failure: true,
+      };
+    },
+    campSendEmailEpaadRequesting(state) {
+      state.campSendEmailEpaadStatus = {
+        requesting: true,
+        success: false,
+        failure: false,
+      };
+    },
+    campSendEmailEpaadSuccess(state) {
+      state.campSendEmailEpaadStatus = {
+        requesting: false,
+        success: true,
+        failure: false,
+      };
+    },
+    campSendEmailEpaadFailed(state) {
+      state.campSendEmailEpaadStatus = {
+        requesting: false,
+        success: false,
+        failure: true,
+      };
+    },
+    clearCampSendEmailEpaadStats(state) {
+      state.campSendEmailEpaadStatus = initialState.campSendEmailEpaadStatus;
+    },
     clearUpdateProgramData(state) {
       state.programMember = initialState.programMember;
       state.programMemberStatus = initialState.programMemberStatus;
       state.supportPeople = initialState.supportPeople;
       state.supportPeopleStatus = initialState.supportPeopleStatus;
       state.updateProgramMemberStatus = initialState.updateProgramMemberStatus;
+      state.campSendEmailEpaadStatus = initialState.campSendEmailEpaadStatus;
       state.deactivateProgramMemberStatus =
         initialState.deactivateProgramMemberStatus;
+      state.reActivateProgramMemberStatus =
+        initialState.reActivateProgramMemberStatus;
       state.pushToEpaadProgramMemberStatus =
         initialState.pushToEpaadProgramMemberStatus;
     },
@@ -257,12 +350,22 @@ export const {
   deactivateProgramMemberRequesting,
   deactivateProgramMemberSuccess,
   deactivateProgramMemberFailed,
+  reActivateProgramMemberRequesting,
+  reActivateProgramMemberSuccess,
+  reActivateProgramMemberFailed,
   pushToEpaadProgramMemberRequesting,
   pushToEpaadProgramMemberSuccess,
   pushToEpaadProgramMemberFailed,
   updateFollowUpStatusRequesting,
   updateFollowUpStatusSuccess,
   updateFollowUpStatusFailed,
+  updateStaticPoolingStatusRequesting,
+  updateStaticPoolingStatusSuccess,
+  updateStaticPoolingStatusFailed,
+  campSendEmailEpaadRequesting,
+  campSendEmailEpaadSuccess,
+  campSendEmailEpaadFailed,
+  clearCampSendEmailEpaadStats,
   clearUpdateProgramData,
 } = editProgramMemberSlice.actions;
 
@@ -338,6 +441,25 @@ export const deactivateProgramMember = (
   );
 };
 
+export const reActivateProgramMember = (
+  data: ReActivateProgramMemberRequestType,
+): AppThunk => async (dispatch) => {
+  dispatch(reActivateProgramMemberRequesting());
+  reActivateProgramMemberAPI(data).then(
+    (): void => {
+      dispatch(reActivateProgramMemberSuccess());
+      callSnackbar({
+        message: 'Successfully re-activated a program member!',
+        messageType: 'success',
+      });
+    },
+    (error: ErrorObjectType): void => {
+      dispatch(reActivateProgramMemberFailed());
+      extractErrorMessage(error, 'Failed to re-activate a program member!');
+    },
+  );
+};
+
 export const pushToEpaadProgramMember = (
   data: PushToEpaadProgramMemberRequestType,
 ): AppThunk => async (dispatch) => {
@@ -372,6 +494,44 @@ export const updateFollowUpStatus = (
     (error: ErrorObjectType): void => {
       dispatch(updateFollowUpStatusFailed());
       extractErrorMessage(error, 'Failed to update follow up status!');
+    },
+  );
+};
+
+export const updateStaticPoolingStatus = (
+  data: UpdateStaticPoolingRequestType,
+): AppThunk => async (dispatch) => {
+  dispatch(updateStaticPoolingStatusRequesting());
+  updateStaticPoolingStatusAPI(data).then(
+    (): void => {
+      dispatch(updateStaticPoolingStatusSuccess());
+      callSnackbar({
+        message: 'Successfully updated static pooling status!',
+        messageType: 'success',
+      });
+    },
+    (error: ErrorObjectType): void => {
+      dispatch(updateStaticPoolingStatusFailed());
+      extractErrorMessage(error, 'Failed to update static pooling status!');
+    },
+  );
+};
+
+export const campSendEmailEpaad = (
+  data: CampSendEmailEpaadRequestType,
+): AppThunk => async (dispatch) => {
+  dispatch(campSendEmailEpaadRequesting());
+  campSendEmailEpaadAPI(data).then(
+    (): void => {
+      dispatch(campSendEmailEpaadSuccess());
+      callSnackbar({
+        message: 'Successfully sent email!',
+        messageType: 'success',
+      });
+    },
+    (error: ErrorObjectType): void => {
+      dispatch(campSendEmailEpaadFailed());
+      extractErrorMessage(error, 'Failed to send email!');
     },
   );
 };

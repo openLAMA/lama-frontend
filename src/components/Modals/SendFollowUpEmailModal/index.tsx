@@ -30,9 +30,9 @@ import { Autocomplete } from '@material-ui/lab';
 import BasicFormWrapper from 'components/Wrappers/BasicFormWrapper';
 import ModalWrapper from 'components/Wrappers/ModalWrapper';
 import TextControllerInput from 'components/FormControllerInputs/TextControllerInput';
-import DatePickerControllerInput from 'components/FormControllerInputs/DatePickerControlInput';
 import FollowUpSMESummaryCard from 'components/pageSpecific/OnboardingAndTrainingAdministration/FollowUpModal/FollowUpSMESummaryCard';
 import FollowUpCompanySummaryCard from 'components/pageSpecific/OnboardingAndTrainingAdministration/FollowUpModal/FollowUpCompanySummaryCard';
+import FollowUpCampSummaryCard from 'components/pageSpecific/OnboardingAndTrainingAdministration/FollowUpModal/FollowUpCampSummaryCard';
 
 // Actions
 import {
@@ -48,8 +48,10 @@ import { ProgramMemberType } from 'redux/globalState/programMembers/types';
 // Utils
 import { RootState } from 'redux/combineReducers';
 import organizationTypesEnum from 'utils/organizationTypesEnum';
-import { convertDateWithoutTime } from 'utils/dateFNSCustom';
 import programMemberStatusEnum from 'utils/programMemberStatusEnum';
+
+// Form validation
+import { fieldRequired as formFieldRequired } from 'formValidation';
 
 interface ISendFollowUpEmailModalProps {
   programMember: ProgramMemberType;
@@ -68,16 +70,25 @@ const SendFollowUpEmailModal: React.FC<ISendFollowUpEmailModalProps> = (
     (state: RootState) => state.followUpEmail.followUpEmailStatus,
   );
 
-  const { control, handleSubmit, setError, errors } = useForm<any>({
+  const {
+    control,
+    handleSubmit,
+    setError,
+    errors,
+    clearErrors,
+    watch,
+  } = useForm<any>({
     criteriaMode: 'all',
     mode: 'onChange',
     defaultValues: {
-      SMSStartDate: '',
       followUpMessage: '',
       additionalEmail: '',
       recipients: [],
+      orgContact: null,
     },
   });
+
+  const watchRecipients = watch('recipients', []);
 
   useEffect(() => {
     return () => {
@@ -85,43 +96,59 @@ const SendFollowUpEmailModal: React.FC<ISendFollowUpEmailModalProps> = (
     };
   }, []);
 
+  useEffect(() => {
+    if (watchRecipients.length !== 0) {
+      clearErrors('additionalEmail');
+    }
+  }, [watchRecipients]);
+
   const onSubmitForm = (values: any) => {
-    const receivers = values.recipients.map((person: any) => person.email);
-    if (receivers.length === 0 && !values.additionalEmail) {
-      setError('additionalEmail', {
-        type: 'manual',
-        message: t('formValidation:Field is required!'),
-        shouldFocus: true,
-      });
-      return null;
-    }
-    if (values.additionalEmail) {
-      receivers.unshift(values.additionalEmail);
-    }
     const defaultCCReceiver = process.env.REACT_APP_CC_RECEIVER || '';
-    const ccReceivers = [defaultCCReceiver];
-    if (programMember.organizationTypeId === organizationTypesEnum.Company) {
-      if (programMember.supportPerson?.email) {
-        ccReceivers.unshift(programMember.supportPerson.email);
-      } else {
-        return;
+    if (programMember.organizationTypeId === organizationTypesEnum.CAMP) {
+      const ccReceivers = [defaultCCReceiver];
+      const receivers = [values.orgContact.email];
+      if (values.additionalEmail) {
+        receivers.push(values.additionalEmail);
       }
+      const data: PostFollowUpEmailRequestType = {
+        organizationId: programMember.id,
+        message: values.followUpMessage,
+        receivers,
+        ccReceivers,
+        organizationContactPersonId: values.orgContact?.id,
+      };
+      dispatch(postFollowUpEmail(data));
+    } else {
+      const receivers = values.recipients.map((person: any) => person.email);
+
+      if (receivers.length === 0 && !values.additionalEmail) {
+        setError('additionalEmail', {
+          type: 'manual',
+          message: t('formValidation:Field is required!'),
+          shouldFocus: true,
+        });
+        return null;
+      }
+      if (values.additionalEmail) {
+        receivers.unshift(values.additionalEmail);
+      }
+      const ccReceivers = [defaultCCReceiver];
+      if (programMember.organizationTypeId === organizationTypesEnum.Company) {
+        if (programMember.supportPerson?.email) {
+          ccReceivers.unshift(programMember.supportPerson.email);
+        } else {
+          return;
+        }
+      }
+      const data: PostFollowUpEmailRequestType = {
+        organizationId: programMember.id,
+        message: values.followUpMessage,
+        receivers,
+        ccReceivers: [defaultCCReceiver],
+        organizationContactPersonId: values?.orgContact?.id,
+      };
+      dispatch(postFollowUpEmail(data));
     }
-    let smsStartDate = null;
-    if (
-      programMember.organizationTypeId === organizationTypesEnum.SME &&
-      values.SMSStartDate
-    ) {
-      smsStartDate = convertDateWithoutTime(values.SMSStartDate);
-    }
-    const data: PostFollowUpEmailRequestType = {
-      organizationId: programMember.id,
-      message: values.followUpMessage,
-      smsStartDate: smsStartDate,
-      receivers,
-      ccReceivers: [defaultCCReceiver],
-    };
-    dispatch(postFollowUpEmail(data));
   };
 
   let disabledSendButton = false;
@@ -159,6 +186,8 @@ const SendFollowUpEmailModal: React.FC<ISendFollowUpEmailModalProps> = (
     if (programMember.status === programMemberStatusEnum.NotActive) {
       disabledSendButton = true;
     }
+  } else if (programMember.organizationTypeId === organizationTypesEnum.CAMP) {
+    // Do nothing
   } else {
     disabledSendButton = true;
   }
@@ -167,18 +196,6 @@ const SendFollowUpEmailModal: React.FC<ISendFollowUpEmailModalProps> = (
     if (programMember.organizationTypeId === organizationTypesEnum.SME) {
       return (
         <>
-          <Grid item xs={12}>
-            <DatePickerControllerInput
-              control={control}
-              name="SMSStartDate"
-              label={t('common:SMS start date')}
-              id="sms-start-date-input"
-              fieldRequired
-              error={Boolean(errors?.SMSStartDate?.message)}
-              errorMessage={errors?.SMSStartDate?.message}
-              disabled={followUpEmailStatus.requesting}
-            />
-          </Grid>
           <Grid item xs={12}>
             <FollowUpSMESummaryCard />
           </Grid>
@@ -191,6 +208,16 @@ const SendFollowUpEmailModal: React.FC<ISendFollowUpEmailModalProps> = (
         <>
           <Grid item xs={12}>
             <FollowUpCompanySummaryCard />
+          </Grid>
+        </>
+      );
+    } else if (
+      programMember.organizationTypeId === organizationTypesEnum.CAMP
+    ) {
+      return (
+        <>
+          <Grid item xs={12}>
+            <FollowUpCampSummaryCard />
           </Grid>
         </>
       );
@@ -249,49 +276,112 @@ const SendFollowUpEmailModal: React.FC<ISendFollowUpEmailModalProps> = (
                       disabled={followUpEmailStatus.requesting}
                     />
                   </Grid>
-                  <Grid item xs={12}>
-                    <Controller
-                      control={control}
-                      name="recipients"
-                      render={({ ref, onChange, ...rest }) => {
-                        return (
-                          <Autocomplete
-                            {...rest}
-                            multiple
-                            id="recipients"
-                            options={listOfContactPeople}
-                            getOptionLabel={(option: ContactPersonType) => {
-                              return option.email || '';
-                            }}
-                            onChange={(event: any, newValue: any) => {
-                              onChange(newValue);
-                              return newValue;
-                            }}
-                            renderOption={(option: ContactPersonType) => {
-                              return <span>{option.email}</span>;
-                            }}
-                            renderInput={(params) => {
-                              return (
-                                <TextField
-                                  {...params}
-                                  label={t('common:Recipients')}
-                                  variant="outlined"
-                                  error={Boolean(errors.recipients?.message)}
-                                  helperText={
-                                    Boolean(errors.recipients?.message)
-                                      ? t(
-                                          `formValidation:${errors.recipients?.message}`,
-                                        )
-                                      : ''
-                                  }
-                                />
-                              );
-                            }}
-                          />
-                        );
-                      }}
-                    />
-                  </Grid>
+                  {programMember.organizationTypeId !==
+                    organizationTypesEnum.CAMP && (
+                    <Grid item xs={12}>
+                      <Controller
+                        control={control}
+                        name="recipients"
+                        render={({ ref, onChange, ...rest }) => {
+                          return (
+                            <Autocomplete
+                              {...rest}
+                              multiple
+                              id="recipients"
+                              options={listOfContactPeople}
+                              getOptionLabel={(option: ContactPersonType) => {
+                                return `${option.email} (${option.name})` || '';
+                              }}
+                              onChange={(event: any, newValue: any) => {
+                                onChange(newValue);
+                                return newValue;
+                              }}
+                              renderOption={(option: ContactPersonType) => {
+                                return (
+                                  <span>{`${option.email} (${option.name})`}</span>
+                                );
+                              }}
+                              renderInput={(params) => {
+                                return (
+                                  <TextField
+                                    {...params}
+                                    label={t('common:Recipients')}
+                                    variant="outlined"
+                                    error={Boolean(errors.recipients?.message)}
+                                    helperText={
+                                      Boolean(errors.recipients?.message)
+                                        ? t(
+                                            `formValidation:${errors.recipients?.message}`,
+                                          )
+                                        : ''
+                                    }
+                                  />
+                                );
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </Grid>
+                  )}
+                  {programMember.organizationTypeId ===
+                    organizationTypesEnum.CAMP && (
+                    <Grid item xs={12}>
+                      <Controller
+                        control={control}
+                        name="orgContact"
+                        rules={{
+                          validate: {
+                            fieldRequired: (value): string | undefined => {
+                              const message = formFieldRequired(value);
+                              if (message) {
+                                return t(`formValidation:${message}`);
+                              }
+                              return undefined;
+                            },
+                          },
+                        }}
+                        render={({ ref, onChange, ...rest }) => {
+                          return (
+                            <Autocomplete
+                              {...rest}
+                              id="orgContact"
+                              options={listOfContactPeople}
+                              getOptionLabel={(option: ContactPersonType) => {
+                                return `${option.email} (${option.name})` || '';
+                              }}
+                              onChange={(event: any, newValue: any) => {
+                                onChange(newValue);
+                                return newValue;
+                              }}
+                              renderOption={(option: ContactPersonType) => {
+                                return (
+                                  <span>{`${option.email} (${option.name})`}</span>
+                                );
+                              }}
+                              renderInput={(params) => {
+                                return (
+                                  <TextField
+                                    {...params}
+                                    label={t('common:Organization contact')}
+                                    variant="outlined"
+                                    error={Boolean(errors.orgContact?.message)}
+                                    helperText={
+                                      Boolean(errors.orgContact?.message)
+                                        ? t(
+                                            `formValidation:${errors.orgContact?.message}`,
+                                          )
+                                        : ''
+                                    }
+                                  />
+                                );
+                              }}
+                            />
+                          );
+                        }}
+                      />
+                    </Grid>
+                  )}
                 </Grid>
               </Grid>
               {renderForType()}

@@ -27,6 +27,10 @@ import {
   GetLaboratoryAdministrationEmployeesResponseType,
   AddLaboratoryAdministrationEmployeeToShiftRequestType,
   IncreaseShiftCountForDayLaboratoryAdministrationRequestType,
+  AddLaboratoryAdministrationTemporaryEmployeeToShiftRequestType,
+  GetLaboratoryAdministrationTemporaryEmployeesResponseType,
+  RemoveLaboratoryAdministrationTemporaryEmploeeRequestType,
+  GetLaboratoryAdministrationTemporaryEmployeesRequestType,
 } from 'redux/laboratoryAdministration/laboratotyAdministrationEditDay/types';
 
 export const getLaboratoryAdministrationEditDayDataAPI = async (
@@ -72,4 +76,32 @@ export const increaseShiftCountForDayLaboratoryAdministrationAPI = async (
     url: 'laboratory/invitations/increaseShiftCount',
     data,
     method: APIMethods.PUT,
+  });
+
+export const getLaboratoryAdministrationTemporaryEmployeesAPI = async (
+  params: GetLaboratoryAdministrationTemporaryEmployeesRequestType,
+): Promise<GetLaboratoryAdministrationTemporaryEmployeesResponseType> =>
+  HttpClient.request<GetLaboratoryAdministrationTemporaryEmployeesResponseType>(
+    {
+      url: 'laboratory/availableTemporaryPersonal',
+      method: APIMethods.GET,
+      params,
+    },
+  );
+
+export const addLaboratoryAdministrationTemporaryEmployeeToShiftAPI = async (
+  data: AddLaboratoryAdministrationTemporaryEmployeeToShiftRequestType,
+): Promise<null> =>
+  HttpClient.request<null>({
+    url: 'laboratory/confirmationsWithoutInvitation',
+    data,
+    method: APIMethods.POST,
+  });
+
+export const removeLaboratoryAdministrationTemporaryEmployeeAPI = async (
+  data: RemoveLaboratoryAdministrationTemporaryEmploeeRequestType,
+): Promise<null> =>
+  HttpClient.request<null>({
+    url: `laboratory/confirmationsWithoutInvitation/${data.id}`,
+    method: APIMethods.DELETE,
   });

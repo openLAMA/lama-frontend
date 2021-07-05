@@ -21,6 +21,8 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { AppThunk } from 'redux/store';
 import { extractErrorMessage } from 'apiService/axiosInstance';
 
+import callSnackbar from 'utils/customHooks/useSnackbar';
+
 // Types
 import { IApiStatus } from 'redux/globalTypes';
 import {
@@ -28,15 +30,20 @@ import {
   ProgramMemberFilterType,
   GetProgramMembersRequestType,
   GetProgramMembersResponseType,
+  SetContractReceivedRequestType,
 } from 'redux/globalState/programMembers/types';
 import { ErrorObjectType } from 'apiService/types';
 
-import { getProgramMembersAPI } from 'redux/globalState/programMembers/programMembersApi';
+import {
+  getProgramMembersAPI,
+  setContractReceivedStatusAPI,
+} from 'redux/globalState/programMembers/programMembersApi';
 
 interface IProgramMembersPersonal {
   programMembersStatus: IApiStatus;
   programMembers: GetProgramMembersType;
   filter: ProgramMemberFilterType;
+  setContractReceivedStatus: IApiStatus;
 }
 
 const initialState = {
@@ -61,6 +68,11 @@ const initialState = {
     filterEpaadStatusPending: false,
     filterAssignedToMe: false,
     showAllOrganizations: true,
+  },
+  setContractReceivedStatus: {
+    requesting: false,
+    success: false,
+    failure: false,
   },
 } as IProgramMembersPersonal;
 
@@ -93,6 +105,34 @@ const programMembersSlice = createSlice({
         failure: true,
       };
     },
+    setContractReceivedStatusRequesting(state) {
+      state.setContractReceivedStatus = {
+        requesting: true,
+        success: false,
+        failure: false,
+      };
+    },
+    setContractReceivedStatusSuccess(state) {
+      state.setContractReceivedStatus = {
+        requesting: false,
+        success: true,
+        failure: false,
+      };
+    },
+    setContractReceivedStatusFailed(state) {
+      state.setContractReceivedStatus = {
+        requesting: false,
+        success: false,
+        failure: true,
+      };
+    },
+    clearSetContractReceivedFlags(state) {
+      state.setContractReceivedStatus = {
+        requesting: false,
+        success: false,
+        failure: false,
+      };
+    },
     setFilter(state, action: PayloadAction<ProgramMemberFilterType>) {
       state.filter = action.payload;
     },
@@ -103,6 +143,10 @@ export const {
   programMembersRequesting,
   programMembersSuccess,
   programMembersFailed,
+  setContractReceivedStatusRequesting,
+  setContractReceivedStatusSuccess,
+  setContractReceivedStatusFailed,
+  clearSetContractReceivedFlags,
   setFilter,
 } = programMembersSlice.actions;
 
@@ -119,6 +163,25 @@ export const getProgramMembers = (
     (error: ErrorObjectType): void => {
       dispatch(programMembersFailed());
       extractErrorMessage(error, 'Failed to get program members data!');
+    },
+  );
+};
+
+export const setContractReceivedStatus = (
+  data: SetContractReceivedRequestType,
+): AppThunk => async (dispatch) => {
+  dispatch(setContractReceivedStatusRequesting());
+  setContractReceivedStatusAPI(data).then(
+    (): void => {
+      dispatch(setContractReceivedStatusSuccess());
+      callSnackbar({
+        message: 'Successfully set contract received status!',
+        messageType: 'success',
+      });
+    },
+    (error: ErrorObjectType): void => {
+      dispatch(setContractReceivedStatusFailed());
+      extractErrorMessage(error, 'Failed to set contract received status!');
     },
   );
 };

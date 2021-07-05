@@ -391,7 +391,12 @@ const MyOrganizationForm: React.FC = () => {
                                         : false;
                                     }}
                                     renderOption={(option: CityType) => {
-                                      return <span>{option.name}</span>;
+                                      return (
+                                        <Grid container justify="space-between">
+                                          <Grid item>{option.name}</Grid>
+                                          <Grid item>{option.zipCode}</Grid>
+                                        </Grid>
+                                      );
                                     }}
                                     renderInput={(params) => {
                                       return (

@@ -44,12 +44,16 @@ import {
   MailOutline as MailOutlineIcon,
   ArrowForwardIos as ArrowForwardIosIcon,
   Replay as ReplayIcon,
+  AddOutlined as AddOutlinedIcon,
+  DeleteOutline as DeleteOutlineIcon,
 } from '@material-ui/icons';
 
 // Custom components
 import RequiredPeopleIndicator from 'components/RequiredPeopleIndicator';
 import LoadingSwapComponent from 'components/loaders/LoadingSwapComponent';
 import StudentInviteModal from 'components/Modals/StudentsInviteModal';
+import AddEditStateModal from 'components/Modals/AddEditStateModal';
+import RemoveStateModal from 'components/Modals/RemoveStateModal';
 import withErrorHandler from 'components/Wrappers/ErrorBoundaryWrapper';
 
 // Actions
@@ -60,6 +64,7 @@ import {
   CapacityOverviewType,
   CapacityOverviewShiftType,
   GetCapacityOverviewRequestType,
+  CantonType,
 } from 'redux/globalState/capacity/types';
 
 // Utils
@@ -71,12 +76,15 @@ import {
   getWeekNumber,
   checkDateAndConvert,
   subtractDays,
+  isPastDate,
 } from 'utils/dateFNSCustom';
 import separateNumberWithCommas from 'utils/separateNumberWithCommas';
 
 interface ICapacityOverviewTableProps {
   isLaboratory?: boolean;
 }
+
+import styles from './CapacityOverviewTable.module.scss';
 
 const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
   props: ICapacityOverviewTableProps,
@@ -87,6 +95,18 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
 
   const [showInviteModal, setShowInviteModal] = useState<boolean>(false);
   const [inviteForDate, setInviteForDate] = useState<string>('');
+  const [showAddStateModal, setShowAddStateModal] = useState<boolean>(false);
+  const [showRemoveStateModal, setShowRemoveStateModal] = useState<boolean>(
+    false,
+  );
+
+  const [
+    removeStateModalData,
+    setRemoveStateModalData,
+  ] = useState<CantonType | null>(null);
+  const [showEditStateModal, setShowEditStateModal] = useState<boolean>(false);
+  const [editStateModalId, setEditStateModalId] = useState<string>('');
+  const [toggleStates, setToggleStates] = useState<boolean>(false);
 
   const capacityViewStatus = useSelector(
     (state: RootState) => state.capacity.capacityOverviewStatus,
@@ -126,6 +146,51 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
     initialDispatch();
   };
 
+  const onOpenAddStateModal = () => {
+    setShowAddStateModal(true);
+  };
+
+  const onCloseAddStateModal = () => {
+    setShowAddStateModal(false);
+  };
+
+  const onSuccessAddStateModal = () => {
+    setShowAddStateModal(false);
+    initialDispatch();
+  };
+
+  const onOpenRemoveStateModal = (canton: CantonType) => {
+    setShowRemoveStateModal(true);
+    setRemoveStateModalData(canton);
+  };
+
+  const onCloseRemoveStateModal = () => {
+    setShowRemoveStateModal(false);
+    setRemoveStateModalData(null);
+  };
+
+  const onSuccessRemoveStateModal = () => {
+    setShowRemoveStateModal(false);
+    setRemoveStateModalData(null);
+    initialDispatch();
+  };
+
+  const onOpenEditStateModal = (id: string) => {
+    setShowEditStateModal(true);
+    setEditStateModalId(id);
+  };
+
+  const onCloseEditStateModal = () => {
+    setShowEditStateModal(false);
+    setEditStateModalId('');
+  };
+
+  const onSuccessEditStateModal = () => {
+    setShowEditStateModal(false);
+    setEditStateModalId('');
+    initialDispatch();
+  };
+
   const onGoBackFiveDays = () => {
     const earliestDate = capacityOverviewData[0].date;
     if (earliestDate) {
@@ -154,6 +219,12 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
         } else {
           color = 0;
         }
+      }
+
+      const parseDate = checkDateAndConvert(item.date);
+      let isPast = false;
+      if (parseDate) {
+        isPast = isPastDate(parseDate);
       }
 
       const element = (
@@ -190,7 +261,7 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
                 <span>
                   <IconButton
                     color="primary"
-                    disabled={item.invitationAlreadySent}
+                    disabled={item.invitationAlreadySent || isPast}
                     size="small"
                     onClick={() => onSendInvitation(item.date)}>
                     <MailOutlineIcon style={{ fontSize: 20 }} />
@@ -224,7 +295,16 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
     shift: CapacityOverviewShiftType,
     invitationAlreadySent: boolean,
   ) => {
-    const fixedNonCanceledFixedEmployeesCount = shift.fixedEmployees.reduce<number>(
+    const nonCanceledFixedEmployeesCount = shift.fixedEmployees.reduce<number>(
+      (peopleCount, item) => {
+        if (!item.isCanceled) {
+          return peopleCount + 1;
+        }
+        return peopleCount;
+      },
+      0,
+    );
+    const confirmedEmployeesWithoutInvitation = shift.confirmedWithoutInvitation.reduce<number>(
       (peopleCount, item) => {
         if (!item.isCanceled) {
           return peopleCount + 1;
@@ -240,7 +320,8 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
         max={shift.requiredPersonnelCountShift}
         total={
           shift.confirmedNotCanceledEmployeesCount +
-            fixedNonCanceledFixedEmployeesCount || 0
+          (confirmedEmployeesWithoutInvitation || 0) +
+          (nonCanceledFixedEmployeesCount || 0)
         }
       />
     );
@@ -248,7 +329,8 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
     let employeeNames;
     if (
       shift?.confirmedEmployees?.length !== 0 ||
-      shift?.fixedEmployees?.length !== 0
+      shift?.fixedEmployees?.length !== 0 ||
+      shift?.confirmedWithoutInvitation?.length !== 0
     ) {
       employeeNames = (
         <Grid container spacing={1} className="pt-4">
@@ -273,6 +355,16 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
                   className={`font-size-tiny color-gray ${
                     employee.isCanceled && 'strike-through'
                   }`}>{`${employee.firstName} ${employee.lastName}`}</Typography>
+              </Grid>
+            );
+          })}
+          {shift.confirmedWithoutInvitation.map((employee: any) => {
+            return (
+              <Grid key={employee.email} item xs={12}>
+                <Typography
+                  noWrap
+                  variant="body2"
+                  className="font-size-tiny color-darker-gray">{`${employee.firstName} ${employee.lastName}`}</Typography>
               </Grid>
             );
           })}
@@ -304,28 +396,134 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
   // Use for mapping
   const tableData = [];
 
-  tableData.push({
-    id: '1',
-    text: t('common:Daily test samples'),
-    data: capacityOverviewData?.map(
-      (item: CapacityOverviewType): tableDataType => {
-        return {
-          id: item.date,
-          tableData: [
-            {
-              key: item.date,
-              element: separateNumberWithCommas(item.samples),
-            },
-          ],
-        };
-      },
-    ),
-  });
-
   if (isLaboratory) {
     tableData.push({
-      id: '2',
-      text: t('common:Morning shift'),
+      id: uuidv4(),
+      element: t('common:Total'),
+      onClick: () => {
+        setToggleStates(!toggleStates);
+      },
+      data: capacityOverviewData?.map(
+        (item: CapacityOverviewType): tableDataType => {
+          return {
+            id: item.date,
+            tableData: [
+              {
+                key: item.date,
+                element: separateNumberWithCommas(item.totalSamples),
+              },
+            ],
+          };
+        },
+      ),
+    });
+
+    if (toggleStates) {
+      tableData.push({
+        id: uuidv4(),
+        element: 'Basel Landschaft',
+        data: capacityOverviewData?.map(
+          (item: CapacityOverviewType): tableDataType => {
+            return {
+              id: item.date,
+              tableData: [
+                {
+                  key: item.date,
+                  element: separateNumberWithCommas(item.samples),
+                },
+              ],
+            };
+          },
+        ),
+      });
+
+      let cantonsArray = null;
+      if (capacityOverviewData[0]?.cantonsSamplesData) {
+        cantonsArray = capacityOverviewData[0].cantonsSamplesData;
+      }
+
+      if (cantonsArray?.length !== 0) {
+        cantonsArray?.forEach((canton) => {
+          tableData.push({
+            id: uuidv4(),
+            element: (
+              <Grid container direction="column">
+                <Grid item>
+                  <Typography variant="caption">{`${canton.cantonName} (${canton.cantonShortName})`}</Typography>
+                </Grid>
+                <Grid item className="pt-2">
+                  <Grid container spacing={1}>
+                    <Grid item>
+                      <IconButton
+                        color="primary"
+                        size="small"
+                        onClick={() => onOpenEditStateModal(canton.cantonId)}>
+                        <EditIcon style={{ fontSize: 20 }} />
+                      </IconButton>
+                    </Grid>
+                    <Grid item>
+                      <IconButton
+                        color="primary"
+                        size="small"
+                        onClick={() => onOpenRemoveStateModal(canton)}>
+                        <DeleteOutlineIcon style={{ fontSize: 20 }} />
+                      </IconButton>
+                    </Grid>
+                  </Grid>
+                </Grid>
+              </Grid>
+            ),
+            data: capacityOverviewData?.map(
+              (item: CapacityOverviewType): tableDataType => {
+                const findCanton = item.cantonsSamplesData.find(
+                  (cantonItem) => cantonItem.cantonId === canton.cantonId,
+                );
+                return {
+                  id: item.date,
+                  tableData: [
+                    {
+                      key: item.date,
+                      element: separateNumberWithCommas(
+                        findCanton?.samples || 0,
+                      ),
+                    },
+                  ],
+                };
+              },
+            ),
+          });
+        });
+      }
+
+      tableData.push({
+        id: uuidv4(),
+        element: (
+          <IconButton
+            color="primary"
+            size="small"
+            onClick={onOpenAddStateModal}>
+            <AddOutlinedIcon />
+          </IconButton>
+        ),
+        data: capacityOverviewData?.map(
+          (item: CapacityOverviewType): tableDataType => {
+            return {
+              id: item.date,
+              tableData: [
+                {
+                  key: item.date,
+                  element: '-',
+                },
+              ],
+            };
+          },
+        ),
+      });
+    }
+
+    tableData.push({
+      id: uuidv4(),
+      element: t('common:Morning shift'),
       data: capacityOverviewData?.map(
         (item: CapacityOverviewType): tableDataType => {
           return {
@@ -343,8 +541,8 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
       ),
     });
     tableData.push({
-      id: '3',
-      text: t('common:Afternoon shift'),
+      id: uuidv4(),
+      element: t('common:Afternoon shift'),
       data: capacityOverviewData?.map(
         (item: CapacityOverviewType): tableDataType => {
           return {
@@ -357,6 +555,24 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
                     element: <Typography key={item.date}>-</Typography>,
                   },
                 ],
+          };
+        },
+      ),
+    });
+  } else {
+    tableData.push({
+      id: uuidv4(),
+      element: 'Basel Landschaft',
+      data: capacityOverviewData?.map(
+        (item: CapacityOverviewType): tableDataType => {
+          return {
+            id: item.date,
+            tableData: [
+              {
+                key: item.date,
+                element: separateNumberWithCommas(item.samples),
+              },
+            ],
           };
         },
       ),
@@ -439,14 +655,21 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
               </TableHead>
               <TableBody>
                 {tableData.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell>{item.text}</TableCell>
+                  <TableRow
+                    key={item.id}
+                    onClick={item.onClick}
+                    className={item.onClick ? styles.tableRowHover : ''}>
+                    <TableCell>
+                      <Typography variant="caption">{item.element}</Typography>
+                    </TableCell>
                     {item?.data?.map((d: tableDataType) => {
                       return (
                         <TableCell key={d.id} className="relative">
-                          {d.tableData.map((elem) => {
-                            return elem.element;
-                          })}
+                          <Typography variant="caption">
+                            {d.tableData.map((elem) => {
+                              return elem.element;
+                            })}
+                          </Typography>
                         </TableCell>
                       );
                     })}
@@ -462,6 +685,26 @@ const CapacityOverviewTable: React.FC<ICapacityOverviewTableProps> = (
           onClose={onCloseInvitationModal}
           onSuccess={onSuccessInvitationModal}
           forDate={inviteForDate}
+        />
+      )}
+      {showAddStateModal && (
+        <AddEditStateModal
+          onClose={onCloseAddStateModal}
+          onSuccess={onSuccessAddStateModal}
+        />
+      )}
+      {showRemoveStateModal && (
+        <RemoveStateModal
+          onClose={onCloseRemoveStateModal}
+          onSuccess={onSuccessRemoveStateModal}
+          deleteData={removeStateModalData}
+        />
+      )}
+      {showEditStateModal && (
+        <AddEditStateModal
+          onClose={onCloseEditStateModal}
+          onSuccess={onSuccessEditStateModal}
+          id={editStateModalId}
         />
       )}
     </>

@@ -23,13 +23,21 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useHistory, Link } from 'react-router-dom';
 
 // Material UI
-import { AppBar, Button, Grid, Toolbar, Typography } from '@material-ui/core';
+import {
+  AppBar,
+  Button,
+  IconButton,
+  Grid,
+  Toolbar,
+  Tooltip,
+} from '@material-ui/core';
 
 // Material Icons
-import { ExitToApp as ExitToAppIcon } from '@material-ui/icons';
+import { PowerSettingsNew as PowerSettingsNewIcon } from '@material-ui/icons';
 
 // Custom components
 import CompanyLogo from 'components/CompanyLogo';
+import ProfileIcon from 'components/ProfileIcon';
 
 // Actions
 import { clearAuthData } from 'redux/authData/authDataSlice';
@@ -86,23 +94,22 @@ const Navbar: React.FC = () => {
               </div>
             </Grid>
             <Grid item>
-              <Grid container spacing={2} alignItems="center">
+              <Grid container spacing={1} alignItems="center">
                 {Env.get() === 'development' && (
                   <Grid item>
                     <Button onClick={changeLang}>Change lang</Button>
                   </Grid>
                 )}
                 <Grid item>
-                  <Typography>{userData?.name}</Typography>
+                  <ProfileIcon name={userData?.name} />
                 </Grid>
 
                 <Grid item>
-                  <Button color="secondary" onClick={onSignOut}>
-                    <Typography className="pr-2">
-                      {t('common:Logout')}
-                    </Typography>
-                    <ExitToAppIcon style={{ paddingBottom: '2px' }} />
-                  </Button>
+                  <Tooltip title={`${t('common:Logout')}`} enterDelay={300}>
+                    <IconButton color="secondary" onClick={onSignOut}>
+                      <PowerSettingsNewIcon style={{ paddingBottom: '2px' }} />
+                    </IconButton>
+                  </Tooltip>
                 </Grid>
               </Grid>
             </Grid>

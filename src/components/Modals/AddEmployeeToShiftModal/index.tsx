@@ -45,7 +45,10 @@ import {
   LaboratoryTestingPersonalResultType,
   TestingPersonnelType,
 } from 'redux/laboratoryAdministration/laboratoryAdministrationTestingPersonal/types';
-import { CapacityOverviewShiftConfirmedEmployeeType } from 'redux/globalState/capacity/types';
+import {
+  CapacityOverviewShiftConfirmedEmployeeType,
+  CapacityOverviewShiftConfirmedWithoutInvitationEmployeeType,
+} from 'redux/globalState/capacity/types';
 
 // Utils
 import { RootState } from 'redux/combineReducers';
@@ -90,6 +93,14 @@ const AddEmployeeToShiftModal: React.FC<IAddEmployeeToShiftModalProps> = (
             person.email === employee.email,
         );
         if (foundFixedEmployee) {
+          return false;
+        }
+        const foundTemporaryEmployee = data.shiftData.confirmedWithoutInvitation.find(
+          (
+            person: CapacityOverviewShiftConfirmedWithoutInvitationEmployeeType,
+          ) => person.email === employee.email,
+        );
+        if (foundTemporaryEmployee) {
           return false;
         }
         return true;

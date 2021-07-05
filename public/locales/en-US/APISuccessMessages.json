@@ -9,5 +9,13 @@
   "Successfully pushed program member data to Epaad!": "Successfully pushed program member data to Epaad!",
   "Successfully sent follow up emails!": "Successfully sent follow up emails!",
   "Successfully updated follow up status!": "Successfully updated follow up status!",
-  "Successfully removed person from shift!": "Successfully removed person from shift!"
+  "Successfully removed person from shift!": "Successfully removed person from shift!",
+  "Successfully added new state!": "Successfully added new state!",
+  "Successfully updated state!": "Successfully updated state!",
+  "Successfully removed state!": "Successfully removed state!",
+  "Successfully added a employee to shift!": "Successfully added a employee to shift!",
+  "Successfully updated static pooling status!": "Successfully updated static pooling status!",
+  "Successfully set contract received status!": "Successfully set contract received status!",
+  "Successfully re-activated a program member!": "Successfully re-activated a program member!",
+  "Successfully sent email!": "Successfully sent email!"
 }

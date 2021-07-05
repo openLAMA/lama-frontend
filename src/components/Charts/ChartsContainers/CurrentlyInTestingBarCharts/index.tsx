@@ -101,7 +101,7 @@ const CurrentlyInTestingBarCharts: React.FC = () => {
           indicatorColor="primary"
           textColor="primary"
           variant="fullWidth"
-          aria-label={t('aria:Line charts')}>
+          aria-label={t('aria:onboarding.Line charts')}>
           <Tab label={t('common:Organizations')} {...a11yProps(0)} />
           <Tab label={t('common:People')} {...a11yProps(1)} />
         </Tabs>

@@ -53,6 +53,7 @@ import NumberControllerInput from 'components/FormControllerInputs/NumberControl
 import DropdownControllerInput from 'components/FormControllerInputs/DropdownControlInput';
 import Card from 'components/Card';
 import DatePickerControllerInput from 'components/FormControllerInputs/DatePickerControlInput';
+import DateAndTimePickerControllerInput from 'components/FormControllerInputs/DateAndTimePickerControllerInput';
 import ButtonWithLoadingAnimation from 'components/Buttons/ButtonWithLoadingAnimation';
 import Notes from 'components/Notes/index';
 
@@ -83,6 +84,7 @@ import programMemberStatusEnum from 'utils/programMemberStatusEnum';
 import {
   convertDateWithoutTime,
   convertStringDateToDate,
+  convertDateTimeInUTCFormat,
 } from 'utils/dateFNSCustom';
 import organizationTypesEnum from 'utils/organizationTypesEnum';
 
@@ -183,7 +185,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
       trainingTimestamp:
         convertStringDateToDate(programMember?.trainingTimestamp) || '',
       onboardingTimestamp:
-        convertStringDateToDate(programMember?.onboardingTimestamp) || '',
+        convertStringDateToDate(programMember?.onboardingTimestamp) || null,
       firstTestTimestamp:
         convertStringDateToDate(programMember?.firstTestTimestamp) || '',
       secondTestTimestamp:
@@ -317,14 +319,6 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
             openFollowUpModal = false;
             disableFollowUpModal();
           }
-          if (!Boolean(programMember.onboardingTimestamp)) {
-            setError('onboardingTimestamp', {
-              type: 'manual',
-              message: t('formValidation:Field is required!'),
-            });
-            openFollowUpModal = false;
-            disableFollowUpModal();
-          }
           if (!Boolean(programMember.organizationShortcutName)) {
             setError('organizationShortcutName', {
               type: 'manual',
@@ -376,6 +370,15 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
     }
   }, [location]);
 
+  const addNewContactPersonFieldArray = () => {
+    contactsFieldArray.append({
+      name: '',
+      email: '',
+      phoneNumber: '',
+      landLineNumber: '',
+    });
+  };
+
   const onSubmitForm = (values: any) => {
     if (values.exclusionStartDate && !values.exclusionEndDate) {
       setError('exclusionEndDate', {
@@ -389,6 +392,8 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
         message: t('formValidation:Field is required!'),
         shouldFocus: true,
       });
+    } else if (!values.contacts || values?.contacts?.length === 0) {
+      addNewContactPersonFieldArray();
     } else {
       const data: PutProgramMemberType = {
         name: values.name,
@@ -397,7 +402,9 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
         zip: values.zip,
         address: values.address,
         trainingTimestamp: convertDateWithoutTime(values.trainingTimestamp),
-        onboardingTimestamp: convertDateWithoutTime(values.onboardingTimestamp),
+        onboardingTimestamp: convertDateTimeInUTCFormat(
+          values.onboardingTimestamp,
+        ),
         firstTestTimestamp: convertDateWithoutTime(values.firstTestTimestamp),
         secondTestTimestamp: convertDateWithoutTime(values.secondTestTimestamp),
         thirdTestTimestamp: convertDateWithoutTime(values.thirdTestTimestamp),
@@ -529,7 +536,12 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                                     return optionSelected?.name ? true : false;
                                   }}
                                   renderOption={(option: CityType) => {
-                                    return <span>{option.name}</span>;
+                                    return (
+                                      <Grid container justify="space-between">
+                                        <Grid item>{option.name}</Grid>
+                                        <Grid item>{option.zipCode}</Grid>
+                                      </Grid>
+                                    );
                                   }}
                                   renderInput={(params) => {
                                     return (
@@ -705,7 +717,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                           />
                         </Grid>
                         <Grid item>
-                          <DatePickerControllerInput
+                          <DateAndTimePickerControllerInput
                             control={control}
                             name="onboardingTimestamp"
                             label={t('common:Onboarding date')}
@@ -919,14 +931,9 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                                   <Button
                                     color="secondary"
                                     startIcon={<AddCircleOutlineIcon />}
-                                    onClick={() =>
-                                      contactsFieldArray.append({
-                                        name: '',
-                                        email: '',
-                                        phoneNumber: '',
-                                        landLineNumber: '',
-                                      })
-                                    }>
+                                    onClick={() => {
+                                      addNewContactPersonFieldArray();
+                                    }}>
                                     <Typography>
                                       {t('common:Add another contact')}
                                     </Typography>
@@ -1050,14 +1057,9 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                               <Button
                                 color="secondary"
                                 startIcon={<AddCircleOutlineIcon />}
-                                onClick={() =>
-                                  contactsFieldArray.append({
-                                    name: '',
-                                    email: '',
-                                    phoneNumber: '',
-                                    landLineNumber: '',
-                                  })
-                                }>
+                                onClick={() => {
+                                  addNewContactPersonFieldArray();
+                                }}>
                                 <Typography>
                                   {t('common:Add another contact')}
                                 </Typography>

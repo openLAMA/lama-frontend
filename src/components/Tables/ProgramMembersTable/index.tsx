@@ -17,7 +17,7 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link } from 'react-router-dom';
@@ -39,6 +39,7 @@ import {
 import {
   EditOutlined as EditOutlineIcon,
   AddCommentOutlined as AddCommentOutlinedIcon,
+  DescriptionOutlined as DescriptionOutlinedIcon,
 } from '@material-ui/icons';
 
 // Custom components
@@ -66,6 +67,7 @@ import {
   ProgramMemberFilterType,
   ProgramMemberType,
 } from 'redux/globalState/programMembers/types';
+import ContractReceivedModal from 'components/Modals/ContractReceivedModal';
 
 interface IProgramMembersTableProps {
   data: ProgramMemberType[];
@@ -112,6 +114,19 @@ const ProgramMembersTable: React.FC<IProgramMembersTableProps> = (
     }
     newFilter.orderBy = property;
     setNewFilter(newFilter);
+  };
+
+  const [
+    showContractReceivedModal,
+    setShowContractReceivedModal,
+  ] = useState<ProgramMemberType | null>(null);
+
+  const onOpenContractReceivedModal = (data: ProgramMemberType) => {
+    setShowContractReceivedModal(data);
+  };
+
+  const onCloseContractReceivedModal = () => {
+    setShowContractReceivedModal(null);
   };
 
   return (
@@ -203,7 +218,6 @@ const ProgramMembersTable: React.FC<IProgramMembersTableProps> = (
                           id: 'phone',
                           label: t('common:Mobile phone number'),
                         },
-
                         {
                           id: 'trainingTimestamp',
                           label: t('common:Information event date'),
@@ -317,6 +331,26 @@ const ProgramMembersTable: React.FC<IProgramMembersTableProps> = (
                                       </Tooltip>
                                     )}
                                   </Grid>
+                                  <Grid item>
+                                    <Tooltip
+                                      title={`${t(
+                                        'common:Contract received',
+                                      )}`}>
+                                      <span>
+                                        <IconButton
+                                          color="primary"
+                                          size="small"
+                                          disabled={item.isContractReceived}
+                                          onClick={() =>
+                                            onOpenContractReceivedModal(item)
+                                          }>
+                                          <DescriptionOutlinedIcon
+                                            style={{ fontSize: 20 }}
+                                          />
+                                        </IconButton>
+                                      </span>
+                                    </Tooltip>
+                                  </Grid>
                                 </Grid>
                               </TableCell>
                             )}
@@ -406,6 +440,12 @@ const ProgramMembersTable: React.FC<IProgramMembersTableProps> = (
           </Grid>
         </Grid>
       </Grid>
+      {showContractReceivedModal && (
+        <ContractReceivedModal
+          onClose={onCloseContractReceivedModal}
+          data={showContractReceivedModal}
+        />
+      )}
     </>
   );
 };

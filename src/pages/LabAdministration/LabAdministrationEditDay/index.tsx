@@ -70,6 +70,17 @@ const LabAdministrationEditDay: React.FC<LabAdministrationEditDayType> = () => {
       state.laboratoryAdministrationEditDay.addEmployeeToShiftStatus,
   );
 
+  const addTemporaryEmployeeToShiftStatus = useSelector(
+    (state: RootState) =>
+      state.laboratoryAdministrationEditDay.addTemporaryEmployeeToShiftStatus,
+  );
+
+  const removeTemporaryEmployeeFromShiftStatus = useSelector(
+    (state: RootState) =>
+      state.laboratoryAdministrationEditDay
+        .removeTemporaryEmployeeFromShiftStatus,
+  );
+
   const increaseShiftCountForDayStatus = useSelector(
     (state: RootState) =>
       state.laboratoryAdministrationEditDay.increaseShiftCountForDayStatus,
@@ -82,7 +93,6 @@ const LabAdministrationEditDay: React.FC<LabAdministrationEditDayType> = () => {
 
   useLayoutEffect(() => {
     if (isProvidedDateValid) {
-      console.log('isProvidedDateValid: ', isProvidedDateValid);
       dispatch(
         getLaboratoryAdministrationEditDayData({
           date: reactParams.date,
@@ -95,7 +105,9 @@ const LabAdministrationEditDay: React.FC<LabAdministrationEditDayType> = () => {
     if (
       removeConfirmedPersonStatus.success ||
       addEmployeeToShiftStatus.success ||
-      increaseShiftCountForDayStatus.success
+      increaseShiftCountForDayStatus.success ||
+      addTemporaryEmployeeToShiftStatus.success ||
+      removeTemporaryEmployeeFromShiftStatus.success
     ) {
       dispatch(
         getLaboratoryAdministrationEditDayData({
@@ -110,6 +122,8 @@ const LabAdministrationEditDay: React.FC<LabAdministrationEditDayType> = () => {
     removeConfirmedPersonStatus,
     addEmployeeToShiftStatus,
     increaseShiftCountForDayStatus,
+    addTemporaryEmployeeToShiftStatus,
+    removeTemporaryEmployeeFromShiftStatus,
   ]);
 
   const isLoading = getDayDataStatus.requesting;

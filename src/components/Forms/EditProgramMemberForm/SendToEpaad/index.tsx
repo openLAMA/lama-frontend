@@ -17,12 +17,13 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch, batch } from 'react-redux';
 
 // Custom components
 import ButtonWithLoadingAnimation from 'components/Buttons/ButtonWithLoadingAnimation';
+import CampsSendToEpaadModal from 'components/Modals/CampsSendToEpaadModal';
 
 // Actions
 import {
@@ -40,6 +41,8 @@ const SendToEpaad: React.FC = () => {
   const dispatch = useDispatch();
 
   const { t } = useTranslation();
+
+  const [openCampModal, setCampModal] = useState<boolean>(false);
 
   const programMember = useSelector(
     (state: RootState) => state.editProgramMemberData.programMember,
@@ -61,7 +64,11 @@ const SendToEpaad: React.FC = () => {
   }, [pushToEpaadProgramMemberStatus]);
 
   const onSendToEpaad = () => {
-    dispatch(pushToEpaadProgramMember(programMember));
+    if (programMember.organizationTypeId === organizationTypesEnum.CAMP) {
+      setCampModal(true);
+    } else {
+      dispatch(pushToEpaadProgramMember(programMember));
+    }
   };
 
   const isReadOnly = programMember.status === programMemberStatusEnum.NotActive;
@@ -83,6 +90,14 @@ const SendToEpaad: React.FC = () => {
           programMember.organizationTypeId === organizationTypesEnum.School
         }
       />
+      {openCampModal && (
+        <CampsSendToEpaadModal
+          onClose={() => {
+            setCampModal(false);
+          }}
+          programMemberId={programMember.id}
+        />
+      )}
     </>
   );
 };

@@ -8,5 +8,15 @@
   "Are you sure you want to remove this person?": "Soll die person wirklich entfernt werden?",
   "Remove X from this date": "'{{username}}' vom Einsatz entfernen",
   "Add employee to morning shift": "Person hinzufügen",
-  "Add employee to afternoon shift": "Person hinzufügen"
+  "Add employee to afternoon shift": "Person hinzufügen",
+  "Add state": "Kanton Hinzufügen",
+  "Edit state": "Hinzufügen",
+  "Are you sure you want to delete this state?": "Kanton wirklich löschen?",
+  "Remove X from this shift": "Folgende Person entfernen: {{username}}",
+  "Contract received?": "Vertrag Erhalten?",
+  "Are you sure organization X received the contract?": "Sind Sie sicher, dass die Organisation: {{name}} den Vertrag erhalten hat?",
+  "Re-activate this program member?": "Organisation re-aktivieren?",
+  "Are you sure you want to re-activate this program member?": "Organisation re-aktivieren?",
+  "Epaad onboarding date": "Epaad Onboarding Daten",
+  "Are you sure you want to send this organization data to?": "Sollen die Daten an die folgende Adresse geschickt werden?"
 }

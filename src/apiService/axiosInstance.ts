@@ -134,7 +134,8 @@ const getErrorMessage = (error: AxiosError) => {
     showGenericMessage: true,
   };
   let hasDynamicError = false;
-  if (!errorData || typeof errorData === 'string') return errorObject;
+  if (!errorData || !errorData.errors || typeof errorData === 'string')
+    return errorObject;
 
   Object.keys(errorMessagesMapping).forEach((key) => {
     if (errorData.errors[key]) {

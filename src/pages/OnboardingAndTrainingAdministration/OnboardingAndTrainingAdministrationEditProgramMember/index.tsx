@@ -31,6 +31,8 @@ import EditProgramMemberForm from 'components/Forms/EditProgramMemberForm';
 import LoadingSwapComponent from 'components/loaders/LoadingSwapComponent';
 import DeactiveProgramMember from 'components/Forms/EditProgramMemberForm/DeactiveProgramMember';
 import SendToEpaad from 'components/Forms/EditProgramMemberForm/SendToEpaad';
+import FollowUpEmail from 'components/Forms/EditProgramMemberForm/FollowUpEmail';
+import StaticPooling from 'components/Forms/EditProgramMemberForm/StaticPooling';
 
 // Actions
 import { getCities } from 'redux/globalState/citiesData/citiesDataSlice';
@@ -42,7 +44,6 @@ import { OnboardingAndTrainingAdministrationRoutes } from 'config/routes';
 
 // Utils
 import { RootState } from 'redux/combineReducers';
-import FollowUpEmail from 'components/Forms/EditProgramMemberForm/FollowUpEmail';
 
 // Types
 type OnboardingAndTrainingAdministrationEditProgramMemberType = RouteProps;
@@ -95,14 +96,14 @@ const OnboardingAndTrainingAdministrationEditProgramMember: React.FC<OnboardingA
       dispatch(getProgramMember(reactParams.id));
       setOpenFollowUpModal(false);
     }
-  }, [followUpEmailStatus]);
+  }, [followUpEmailStatus.success]);
 
   useEffect(() => {
     if (programMemberStatus.requesting) {
       setOpenFollowUpModal(false);
       setDisableFollowUpModal(false);
     }
-  }, [programMemberStatus]);
+  }, [programMemberStatus.requesting]);
 
   const isLoading =
     citiesStatus.requesting ||
@@ -131,10 +132,10 @@ const OnboardingAndTrainingAdministrationEditProgramMember: React.FC<OnboardingA
         <LoadingSwapComponent isLoading={isLoading} center text={text}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
-              <Grid container justify="flex-end" alignItems="center">
-                {/* <Grid item>
-                  <FollowUpChange />
-                </Grid> */}
+              <Grid container justify="space-between" alignItems="center">
+                <Grid item>
+                  <StaticPooling />
+                </Grid>
                 <Grid item>
                   <Grid container spacing={2}>
                     <Grid item>
@@ -158,7 +159,7 @@ const OnboardingAndTrainingAdministrationEditProgramMember: React.FC<OnboardingA
             </Grid>
             <Grid item xs={12}>
               <Grid item>
-                {/* add props ? isReadOnly */}
+                {/* TODO add props ? isReadOnly */}
                 <EditProgramMemberForm
                   onOpenFollowUpModal={() => {
                     if (!followUpEmailStatus.success) {

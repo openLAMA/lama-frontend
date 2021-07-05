@@ -23,6 +23,11 @@ import { APIMethods } from 'apiService/types';
 import {
   GetCapacityOverviewResponseType,
   GetCapacityOverviewRequestType,
+  AddStateRequestType,
+  GetStateRequestType,
+  GetStateResponseType,
+  UpdateStateRequestType,
+  RemoveStateRequestType,
 } from 'redux/globalState/capacity/types';
 
 export const getCapacityOverviewAPI = async (
@@ -32,4 +37,37 @@ export const getCapacityOverviewAPI = async (
     url: 'laboratory/tests',
     method: APIMethods.GET,
     params,
+  });
+
+export const addStateAPI = async (data: AddStateRequestType): Promise<null> =>
+  HttpClient.request<null>({
+    url: 'laboratory/cantons',
+    method: APIMethods.POST,
+    data,
+  });
+
+export const getStateAPI = async (
+  params: GetStateRequestType,
+): Promise<GetStateResponseType> =>
+  HttpClient.request<GetStateResponseType>({
+    url: `laboratory/cantons/${params.id}`,
+    method: APIMethods.GET,
+    params,
+  });
+
+export const updateStateAPI = async (
+  data: UpdateStateRequestType,
+): Promise<null> =>
+  HttpClient.request<null>({
+    url: 'laboratory/cantons',
+    method: APIMethods.PUT,
+    data,
+  });
+
+export const removeStateAPI = async (
+  data: RemoveStateRequestType,
+): Promise<null> =>
+  HttpClient.request<null>({
+    url: `laboratory/cantons/${data.id}`,
+    method: APIMethods.DELETE,
   });

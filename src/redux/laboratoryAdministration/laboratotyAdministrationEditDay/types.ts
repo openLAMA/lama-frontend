@@ -49,3 +49,25 @@ export type IncreaseShiftCountForDayLaboratoryAdministrationRequestType = {
   invitationId: string;
   shiftNumber: CapacityShiftType;
 };
+
+export type GetLaboratoryAdministrationTemporaryEmployeesRequestType = {
+  date: string;
+  shiftNumber: CapacityShiftType;
+};
+
+export type LaboratoryTemporaryEmployeeType = {
+  testingPersonnelId: string;
+  name: string;
+};
+
+export type GetLaboratoryAdministrationTemporaryEmployeesResponseType = LaboratoryTemporaryEmployeeType[];
+
+export type AddLaboratoryAdministrationTemporaryEmployeeToShiftRequestType = {
+  testingPersonnelId: string;
+  date: string;
+  shiftNumber: CapacityShiftType;
+};
+
+export type RemoveLaboratoryAdministrationTemporaryEmploeeRequestType = {
+  id: string;
+};

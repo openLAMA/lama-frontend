@@ -65,31 +65,24 @@ const FollowUpSMESummaryCard: React.FC = () => {
                 key: `2-${programMember.area || '2'}`,
               },
               {
-                mainText: t('common:Onboarding date'),
-                subText: formatDateToMonthDotDayDotFullYear(
-                  programMember.onboardingTimestamp,
-                ),
-                key: `3-${programMember.onboardingTimestamp || '3'}`,
-              },
-              {
                 mainText: t('common:Organization key'),
                 subText:
                   programMember.organizationShortcutName ||
                   `${t('common:Missing, please fill!')}`,
-                key: `4-${programMember.organizationShortcutName || '4'}`,
+                key: `3-${programMember.organizationShortcutName || '3'}`,
                 error: !Boolean(programMember.organizationShortcutName),
               },
               {
                 mainText: t('common:Testing day'),
                 subText: getDayName(programMember.firstTestTimestamp),
-                key: `5-${programMember.firstTestTimestamp || '5'}`,
+                key: `4-${programMember.firstTestTimestamp || '4'}`,
               },
               {
                 mainText: t('common:Starting date'),
                 subText: formatDateToMonthDotDayDotFullYear(
                   programMember.firstTestTimestamp,
                 ),
-                key: `6-${programMember.firstTestTimestamp || '6'}`,
+                key: `5-${programMember.firstTestTimestamp || '5'}`,
               },
             ]}
           />

@@ -25,8 +25,33 @@ import { IconButton } from '@material-ui/core';
 // Material Icons
 import { AccountCircle as AccountCircleIcon } from '@material-ui/icons';
 
-// Not used
-const ProfileIcon: React.FC = () => {
+// Utils
+import extractFirstLetterOfName from 'utils/extractFirstLetterOfName';
+
+type ProfileIconPropsType = {
+  name?: string;
+};
+
+import styles from './profileIcon.module.scss';
+
+const ProfileIcon: React.FC<ProfileIconPropsType> = (
+  props: ProfileIconPropsType,
+) => {
+  const { name } = props;
+  const extractedLetters = extractFirstLetterOfName(name);
+
+  if (extractedLetters) {
+    return (
+      <IconButton
+        aria-label="account of current user"
+        aria-controls="menuId"
+        aria-haspopup="true"
+        onClick={() => console.log('')}>
+        <div className={styles['letters-circle']}>{extractedLetters}</div>
+      </IconButton>
+    );
+  }
+
   return (
     <IconButton
       aria-label="account of current user"

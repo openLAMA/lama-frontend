@@ -209,7 +209,7 @@ const AddTestingPersonalModal: React.FC<ITestingPersonalModalProps> = (
                 <DropdownControllerInput
                   control={control}
                   name="type"
-                  label={t('common:Type')}
+                  label={t('common:Type of support person')}
                   labelId="testing-personnel-type"
                   id="testing-personnel-select"
                   fieldRequired

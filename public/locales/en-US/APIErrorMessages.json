@@ -83,5 +83,16 @@
   "Cancelation for testing personnel for date X already exists": "Cancelation for testing personnel for {{date}} already exists!",
   "Failed to increase shift count": "Failed to increase shift count",
   "The invitation was not found": "The invitation was not found",
-  "User that you want to delete is assigned to an Organization": "User that you want to delete is assigned to an Organization: '{{emails}}'"
+  "User that you want to delete is assigned to an Organization": "User that you want to delete is assigned to an Organization: '{{emails}}'",
+  "Failed to add new state!": "Failed to add new state!",
+  "Failed to get state!": "Failed to get state!",
+  "Failed to update state!": "Failed to update state!",
+  "Failed to remove state!": "Failed to remove state!",
+  "Canton with this Name already exists": "Canton with this Name already exists",
+  "This canton already exists!": "This canton already exists!",
+  "Date should be greater than today": "Date should be greater than today",
+  "Confirmation for testing personnel for date and shift already exists": "Confirmation for testing personnel for date and shift already exists",
+  "Failed to update static pooling status!": "Failed to update static pooling status!",
+  "Failed to set contract received status!": "Failed to set contract received status!",
+  "Failed to re-activate a program member!": "Failed to re-activate a program member!"
 }

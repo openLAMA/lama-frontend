@@ -84,6 +84,10 @@ const ProgramMemberContainer: React.FC<IProgramMembersContainerProps> = (
     (state: RootState) => state.followUpEmail.followUpEmailStatus,
   );
 
+  const setContractReceivedStatus = useSelector(
+    (state: RootState) => state.programMembersData.setContractReceivedStatus,
+  );
+
   const filter = useSelector(
     (state: RootState) => state.programMembersData.filter,
   );
@@ -136,6 +140,12 @@ const ProgramMemberContainer: React.FC<IProgramMembersContainerProps> = (
       fetchData();
     }
   }, [followUpEmailStatus]);
+
+  useEffect(() => {
+    if (setContractReceivedStatus.success) {
+      fetchData();
+    }
+  }, [setContractReceivedStatus]);
 
   let filteredResults = programMembersTableData.result;
 
