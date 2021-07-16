@@ -67,3 +67,112 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/co
 ### Analyzing the Bundle Size
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size
+
+### Environment variables
+
+.env.develop
+.env.staging
+.env.production
+
+These files contain global variables that are used throughout the application.
+
+When running the command `npm run start` to run the project locally, the system is using the .env.develop file.
+
+When running the command `npm run build:stating` to build the project for a staging environment the .env.staging is used.
+
+When running the command `npm run build` to build the project for production, the .env.production is used.
+
+Variable REACT_APP_API_ENDPOINT_URL contains the base url used in axios to connect to the .NET API endpoints.
+
+Variable REACT_APP_DEFAULT_SUPPORT_PERSON_EMAIL contains the email for the support person
+
+Variable REACT_APP_CC_RECEIVER contains the email for the CC emails.
+
+You will see that the REACT_APP_API_ENDPOINT_URL in the .env.development file is a localhost url. This is because the .NET API does not run on the same domain as the front end. In order to get no CORS errors, a proxy server is needed.
+
+The package i'm using is this [local-cors-proxy](https://www.npmjs.com/package/local-cors-proxy).
+
+The command to start the proxy is this
+
+### `lcp --proxyUrl https://fastly-api-dev.primeholding.com`
+
+### Deployment
+
+For production the project is build locally using the "Run build" command and then the "build" folder is zip.
+TODO finish this.
+
+For the staging, we are using the company's jenkins server, which is proprietary, please ask for the Devops documentation for more details.
+
+### Project structure.
+
+.vscode - vscode configurations
+nginx - nginx config.
+public - static files like the main index.html, favicons and translations.
+src - main code.
+... other configuration files.
+
+### `src folder`
+
+apiService - contains an Axios instance.
+
+assets - logos and other images that are used dynamically in code.
+
+components - main components
+
+config - contains the routes config that is used to automatically map each route using metadata.
+
+formValidation - contains functions that are used in the `FormControllerInputs` components for the React Hook Form library.
+
+pages - contains pages that are separated by the roles.
+
+redux - Redux library to store and maintain the global state.
+
+styles - global scss.
+
+translation - contains the instance of the translations library.
+
+utils - contains various files for functions that are called in multiple places and enums.
+
+### `How the project works`
+
+Everything starts from the main index.tsx file. There will be found the Material UI Theme provider, a global Suspense loader, the Provider for Redux, a global Error boundary component, Persistor, Translator, Snackbar and the App.
+
+In the App.tsx there is the Router, Snackbar viewer component, MainDataLoadingContainerWrapper to load any initial data before the main render.
+Router switch handles the Auth and UnAuth Pages.
+This is also the place where we set the default language for the web application, in this case German.
+
+AuthenticatedRoute is used to map the routes based on the user role after we login. Here we specify the path, the authKey which is used to check against the logged in users role and the component to load in. The component contains the main internal routes for that role.
+
+UnauthenticatedRoute handles all routes that don't require the user to be logged in.
+
+The MainDataLoadingContainerWrapper component downloads some global data from the API that is not constantly updated.
+It fetches all Cities and Organization Types that are used throughout the application.
+If this fails to fetch them it won't load the rest of the application but will show an error message instead.
+
+There are 5 roles.
+Lab - The laboratory
+Logistics - not used - currently it has the initial PoC of Temis AI on it.
+Onboarding and training - The university
+Organization - each organization.
+Unathenticated - login, registering, email validation and other.
+
+Each "role" has a main index file that contains the Navbar component if we want to have something custom for each role.
+NavDrawer which is the main navigation component, unique for each role.
+And the main RouterMapping controller which maps/creates automatically each route based on the "routes" config file mentioned above.
+
+Example of how a page works. Using "LabAdministrationEditDay".
+
+Using the "useParams()" we get the params from the url and dispatch (getLaboratoryAdministrationEditDayData) a fetch function to get the data necessary to view and edit.
+Dispatch call a Thunk middleware, we call the "getDayDataRequesting" function to set the correct flags before the API call is made.
+We call the API endpoint using "getLaboratoryAdministrationEditDayDataAPI". This function called our HttpClient object which contains the axios instance. The axios instance is using a config to add the base url depending on the environment. This instance also handles the error validation and parsing of messages in order to be shown on the UI.
+On response we return the response to the "getDayDataSuccess" function which saves the data in state and adjust the flags.
+On error we return the ErrorObject and pass it to the Error function if we expect to have dynamic error translations, if not we just call a default error message function "extractErrorMessage".
+
+It's a MUST to have all 3 functions in the Thunk middleware.
+"Requesting", "Success", "Error".
+
+Inside the redux folder, we have a global auth and authData states that handle login in/out, saving state and persisting it inside the browser storage.
+
+We have a global folder for states that are used in different roles. For example, "supportPerson" is used in every profile view/edit on all roles.
+
+snackbar state controls the snackbar messages like Success, Information, Warning and Error.
