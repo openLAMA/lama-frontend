@@ -282,12 +282,13 @@ const editProgramMemberSlice = createSlice({
         failure: false,
       };
     },
-    updateStaticPoolingStatusSuccess(state) {
+    updateStaticPoolingStatusSuccess(state, action: PayloadAction<boolean>) {
       state.updateStaticPoolingStatus = {
         requesting: false,
         success: true,
         failure: false,
       };
+      state.programMember.isStaticPooling = action.payload;
     },
     updateStaticPoolingStatusFailed(state) {
       state.updateStaticPoolingStatus = {
@@ -504,7 +505,7 @@ export const updateStaticPoolingStatus = (
   dispatch(updateStaticPoolingStatusRequesting());
   updateStaticPoolingStatusAPI(data).then(
     (): void => {
-      dispatch(updateStaticPoolingStatusSuccess());
+      dispatch(updateStaticPoolingStatusSuccess(data.isStaticPooling));
       callSnackbar({
         message: 'Successfully updated static pooling status!',
         messageType: 'success',

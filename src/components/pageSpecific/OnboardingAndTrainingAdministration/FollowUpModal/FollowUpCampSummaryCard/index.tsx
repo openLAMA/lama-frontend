@@ -55,7 +55,7 @@ const FollowUpCampSummaryCard: React.FC = () => {
                 key: `1-numberOfSamples`,
                 error: !Boolean(
                   programMember?.numberOfSamples &&
-                    programMember?.numberOfSamples < 0,
+                    programMember?.numberOfSamples > 0,
                 ),
               },
               {
