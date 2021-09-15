@@ -540,6 +540,7 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
           ref={csvRef}
           data={dataCsv}
           headers={headers}
+          separator={';'}
           filename={`Lama_${formatDateToMonthDayFullYear(new Date())}.csv`}
         />
       </Grid>

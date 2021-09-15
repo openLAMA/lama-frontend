@@ -66,6 +66,8 @@ const SendToEpaad: React.FC = () => {
   const onSendToEpaad = () => {
     if (programMember.organizationTypeId === organizationTypesEnum.CAMP) {
       setCampModal(true);
+    } else if (programMember.isStaticPooling) {
+      setCampModal(true);
     } else {
       dispatch(pushToEpaadProgramMember(programMember));
     }
