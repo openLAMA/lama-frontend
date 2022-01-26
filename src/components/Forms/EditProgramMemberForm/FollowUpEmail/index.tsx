@@ -83,10 +83,9 @@ const FollowUpEmail: React.FC<FollowUpEmailPropsType> = (
   if (disabled) {
     isFollowUpActionVisible = false;
   }
-  // if (programMember.isOnboardingEmailSent) {
-  //   isFollowUpActionVisible = false;
-  // } else
-  if (programMember.status === programMemberStatusEnum.NotActive) {
+   if (programMember.isOnboardingEmailSent) {
+     isFollowUpActionVisible = false;
+   } else if (programMember.status === programMemberStatusEnum.NotActive) {
     isFollowUpActionVisible = false;
   } else if (
     programMember.organizationTypeId === organizationTypesEnum.Company ||
