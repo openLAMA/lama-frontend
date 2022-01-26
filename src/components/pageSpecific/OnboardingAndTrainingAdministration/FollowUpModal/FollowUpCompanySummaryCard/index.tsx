@@ -70,7 +70,7 @@ const FollowUpCompanySummaryCard: React.FC = () => {
               },
               {
                 mainText: t('common:Organization key'),
-                subText: programMember.organizationShortcutName || ' ',
+                subText: programMember.organizationShortcutName || 'N/A',
                 key: `3-${programMember.organizationShortcutName || '4'}`,
                 error: false,
               },
