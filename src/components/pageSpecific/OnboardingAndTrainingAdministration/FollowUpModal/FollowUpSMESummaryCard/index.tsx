@@ -53,7 +53,7 @@ const FollowUpSMESummaryCard: React.FC = () => {
             arrayOfItems={[
               {
                 mainText: t('common:Epaad id'),
-                subText: programMember.epaadId || ' ',
+                subText: programMember.epaadId || 'N/A',
                 key: `1-${programMember.epaadId || '1'}`,
               },
               {

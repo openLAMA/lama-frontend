@@ -36,7 +36,7 @@ const OnboardingAndTrainingAdministrationCalendar: React.FC<OnboardingAndTrainin
         frameBorder="0"
         height="98%"
         width="100%"
-        src="https://kalender.digital/d4edf3b8189664a654f7?iframe=true"></iframe>
+        src="https://kalender.digital/412f07c91ef64afb4977?iframe=true"></iframe>
     </>
   );
 };
