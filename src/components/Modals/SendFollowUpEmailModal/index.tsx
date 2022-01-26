@@ -174,15 +174,15 @@ const SendFollowUpEmailModal: React.FC<ISendFollowUpEmailModalProps> = (
         disabledSendButton = true;
       }
     }
-    if (programMember.isOnboardingEmailSent) {
-      disabledSendButton = true;
-    }
+    // if (programMember.isOnboardingEmailSent) {
+    //   disabledSendButton = true;
+    // }
     // if (!programMember.organizationShortcutName) {
     //   disabledSendButton = true;
     // }
-    if (!programMember.epaadId) {
-      disabledSendButton = true;
-    }
+    // if (!programMember.epaadId) {
+    //   disabledSendButton = true;
+    // }
     if (programMember.status === programMemberStatusEnum.NotActive) {
       disabledSendButton = true;
     }
