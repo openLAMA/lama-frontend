@@ -177,9 +177,9 @@ const SendFollowUpEmailModal: React.FC<ISendFollowUpEmailModalProps> = (
     if (programMember.isOnboardingEmailSent) {
       disabledSendButton = true;
     }
-    if (!programMember.organizationShortcutName) {
-      disabledSendButton = true;
-    }
+    // if (!programMember.organizationShortcutName) {
+    //   disabledSendButton = true;
+    // }
     if (!programMember.epaadId) {
       disabledSendButton = true;
     }
