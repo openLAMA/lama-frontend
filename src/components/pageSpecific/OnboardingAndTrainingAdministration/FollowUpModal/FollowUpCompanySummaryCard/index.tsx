@@ -73,11 +73,9 @@ const FollowUpCompanySummaryCard: React.FC = () => {
               },
               {
                 mainText: t('common:Organization key'),
-                subText:
-                  programMember.organizationShortcutName ||
-                  `${t('common:Missing, please fill!')}`,
+                subText: programMember.organizationShortcutName || '',
                 key: `3-${programMember.organizationShortcutName || '4'}`,
-                error: !Boolean(programMember.organizationShortcutName),
+                error: false,
               },
             ]}
           />
