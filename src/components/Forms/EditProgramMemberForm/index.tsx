@@ -350,14 +350,14 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
             openFollowUpModal = false;
             disableFollowUpModal();
           }
-          if (!Boolean(programMember.organizationShortcutName)) {
-            setError('organizationShortcutName', {
-              type: 'manual',
-              message: t('formValidation:Field is required!'),
-            });
-            openFollowUpModal = false;
-            disableFollowUpModal();
-          }
+          // if (!Boolean(programMember.organizationShortcutName)) {
+          //   setError('organizationShortcutName', {
+          //     type: 'manual',
+          //     message: t('formValidation:Field is required!'),
+          //   });
+          //   openFollowUpModal = false;
+          //   disableFollowUpModal();
+          // }
           if (openFollowUpModal) {
             onOpenFollowUpModal();
           }
