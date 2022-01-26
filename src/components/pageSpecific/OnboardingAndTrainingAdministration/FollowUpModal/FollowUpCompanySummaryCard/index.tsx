@@ -49,11 +49,8 @@ const FollowUpCompanySummaryCard: React.FC = () => {
             arrayOfItems={[
               {
                 mainText: t('common:Epaad id'),
-                subText:
-                  programMember.epaadId ||
-                  `${t('common:Missing, please fill!')}`,
+                subText: programMember.epaadId || ' ',
                 key: `1-${programMember.epaadId || '1'}`,
-                error: !Boolean(programMember.epaadId),
               },
               {
                 mainText: t('common:Support person'),

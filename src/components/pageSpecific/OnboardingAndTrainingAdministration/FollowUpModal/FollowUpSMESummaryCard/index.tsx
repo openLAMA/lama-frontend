@@ -53,11 +53,8 @@ const FollowUpSMESummaryCard: React.FC = () => {
             arrayOfItems={[
               {
                 mainText: t('common:Epaad id'),
-                subText:
-                  programMember.epaadId ||
-                  `${t('common:Missing, please fill!')}`,
+                subText: programMember.epaadId || ' ',
                 key: `1-${programMember.epaadId || '1'}`,
-                error: !Boolean(programMember.epaadId),
               },
               {
                 mainText: t('common:Area'),
@@ -68,7 +65,6 @@ const FollowUpSMESummaryCard: React.FC = () => {
                 mainText: t('common:Organization key'),
                 subText: programMember.organizationShortcutName || ' ',
                 key: `3-${programMember.organizationShortcutName || '3'}`,
-                error: false,
               },
               {
                 mainText: t('common:Testing day'),
