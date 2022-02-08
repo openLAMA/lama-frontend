@@ -57,6 +57,7 @@ import {
   formatDateToMonthDotDayDotFullYear,
   getDayName,
 } from 'utils/dateFNSCustom';
+import { exportDataAPI } from 'redux/util/utilApi';
 
 interface IProgramMembersFilterProps {
   data: ProgramMemberType[];
@@ -227,11 +228,19 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
   const handleFilterAssignedToMe = () => {
     setFilterAssignedToMe(!filter.filterAssignedToMe);
   };
-
-  const onExportToCSV = () => {
-    if (csvRef?.current) {
+  const onExportToCSV = async () => {
+    /*if (csvRef?.current) {
       csvRef?.current?.link?.click();
-    }
+    }*/
+    const response = await exportDataAPI();
+    const link = document.createElement('a');
+    link.setAttribute(
+      'href',
+      'data:text/csv;charset=utf-8,' + encodeURIComponent(response),
+    );
+    link.setAttribute('download', 'data.csv');
+    document.body.appendChild(link);
+    link.click();
   };
 
   const dataCsv = data
@@ -380,7 +389,6 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
   ) {
     noFilters = false;
   }
-
   return (
     <Grid container spacing={2}>
       {!noFilters && (
