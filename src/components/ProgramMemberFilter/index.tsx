@@ -236,7 +236,7 @@ const ProgramMemberFilter: React.FC<IProgramMembersFilterProps> = (
     const link = document.createElement('a');
     link.setAttribute(
       'href',
-      'data:text/csv;charset=utf-8,' + encodeURIComponent(response),
+      'data:text/csv;charset=utf-8,%EF%BB%BF' + encodeURIComponent(response),
     );
     link.setAttribute('download', 'data.csv');
     document.body.appendChild(link);
