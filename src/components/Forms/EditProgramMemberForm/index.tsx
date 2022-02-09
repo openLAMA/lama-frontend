@@ -91,6 +91,8 @@ import organizationTypesEnum from 'utils/organizationTypesEnum';
 // Form validations
 import { fieldRequired } from 'formValidation';
 
+import styles from './form.module.scss';
+
 const schoolsTypes = [
   {
     id: 'Berufsfachschule',
@@ -882,9 +884,9 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                           />
                         </Grid>
 
-                        <Grid item>
+                        <Grid item className={`${styles.pd} `}>
                           <Typography variant="h6">
-                            {t('common:Reporting details')}
+                            {t('common:Reporting Kontakt')}
                           </Typography>
                         </Grid>
 
