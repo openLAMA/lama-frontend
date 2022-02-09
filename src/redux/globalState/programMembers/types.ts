@@ -81,6 +81,8 @@ export type ProgramMemberType = {
   isOnboardingEmailSent?: boolean;
   isStaticPooling?: boolean;
   isContractReceived?: boolean;
+  ReportingContact?: string;
+  ReportingEmail?: string;
 };
 
 export type FollowUpStatusType = 'NotSent' | 'Sent' | 'Accepted' | 'Declined';
