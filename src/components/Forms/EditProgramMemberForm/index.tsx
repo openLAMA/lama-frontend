@@ -217,6 +217,8 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
       pickupLocation: programMember?.pickupLocation || '',
       contacts: programMember?.contacts || [],
       organizationShortcutName: programMember?.organizationShortcutName || '',
+      reportingContact: programMember?.reportingContact || '',
+      reportingEmail: programMember?.reportingEmail || '',
     },
   });
 
@@ -433,6 +435,8 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
         status: programMember?.status,
         registeredEmployees: programMember?.registeredEmployees,
         organizationShortcutName: values?.organizationShortcutName,
+        reportingContact: values?.reportingContact,
+        reportingEmail: values?.reportingEmail,
       };
       dispatch(updateProgramMember(data));
     }
@@ -698,6 +702,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                         </Grid>
                       </Grid>
                     </Grid>
+
                     <Grid item xs={12} md={6} lg={3}>
                       <Grid container direction="column" spacing={2}>
                         <Grid item>
@@ -812,6 +817,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                         </Grid>
                       </Grid>
                     </Grid>
+
                     <Grid item xs={12} md={6} lg={3}>
                       <Grid container direction="column" spacing={2}>
                         <Grid item>
@@ -875,8 +881,39 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
+
+                        <Grid item>
+                          <Typography variant="h6">
+                            {t('common:Reporting details')}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item>
+                          <TextControllerInput
+                            control={control}
+                            name="reportingContact"
+                            label={t('common:Name')}
+                            id="reporting-contact-input"
+                            error={Boolean(errors?.reportingContact?.message)}
+                            errorMessage={errors?.reportingContact?.message}
+                            disabled={isUpdating || isReadOnly}
+                          />
+                        </Grid>
+
+                        <Grid item>
+                          <TextControllerInput
+                            control={control}
+                            name="reportingEmail"
+                            label={t('common:Email')}
+                            id="reporting-email-input"
+                            error={Boolean(errors?.reportingEmail?.message)}
+                            errorMessage={errors?.reportingEmail?.message}
+                            disabled={isUpdating || isReadOnly}
+                          />
+                        </Grid>
                       </Grid>
                     </Grid>
+
                     <Grid item xs={12} md={6} lg={3}>
                       <Grid
                         container
