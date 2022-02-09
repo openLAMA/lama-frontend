@@ -217,8 +217,8 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
       pickupLocation: programMember?.pickupLocation || '',
       contacts: programMember?.contacts || [],
       organizationShortcutName: programMember?.organizationShortcutName || '',
-      reportingContact: programMember?.ReportingContact || '',
-      reportingEmail: programMember?.ReportingEmail || '',
+      reportingContact: programMember?.reportingContact || '',
+      reportingEmail: programMember?.reportingEmail || '',
     },
   });
 
@@ -435,8 +435,8 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
         status: programMember?.status,
         registeredEmployees: programMember?.registeredEmployees,
         organizationShortcutName: values?.organizationShortcutName,
-        ReportingContact: values?.reportingContact,
-        ReportingEmail: values?.reportingEmail,
+        reportingContact: values?.reportingContact,
+        reportingEmail: values?.reportingEmail,
       };
       dispatch(updateProgramMember(data));
     }

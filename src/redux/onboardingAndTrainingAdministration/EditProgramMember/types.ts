@@ -77,8 +77,8 @@ export type PutProgramMemberType = {
   numberOfRakoBoxes?: number | null;
   pickupLocation?: string | null;
   organizationShortcutName?: string | null;
-  ReportingContact?: string;
-  ReportingEmail?: string;
+  reportingContact?: string;
+  reportingEmail?: string;
 };
 
 export type GetProgramMemberRequestType = string;
