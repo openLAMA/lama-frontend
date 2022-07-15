@@ -52,6 +52,11 @@ export type SupportPersonSelectType = {
   name: string;
 };
 
+export type AttributType = {
+  id: string;
+  name: string;
+};
+
 export type ContactPersonType = {
   id?: string;
   email: string;
