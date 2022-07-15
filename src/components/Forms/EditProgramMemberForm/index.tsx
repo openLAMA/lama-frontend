@@ -163,7 +163,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
   const attributData: AttributType[] = [
     {
       id: '',
-      name: 'Select Attribut',
+      name: '',
     },
     {
       id: 'APH',
@@ -582,7 +582,11 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                               (item: AttributType) => {
                                 return (
                                   <MenuItem key={item.id} value={item.id}>
-                                    {item.name}
+                                    {item.name ? (
+                                      item.name
+                                    ) : (
+                                      <span style={{ opacity: 0 }}>Select</span>
+                                    )}
                                   </MenuItem>
                                 );
                               },
