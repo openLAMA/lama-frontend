@@ -162,6 +162,10 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
 
   const attributData: AttributType[] = [
     {
+      id: '',
+      name: 'Select Attribut',
+    },
+    {
       id: 'APH',
       name: 'APH',
     },
