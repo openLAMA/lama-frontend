@@ -78,6 +78,8 @@ export type PutProgramMemberType = {
   pickupLocation?: string | null;
   organizationShortcutName?: string | null;
   attribut?: string | null;
+  reportingContact?: string;
+  reportingEmail?: string;
 };
 
 export type GetProgramMemberRequestType = string;

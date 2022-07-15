@@ -98,8 +98,8 @@ The command to start the proxy is this
 
 ### Deployment
 
-For production the project is build locally using the "Run build" command and then the "build" folder is zip.
-TODO finish this.
+For production the project is build locally using the "Run build" command and then the "build" folder is zipped and deployed.
+Look at the documentation for the deployment process.
 
 For the staging, we are using the company's jenkins server, which is proprietary, please ask for the Devops documentation for more details.
 
@@ -132,6 +132,13 @@ styles - global scss.
 translation - contains the instance of the translations library.
 
 utils - contains various files for functions that are called in multiple places and enums.
+
+### `Translations`
+
+Very important! Everytime a translation is updated (public/locales/{{language}}), in the instance of i18next,
+you need to update the versions of the translations in order for the library to re-download the new files and,
+save them in the browser storage.
+File located in src/translation/i18n.js line 53 (defaultVersion: 'v0.2.87',). Update the version.
 
 ### `How the project works`
 

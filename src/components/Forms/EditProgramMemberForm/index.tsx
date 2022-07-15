@@ -92,6 +92,8 @@ import organizationTypesEnum from 'utils/organizationTypesEnum';
 // Form validations
 import { fieldRequired } from 'formValidation';
 
+import styles from './form.module.scss';
+
 const schoolsTypes = [
   {
     id: 'Berufsfachschule',
@@ -266,6 +268,8 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
       contacts: programMember?.contacts || [],
       organizationShortcutName: programMember?.organizationShortcutName || '',
       attribut: programMember?.attribut || '',
+      reportingContact: programMember?.reportingContact || '',
+      reportingEmail: programMember?.reportingEmail || '',
     },
   });
 
@@ -368,14 +372,14 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
             openFollowUpModal = false;
             disableFollowUpModal();
           }
-          if (!Boolean(programMember.organizationShortcutName)) {
-            setError('organizationShortcutName', {
-              type: 'manual',
-              message: t('formValidation:Field is required!'),
-            });
-            openFollowUpModal = false;
-            disableFollowUpModal();
-          }
+          // if (!Boolean(programMember.organizationShortcutName)) {
+          //   setError('organizationShortcutName', {
+          //     type: 'manual',
+          //     message: t('formValidation:Field is required!'),
+          //   });
+          //   openFollowUpModal = false;
+          //   disableFollowUpModal();
+          // }
           if (!Boolean(programMember.firstTestTimestamp)) {
             setError('firstTestTimestamp', {
               type: 'manual',
@@ -399,14 +403,14 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
             openFollowUpModal = false;
             disableFollowUpModal();
           }
-          if (!Boolean(programMember.organizationShortcutName)) {
-            setError('organizationShortcutName', {
-              type: 'manual',
-              message: t('formValidation:Field is required!'),
-            });
-            openFollowUpModal = false;
-            disableFollowUpModal();
-          }
+          // if (!Boolean(programMember.organizationShortcutName)) {
+          //   setError('organizationShortcutName', {
+          //     type: 'manual',
+          //     message: t('formValidation:Field is required!'),
+          //   });
+          //   openFollowUpModal = false;
+          //   disableFollowUpModal();
+          // }
           if (openFollowUpModal) {
             onOpenFollowUpModal();
           }
@@ -483,6 +487,8 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
         registeredEmployees: programMember?.registeredEmployees,
         organizationShortcutName: values?.organizationShortcutName,
         attribut: values?.attribut,
+        reportingContact: values?.reportingContact,
+        reportingEmail: values?.reportingEmail,
       };
       dispatch(updateProgramMember(data));
     }
@@ -782,6 +788,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                         </Grid>
                       </Grid>
                     </Grid>
+
                     <Grid item xs={12} md={6} lg={3}>
                       <Grid container direction="column" spacing={2}>
                         <Grid item>
@@ -896,6 +903,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                         </Grid>
                       </Grid>
                     </Grid>
+
                     <Grid item xs={12} md={6} lg={3}>
                       <Grid container direction="column" spacing={2}>
                         <Grid item>
@@ -959,8 +967,39 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
+
+                        <Grid item className={`${styles.pd} `}>
+                          <Typography variant="h6">
+                            {t('common:Reporting Kontakt')}
+                          </Typography>
+                        </Grid>
+
+                        <Grid item>
+                          <TextControllerInput
+                            control={control}
+                            name="reportingContact"
+                            label={t('common:Name')}
+                            id="reporting-contact-input"
+                            error={Boolean(errors?.reportingContact?.message)}
+                            errorMessage={errors?.reportingContact?.message}
+                            disabled={isUpdating || isReadOnly}
+                          />
+                        </Grid>
+
+                        <Grid item>
+                          <TextControllerInput
+                            control={control}
+                            name="reportingEmail"
+                            label={t('common:Email')}
+                            id="reporting-email-input"
+                            error={Boolean(errors?.reportingEmail?.message)}
+                            errorMessage={errors?.reportingEmail?.message}
+                            disabled={isUpdating || isReadOnly}
+                          />
+                        </Grid>
                       </Grid>
                     </Grid>
+
                     <Grid item xs={12} md={6} lg={3}>
                       <Grid
                         container

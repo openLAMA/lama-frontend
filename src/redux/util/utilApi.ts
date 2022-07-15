@@ -17,28 +17,11 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-import React from 'react';
-import { RouteProps } from 'react-router-dom';
+import { HttpClient } from 'apiService';
+import { APIMethods } from 'apiService/types';
 
-type OnboardingAndTrainingAdministrationCalendarType = RouteProps;
-
-const OnboardingAndTrainingAdministrationCalendar: React.FC<OnboardingAndTrainingAdministrationCalendarType> = () => {
-  return (
-    <>
-      {/* <iframe
-        title="Calendar"
-        frameBorder="0"
-        height="98%"
-        width="100%"
-        src="https://kalender.digital/412f07c91ef64afb4977?iframe=true"></iframe> */}
-      <iframe
-        title="Calendar-edit"
-        frameBorder="0"
-        height="98%"
-        width="100%"
-        src="https://kalender.digital/412f07c91ef64afb4977?iframe=true"></iframe>
-    </>
-  );
-};
-
-export default OnboardingAndTrainingAdministrationCalendar;
+export const exportDataAPI = async (): Promise<string> =>
+  HttpClient.request<string>({
+    url: 'util/export-data',
+    method: APIMethods.GET,
+  });

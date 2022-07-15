@@ -106,12 +106,12 @@ const FollowUpEmail: React.FC<FollowUpEmailPropsType> = (
       }
     }
 
-    if (!programMember.organizationShortcutName) {
-      isFollowUpActionVisible = false;
-    }
-    if (!programMember.epaadId) {
-      isFollowUpActionVisible = false;
-    }
+    // if (!programMember.organizationShortcutName) {
+    //   isFollowUpActionVisible = false;
+    // }
+    // if (!programMember.epaadId) {
+    //   isFollowUpActionVisible = false;
+    // }
   } else if (programMember.organizationTypeId === organizationTypesEnum.CAMP) {
     // Do nothing, just to skip setting isFollowUpActionVisible to false;
   } else {

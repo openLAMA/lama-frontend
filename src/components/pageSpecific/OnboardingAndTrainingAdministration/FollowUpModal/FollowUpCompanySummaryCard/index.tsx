@@ -49,11 +49,8 @@ const FollowUpCompanySummaryCard: React.FC = () => {
             arrayOfItems={[
               {
                 mainText: t('common:Epaad id'),
-                subText:
-                  programMember.epaadId ||
-                  `${t('common:Missing, please fill!')}`,
+                subText: programMember.epaadId || 'N/A',
                 key: `1-${programMember.epaadId || '1'}`,
-                error: !Boolean(programMember.epaadId),
               },
               {
                 mainText: t('common:Support person'),
@@ -73,11 +70,9 @@ const FollowUpCompanySummaryCard: React.FC = () => {
               },
               {
                 mainText: t('common:Organization key'),
-                subText:
-                  programMember.organizationShortcutName ||
-                  `${t('common:Missing, please fill!')}`,
+                subText: programMember.organizationShortcutName || 'N/A',
                 key: `3-${programMember.organizationShortcutName || '4'}`,
-                error: !Boolean(programMember.organizationShortcutName),
+                error: false,
               },
             ]}
           />
