@@ -72,6 +72,7 @@ import { OnboardingAndTrainingAdministrationRoutes } from 'config/routes';
 import { CityType } from 'redux/globalState/citiesData/types';
 import { PutProgramMemberType } from 'redux/onboardingAndTrainingAdministration/EditProgramMember/types';
 import {
+  AttributType,
   ContactPersonType,
   OrganizationTypeType,
   SupportPersonSelectType,
@@ -159,6 +160,53 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
     (state: RootState) => state.editProgramMemberData.supportPeople,
   );
 
+  const attributData: AttributType[] = [
+    {
+      id: 'APH',
+      name: 'APH',
+    },
+    {
+      id: 'Betrieb',
+      name: 'Betrieb',
+    },
+    {
+      id: 'Sozialmedizinische u.ä. Institutionen',
+      name: 'Sozialmedizinische u.ä. Institutionen',
+    },
+    {
+      id: 'Institution',
+      name: 'Institution',
+    },
+    {
+      id: 'Betrieb',
+      name: 'Betrieb',
+    },
+    {
+      id: 'Öffentl. Primarschule',
+      name: 'Öffentl. Primarschule',
+    },
+    {
+      id: 'Öffentl. Sekundarstufe 1',
+      name: 'Öffentl. Sekundarstufe 1',
+    },
+    {
+      id: 'Öffentl. Sekundarstrufe 2',
+      name: 'Öffentl. Sekundarstrufe 2',
+    },
+    {
+      id: 'Fach-/Hochschule',
+      name: 'Fach-/Hochschule',
+    },
+    {
+      id: 'Weitere Schule',
+      name: 'Weitere Schule',
+    },
+    {
+      id: 'Lager/Camps',
+      name: 'Lager/Camps',
+    },
+  ];
+
   const updateProgramMemberStatus = useSelector(
     (state: RootState) => state.editProgramMemberData.updateProgramMemberStatus,
   );
@@ -219,6 +267,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
       pickupLocation: programMember?.pickupLocation || '',
       contacts: programMember?.contacts || [],
       organizationShortcutName: programMember?.organizationShortcutName || '',
+      attribut: programMember?.attribut || '',
       reportingContact: programMember?.reportingContact || '',
       reportingEmail: programMember?.reportingEmail || '',
     },
@@ -437,6 +486,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
         status: programMember?.status,
         registeredEmployees: programMember?.registeredEmployees,
         organizationShortcutName: values?.organizationShortcutName,
+        attribut: values?.attribut,
         reportingContact: values?.reportingContact,
         reportingEmail: values?.reportingEmail,
       };
@@ -474,6 +524,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             {t('common:General information')}
                           </Typography>
                         </Grid>
+
                         <Grid item>
                           <TextControllerInput
                             control={control}
@@ -487,6 +538,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
+
                         <Grid item>
                           <DropdownControllerInput
                             control={control}
@@ -511,6 +563,30 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             }
                           />
                         </Grid>
+
+                        <Grid item>
+                          <DropdownControllerInput
+                            control={control}
+                            name="attribut"
+                            label={t('common:Attribut')}
+                            labelId="type"
+                            id="attribut"
+                            fieldRequired
+                            error={Boolean(errors?.attribut?.message)}
+                            errorMessage={errors?.attribut?.message}
+                            menuItems={attributData?.map(
+                              (item: AttributType) => {
+                                return (
+                                  <MenuItem key={item.id} value={item.id}>
+                                    {item.name}
+                                  </MenuItem>
+                                );
+                              },
+                            )}
+                            disabled={isUpdating || isReadOnly}
+                          />
+                        </Grid>
+
                         <Grid item>
                           <Controller
                             control={control}
@@ -572,6 +648,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             }}
                           />
                         </Grid>
+
                         <Grid item>
                           <TextControllerInput
                             control={control}
@@ -584,6 +661,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             disabled
                           />
                         </Grid>
+
                         <Grid item>
                           <TextControllerInput
                             control={control}
@@ -596,6 +674,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
+
                         <Grid item>
                           <TextControllerInput
                             control={control}
@@ -607,6 +686,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
+
                         <Grid item>
                           <TextControllerInput
                             control={control}
@@ -618,6 +698,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
+
                         <Grid item>
                           <TextControllerInput
                             control={control}
@@ -629,6 +710,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
+
                         <Grid
                           item
                           className={`${
@@ -658,6 +740,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
+
                         <Grid item>
                           <DropdownControllerInput
                             control={control}
@@ -685,6 +768,7 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
                             disabled={isUpdating || isReadOnly}
                           />
                         </Grid>
+
                         <Grid item>
                           <TextControllerInput
                             control={control}

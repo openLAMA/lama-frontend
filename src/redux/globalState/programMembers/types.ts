@@ -18,7 +18,11 @@
 */
 
 // Generic Types
-import { ContactPersonType, SupportPersonType } from 'redux/globalTypes';
+import {
+  AttributType,
+  ContactPersonType,
+  SupportPersonType,
+} from 'redux/globalTypes';
 
 export type ProgramMemberType = {
   epaadId?: string;
@@ -81,6 +85,7 @@ export type ProgramMemberType = {
   isOnboardingEmailSent?: boolean;
   isStaticPooling?: boolean;
   isContractReceived?: boolean;
+  attribut?: string | null;
   reportingContact?: string;
   reportingEmail?: string;
 };

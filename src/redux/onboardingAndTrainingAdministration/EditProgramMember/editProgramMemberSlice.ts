@@ -24,7 +24,11 @@ import { extractErrorMessage } from 'apiService/axiosInstance';
 import callSnackbar from 'utils/customHooks/useSnackbar';
 
 // Types
-import { IApiStatus, SupportPersonSelectType } from 'redux/globalTypes';
+import {
+  AttributType,
+  IApiStatus,
+  SupportPersonSelectType,
+} from 'redux/globalTypes';
 import { ProgramMemberType } from 'redux/globalState/programMembers/types';
 import {
   GetProgramMemberRequestType,
