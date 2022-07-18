@@ -182,10 +182,6 @@ const EditProgramMemberForm: React.FC<EditProgramMemberFormTypes> = (
       name: 'Institution',
     },
     {
-      id: 'Betrieb',
-      name: 'Betrieb',
-    },
-    {
       id: 'Öffentl. Primarschule',
       name: 'Öffentl. Primarschule',
     },
