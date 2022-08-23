@@ -172,7 +172,6 @@ export const getMyProfileOrganization = (
 ): AppThunk => async (dispatch, getState) => {
   dispatch(getOrganizationRequesting());
   const state = getState();
-
   getOrganizationAPI(data).then(
     (response: GetOrganizationResponseType): void => {
       const userId = state.authData.userId;
