@@ -17,41 +17,44 @@
  * along with this program.  If not, see https://www.gnu.org/licenses/.
 */
 
-// Generic Types
-import { ContactPersonType } from 'redux/globalTypes';
+.pwd-form {
+  margin-top: 50px;
+  h3 {
+    font-family: 'Roboto', 'Helvetica', 'Arial', sans-serif;
+    font-weight: 500;
+    margin-bottom: 20px;
+    font-size: 1.25rem;
+  }
+  .old-pwd {
+    margin-bottom: 10px;
+    border: 1px solid #ddd;
+    width: 191px;
+    padding: 7px 10px;
+    font-size: 13px;
+    border-radius: 5px;
+    background-color: #fff;
+  }
+  .new-pwd {
+    input {
+      height: 30px;
+      margin-right: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      &:focus-visible {
+        border-color: #a5a0a0;
+        outline: none;
+      }
+    }
 
-export type GetOrganizationType = {
-  id: string;
-  name: string;
-  organizationTypeId: number;
-  cityId: string;
-  ZIP: string;
-  contacts: ContactPersonType[];
-  numberOfSamples: number | null;
-  numberOfPools: number | null;
-  address: string;
-  status: string;
-  supportPersonId: string;
-};
-
-export type PutOrganizationType = {
-  id: string;
-  name: string;
-  typeId: number;
-  cityId: string;
-  ZIP: string;
-  contacts: ContactPersonType[];
-  numberOfSamples: number | null;
-  numberOfPools: number | null;
-  address: string;
-  supportPersonId: string;
-  dataPassword?: string;
-};
-
-export type GetOrganizationRequestType = {
-  id: string;
-};
-
-export type GetOrganizationResponseType = GetOrganizationType;
-
-export type UpdateOrganizationRequestType = PutOrganizationType;
+    button {
+      background-color: #473bb8;
+      border: none;
+      color: #fff;
+      border-radius: 5px;
+      padding: 7px 20px;
+      cursor: pointer;
+      height: 30px;
+    }
+  }
+}

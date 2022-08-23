@@ -31,6 +31,7 @@ import DashboardInfo from 'components/pageSpecific/OrganizationAdministration/Da
 
 // Routes
 import { OrganizationAdministrationRoutes } from 'config/routes';
+import PasswordForm from './form';
 
 // Types
 type OrganizationAdministrationDashboardType = RouteProps;
@@ -51,6 +52,10 @@ const OrganizationAdministrationDashboard: React.FC<OrganizationAdministrationDa
               <ImportantLinks />
             </Grid>
           </Grid>
+        </Grid>
+
+        <Grid>
+          <PasswordForm />
         </Grid>
       </Grid>
     </>
